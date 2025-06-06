@@ -169,7 +169,7 @@ html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; font-family:
     .detailed-scores-block {
         align-items: stretch; /* 내부 score-item들도 꽉 차도록 */
     }
-     .score-item {
+        .score-item {
         justify-content: space-between; /* 아이콘과 텍스트 양쪽 정렬 (선택 사항) */
     }
 }
@@ -199,7 +199,7 @@ html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; font-family:
     .detailed-scores-block {
         align-items: center; /* 모바일에서 score-item들 중앙 정렬 */
     }
-     .score-item {
+        .score-item {
         min-width: auto; /* 모바일에서 최소 너비 제한 해제 */
         width: 90%; /* 적절한 너비 설정 */
         justify-content: flex-start; /* 왼쪽 정렬 */
