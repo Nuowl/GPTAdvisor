@@ -1,14 +1,28 @@
-/* Settings Page Specific Styles */
-/* ... (기존 .settings-page-container, .settings-interface, .settings-profile-header 등 스타일은 이전과 동일) ... */
-/* ... (기존 .settings-section, form 관련 스타일, 버튼 기본 스타일 등은 이전과 동일) ... */
+/* Settings_Page/style_settings.css */
 
-.settings-page-container {
-    padding: 20px; 
+html, body { /* 최상위에서 높이와 overflow를 제어 */
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* 페이지 전체 스크롤바 방지 */
+    font-family: 'Noto Sans KR', 'Mulish', sans-serif;
+}
+
+/* Main_Page/style.css 에도 유사한 설정이 있을 수 있으므로 확인 */
+.main-dashboard-container {
+    display: flex;
+    width: 100%;
+    height: 100%; /* body 높이를 상속 */
+    box-sizing: border-box;
+    background-color: #F5FAFF;
+}
+
+.main-content.settings-page-container { /* .main-content가 이 역할을 한다고 가정 */
     display: flex;
     flex-direction: column;
-    flex-grow: 1;
-    overflow: hidden;
-    height: calc(100vh - 40px); 
+    flex-grow: 1; /* 사이드바를 제외한 나머지 공간을 채움 */
+    overflow: hidden; /* 이 컨테이너 자체는 스크롤되지 않도록 함 */
+    padding: 15px; /* 패딩을 약간 줄여봄 */
     box-sizing: border-box;
 }
 
@@ -17,37 +31,50 @@
     border: 2.5px solid #3377DD;
     border-radius: 15px;
     width: 100%;
-    flex-grow: 1; 
+    height: 100%; /* 부모(.settings-page-container)의 높이를 완전히 사용 */
     display: flex;
-    flex-direction: column;
-    padding: 20px 30px; 
+    flex-direction: column; /* 내부 요소들을 수직으로 배치 */
+    padding: 20px 25px; /* 내부 패딩 조정 */
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    overflow-y: auto; 
+    overflow-y: auto; /* !!!! 이 요소 내부에서 내용이 넘칠 경우 스크롤 !!!! */
+    box-sizing: border-box;
 }
 
+/* 프로필 헤더, 섹션 제목 등은 공간을 너무 많이 차지하지 않으므로 flex-shrink:0 유지 또는 제거 후 테스트 */
 .settings-profile-header {
     display: flex;
     align-items: center;
-    margin-bottom: 20px; 
-    flex-shrink: 0; 
+    margin-bottom: 20px;
+    flex-shrink: 0; /* 이 섹션은 내용이 많지 않으므로 줄어들지 않도록 함 */
 }
-.profile-image-container {
+.profile-image-container { /* 크기 및 간격은 이전과 유사하게 유지 */
     width: 80px; height: 80px; margin-right: 15px; 
     position: relative; cursor: pointer;
 }
+/* ... #settings-profile-img-display, .profile-image-overlay, .edit-profile-icon, #settings-username-display 스타일은 이전과 동일 ... */
 #settings-profile-img-display { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: block; opacity: 0.5;}
 .profile-image-container .profile-image-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; background-color: #939393; opacity: 0.69; mix-blend-mode: multiply; pointer-events: none; }
 .edit-profile-icon { width: 28px; height: 28px; bottom: 2px; right: 2px; position: absolute; background-color: rgba(255, 255, 255, 0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
 .edit-profile-icon i.fa-cog { font-size: 14px; color: #505050; }
 #settings-username-display { font-size: 24px; font-weight: 700; color: #333; }
 
-.settings-section {
-    margin-bottom: 20px; 
-    flex-shrink: 0; 
-}
-.settings-section:last-of-type { margin-bottom: 10px; }
-.settings-section h2 { font-size: 16px; margin-bottom: 10px; padding-bottom: 6px; font-weight: 700; color: #3377DD; border-bottom: 1px solid #E0E7FF; }
 
+.settings-section {
+    margin-bottom: 20px;
+    /* flex-shrink: 0; <- 이 부분을 제거하거나, 정말 필요한 경우에만 사용합니다.
+       특히 폼 요소가 많은 섹션은 내용에 따라 자연스럽게 공간을 차지해야 합니다. */
+}
+.settings-section:last-of-type { 
+    margin-bottom: 10px;
+    margin-top: auto; /* 마지막 섹션(버튼들)을 아래로 밀어냄 (선택 사항) */
+    padding-top: 15px; /* 위 요소와 간격 (선택 사항) */
+}
+.settings-section h2 { 
+    font-size: 16px; margin-bottom: 10px; padding-bottom: 6px; 
+    font-weight: 700; color: #3377DD; border-bottom: 1px solid #E0E7FF; 
+}
+
+/* 폼 요소 스타일은 이전 압축된 버전 유지 */
 #account-info-form .form-group { margin-bottom: 12px;  }
 #account-info-form label { font-size: 12px; margin-bottom: 4px; display: block; color: #555; font-weight: 600;}
 #account-info-form input[type="text"],
@@ -59,8 +86,14 @@
 .gender-button { padding: 8px; font-size: 13px; border-radius: 6px; flex: 1; border: 2px solid #3377DD; background-color: #FFFFFF; color: #333; cursor: pointer; font-weight: 600; transition: background-color 0.2s, color 0.2s;}
 .gender-button.selected { background-color: #3377DD; color: #FFFFFF; }
 
+
 .settings-button-primary,
-.settings-button-secondary { min-width: 100px; padding: 8px 15px; font-size: 14px; border-radius: 6px; display: inline-block; width: auto; font-weight: 600; cursor: pointer; text-align: center; transition: background-color 0.2s, border-color 0.2s, color 0.2s;}
+.settings-button-secondary { 
+    min-width: 100px; padding: 8px 15px; font-size: 14px; border-radius: 6px; 
+    display: inline-block; width: auto; font-weight: 600; cursor: pointer; text-align: center; 
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+}
+/* ... .settings-button-primary, .settings-button-secondary 스타일은 이전과 동일 ... */
 .settings-button-primary { background-color: #FFFFFF; color: #3377DD; border: 2px solid #3377DD; }
 .settings-button-primary:hover:not(:disabled) { background-color: #3377DD; color: #FFFFFF; }
 .settings-button-primary:disabled { background-color: #E0E0E0; color: #A0A0A0; border-color: #E0E0E0; cursor: not-allowed; }
@@ -72,15 +105,15 @@
 .account-actions-section {
     display: flex;
     gap: 10px; /* 버튼 사이 간격 */
-    margin-top: 20px; /* 이전 섹션과의 간격 */
+    margin-top: 15px; /* 이전 섹션과의 간격을 조금 줄임 */
+    flex-shrink: 0; /* 이 버튼 영역은 줄어들지 않도록 */
 }
 
 .settings-button-logout.half-width,
 .settings-button-delete.half-width {
     flex: 1; /* 두 버튼이 공간을 동일하게 나눠 가짐 */
-    /* width: calc(50% - 5px); /* 명시적 너비 설정도 가능 (gap 고려) */
     padding: 10px;
-    font-size: 15px;
+    font-size: 14px; /* 버튼 글꼴 크기 일관성 유지 */
     font-weight: 600;
     border: none;
     border-radius: 8px;
@@ -91,7 +124,7 @@
 }
 
 .settings-button-logout.half-width {
-    background-color: #3377DD; /* 기존 로그아웃 버튼 색상 */
+    background-color: #3377DD;
     color: #FFFFFF;
 }
 .settings-button-logout.half-width:hover {
@@ -99,13 +132,12 @@
 }
 
 .settings-button-delete.half-width {
-    background-color: #E53935; /* 빨간색 계열 */
-    color: #FFFFFF;
-    border: 2px solid #D32F2F; /* 약간 더 어두운 빨간색 테두리 (선택 사항) */
+    background-color: #E53935; 
+    color: #000000;
+    border: none; /* 테두리 제거하여 다른 버튼과 일관성 또는 border: 2px solid #D32F2F; 유지 */
 }
 .settings-button-delete.half-width:hover {
-    background-color: #C62828; /* 호버 시 더 어두운 빨간색 */
-    border-color: #B71C1C;
+    background-color: #C62828;
 }
 
 
