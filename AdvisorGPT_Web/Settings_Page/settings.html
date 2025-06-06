@@ -33,10 +33,11 @@
         </div>
     </aside>
 
-    <!-- Main Content for Settings -->
+    <!-- Main Content for Settings (프로필, 계정 정보 변경, 데이터 로컬 저장 섹션은 이전과 동일) -->
     <main class="main-content settings-page-container">
         <div class="settings-interface">
             <div class="settings-profile-header">
+                <!-- ... (프로필 헤더 내용 이전과 동일) ... -->
                 <div class="profile-image-container">
                     <img src="../image/user_profile_default.png" alt="User Profile" id="settings-profile-img-display">
                     <div class="profile-image-overlay"></div>
@@ -49,6 +50,7 @@
             </div>
 
             <div class="settings-section">
+                <!-- ... (계정 정보 변경 폼 이전과 동일) ... -->
                 <h2>계정 정보 변경</h2>
                 <form id="account-info-form">
                     <div class="form-group">
@@ -71,22 +73,25 @@
                             <button type="button" class="gender-button" data-gender="male">남자</button>
                             <button type="button" class="gender-button" data-gender="female">여자</button>
                         </div>
-                    </div>
+                    </div>  
                     <button type="submit" id="save-info-button" class="settings-button-primary" disabled>정보 변경</button>
                 </form>
             </div>
 
             <div class="settings-section">
+                <!-- ... (데이터 로컬 저장 버튼 이전과 동일) ... -->
                 <h2>데이터 로컬 저장</h2>
                 <button id="download-data-button" class="settings-button-secondary">다운로드 (PDF)</button>
             </div>
 
-            <div class="settings-section">
-                <button id="logout-button" class="settings-button-logout">로그아웃</button>
+            <!-- 로그아웃 및 계정 탈퇴 버튼 섹션 수정 -->
+            <div class="settings-section account-actions-section">
+                <button id="logout-button" class="settings-button-logout half-width">로그아웃</button>
+                <button id="delete-account-button" class="settings-button-delete half-width">계정 탈퇴</button>
             </div>
 
-            </div>
-        </main>
+        </div>
+    </main>
     </div>
     
 <script src="fontData.js"></script>
