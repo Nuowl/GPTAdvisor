@@ -1,208 +1,211 @@
-/* GPT Chatbot Specific Styles */
+    /* GPT Chatbot Specific Styles */
 
-.main-content.chatbot-page-container {
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    overflow: hidden; /* Important for containing the fixed-height chatbot-interface */
-    height: calc(100vh - 40px); /* Example: Adjust if you have top/bottom margins/paddings on body or other containers */
-    box-sizing: border-box;
-}
+    body .main-dashboard-container .main-content.chatbot-page-container {
+        /* flex-grow: 1; /* Main_Page/style.css 에서 이미 설정되어 있을 것 */
+        min-width: 0; /* !!!! 매우 중요: 내부 콘텐츠가 부모를 초과하여 늘어나는 것을 방지 !!!! */
+        /* padding, display: flex, flex-direction: column 등은 이전 chatbot-page-container 스타일 유지 */
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden; 
+        height: calc(100vh - 40px); /* 이 값은 body와 .main-dashboard-container의 설정에 따라 달라질 수 있음 */
+        box-sizing: border-box;
+    }
 
-.chatbot-interface {
-    background-color: #FFFFFF;
-    border: 2.5px solid #3377DD;
-    border-radius: 15px;
-    width: 100%;
-    height: 100%; /* Ensure this takes the height from chatbot-page-container */
-    flex-grow: 1; /* Make chatbot-interface fill the chatbot-page-container */
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    overflow: hidden; /* Crucial for clipping children and for fixed height behavior */
-}
+    .chatbot-interface {
+        background-color: #FFFFFF;
+        border: 2.5px solid #3377DD;
+        border-radius: 15px;
+        width: 100%;
+        height: 100%; /* Ensure this takes the height from chatbot-page-container */
+        /* flex-grow: 1; /* Make chatbot-interface fill the chatbot-page-container */
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        overflow: hidden; /* Crucial for clipping children and for fixed height behavior */
+        box-sizing: border-box;
+    }
 
-/* 2. Chat Display Area: This is the 'transparent window' that scrolls. */
-.chat-display-area {
-    flex-grow: 1; /* Allows this area to take available space */
-    overflow-y: auto; /* Enables vertical scrolling *within this area* */
-    padding: 0px 20px 15px 20px; /* Adjusted padding */
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    /* This area itself does not grow indefinitely. Its parent (.chatbot-interface) has a fixed or constrained height. */
-}
+    /* 2. Chat Display Area: This is the 'transparent window' that scrolls. */
+    .chat-display-area {
+        flex-grow: 1; /* Allows this area to take available space */
+        overflow-y: auto; /* Enables vertical scrolling *within this area* */
+        padding: 0px 20px 15px 20px; /* Adjusted padding */
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        /* This area itself does not grow indefinitely. Its parent (.chatbot-interface) has a fixed or constrained height. */
+    }
 
-.chat-initial-logo-container {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start; /* Align logo to the top */
-    padding-top: 0px;      /* 3. Small top padding */
-    padding-bottom: 0px;
-    /* margin-bottom will be handled by gap in .chat-display-area */
-}
+    .chat-initial-logo-container {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start; /* Align logo to the top */
+        padding-top: 0px;      /* 3. Small top padding */
+        padding-bottom: 0px;
+        /* margin-bottom will be handled by gap in .chat-display-area */
+    }
 
-.chat-initial-logo {
-    width: 300px; /* 3. Increased size for initial top logo */
-    height: auto;  
-    opacity: 0.9;
-}
+    .chat-initial-logo {
+        width: 300px; /* 3. Increased size for initial top logo */
+        height: auto;  
+        opacity: 0.9;
+    }
 
-/* Message styles (remain mostly the same) */
-.chat-message {
-    display: flex;
-    width: fit-content;
-    max-width: 65%;
-    align-items: flex-end;
-    word-wrap: break-word;
-}
-.message-bubble {
-    padding: 10px 15px;
-    border-radius: 18px;
-    line-height: 1.5;
-    /* max-width: 100%; /* 부모 .chat-message의 max-width를 따르도록 */
-    /* 여기서 직접 최대 너비를 지정하여, 부모인 .chat-message 가 늘어나는 것을 방지 */
-    /* 예를 들어, 채팅 표시 영역의 너비를 기준으로 계산할 수 있지만,
-       간단하게는 픽셀 단위나, 부모 너비의 일정 비율로 지정 */
-    max-width: 450px; /* 예시: 최대 너비를 고정값으로 설정 (필요에 따라 조절) */
-                      /* 또는 max-width: calc(100% - 20px); 와 같이 부모(.chat-message) 패딩 고려 */
-    box-sizing: border-box;
-}
+    /* Message styles (remain mostly the same) */
+    .chat-message {
+        display: flex;
+        width: fit-content; /* 기본적으로 내용에 맞게 */
+        /* max-width는 각 user/gpt 메시지에서 구체적으로 설정 */
+        align-items: flex-end;
+        /* word-wrap: break-word; /* p 태그로 이동 */
+    }
+    .message-bubble {
+        padding: 10px 15px;
+        border-radius: 18px;
+        line-height: 1.5;
+        /* max-width: 100%; /* 부모 .chat-message의 max-width를 따르도록 */
+        /* 여기서 직접 최대 너비를 지정하여, 부모인 .chat-message 가 늘어나는 것을 방지 */
+        /* 예를 들어, 채팅 표시 영역의 너비를 기준으로 계산할 수 있지만,
+        간단하게는 픽셀 단위나, 부모 너비의 일정 비율로 지정 */
+        max-width: 100%; /* 예시: 최대 너비를 고정값으로 설정 (필요에 따라 조절) */
+                        /* 또는 max-width: calc(100% - 20px); 와 같이 부모(.chat-message) 패딩 고려 */
+        box-sizing: border-box;
+    }
 
-.message-bubble p {
-    margin: 0;
-    font-size: 15px;
-    word-wrap: break-word; 
-    overflow-wrap: break-word; 
-    white-space: pre-wrap;
-}
+    .message-bubble p {
+        margin: 0;
+        font-size: 15px;
+        word-wrap: break-word; 
+        overflow-wrap: break-word; 
+        white-space: pre-wrap;
+    }
 
-.chat-message.user {
-    align-self: flex-end;
-    margin-left: auto;
-    max-width: 75%;
-}
-.chat-message.user .message-bubble {
-    background-color: #3377DD;
-    color: #FFFFFF;
-    border-radius: 18px 18px 5px 18px;
-}
-.chat-message.user .message-bubble p {
-    margin: 0;
-    font-size: 15px;
-    line-height: 1.5;
-}
+    .chat-message.user {
+        align-self: flex-end;
+        margin-left: auto;
+        max-width: 65%;
+    }
+    .chat-message.user .message-bubble {
+        background-color: #3377DD;
+        color: #FFFFFF;
+        border-radius: 18px 18px 5px 18px;
+    }
+    .chat-message.user .message-bubble p {
+        margin: 0;
+        font-size: 15px;
+        line-height: 1.5;
+    }
 
-.chat-message.gpt {
-    align-self: flex-start;
-    margin-right: auto;
-    max-width: calc(100% - 50px);
-}
-.chat-message.gpt .chat-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: 2.0px solid #3377DD;
-    margin-right: 10px;
-    object-fit: contain;
-    padding: 3px;
-    background-color: #fff;
-    flex-shrink: 0;
-    box-sizing: border-box;
-}
-.chat-message.gpt .message-bubble {
-    background-color: #FFFFFF;
-    color: #000000;
-    border: 2.5px solid #3377DD;
-    border-radius: 18px 18px 18px 5px;
-}
-.chat-message.gpt .message-bubble p {
-    margin: 0;
-    font-size: 15px;
-    line-height: 1.5;
-}
-.chat-message.gpt.error .message-bubble {
-    border-color: #D32F2F;
-    background-color: #FFEBEE;
-    color: #C62828;
-}
+    .chat-message.gpt {
+        align-self: flex-start;
+        margin-right: auto;
+        max-width: 65;
+    }
+    .chat-message.gpt .chat-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 2.0px solid #3377DD;
+        margin-right: 10px;
+        object-fit: contain;
+        padding: 3px;
+        background-color: #fff;
+        flex-shrink: 0;
+        box-sizing: border-box;
+    }
+    .chat-message.gpt .message-bubble {
+        background-color: #FFFFFF;
+        color: #000000;
+        border: 2.5px solid #3377DD;
+        border-radius: 18px 18px 18px 5px;
+    }
+    .chat-message.gpt .message-bubble p {
+        margin: 0;
+        font-size: 15px;
+        line-height: 1.5;
+    }
+    .chat-message.gpt.error .message-bubble {
+        border-color: #D32F2F;
+        background-color: #FFEBEE;
+        color: #C62828;
+    }
 
-.chat-input-wrapper {
-    padding: 10px 15px;
-    flex-shrink: 0; /* Prevent input area from shrinking */
-}
+    .chat-input-wrapper {
+        padding: 10px 15px;
+        flex-shrink: 0; /* Prevent input area from shrinking */
+    }
 
-.chat-input-area {
-    background-color: #FFFFFF;
-    border: 2.5px solid #3377DD;
-    border-radius: 25px;
-    padding: 5px 5px 5px 15px;
-    display: flex;
-    align-items: center;
-}
+    .chat-input-area {
+        background-color: #FFFFFF;
+        border: 2.5px solid #3377DD;
+        border-radius: 25px;
+        padding: 5px 5px 5px 15px;
+        display: flex;
+        align-items: center;
+    }
 
-#chat-message-input {
-    flex-grow: 1;
-    background-color: transparent;
-    color: #333333;
-    border: none;
-    padding: 8px 0;
-    font-size: 15px;
-    line-height: 1.4; /* Base line height */
-    resize: none;
-    overflow-y: hidden;
-    min-height: calc(1.4em + 16px);   /* Min height for one line + padding (1.4 * 15px + 2*8px) ~ 37px */
-    max-height: calc(2.8em + 16px); /* 1. Max height for approx two lines + padding (2 * 1.4 * 15px + 2*8px) ~ 58px */
-    font-family: 'Noto Sans KR', 'Mulish', sans-serif;
-    outline: none;
-    box-sizing: content-box; /* Padding is outside of height calculation for min/max */
-}
+    #chat-message-input {
+        flex-grow: 1;
+        background-color: transparent;
+        color: #333333;
+        border: none;
+        padding: 8px 0;
+        font-size: 15px;
+        line-height: 1.4; /* Base line height */
+        resize: none;
+        overflow-y: hidden;
+        min-height: calc(1.4em + 16px);   /* Min height for one line + padding (1.4 * 15px + 2*8px) ~ 37px */
+        max-height: calc(2.8em + 16px); /* 1. Max height for approx two lines + padding (2 * 1.4 * 15px + 2*8px) ~ 58px */
+        font-family: 'Noto Sans KR', 'Mulish', sans-serif;
+        outline: none;
+        box-sizing: content-box; /* Padding is outside of height calculation for min/max */
+    }
 
-.send-button {
-    background-color: transparent;
-    border: none;
-    padding: 0;
-    margin-left: 8px;
-    cursor: pointer;
-    width: 38px;
-    height: 38px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-.send-button img {
-    width: 30px;
-    height: 30px;
-    filter: brightness(0.7); /* Adjust if using a dark icon on white input bg */
-}
-.send-button:hover img {
-    filter: brightness(0.5);
-}
+    .send-button {
+        background-color: transparent;
+        border: none;
+        padding: 0;
+        margin-left: 8px;
+        cursor: pointer;
+        width: 38px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    .send-button img {
+        width: 30px;
+        height: 30px;
+        filter: brightness(0.7); /* Adjust if using a dark icon on white input bg */
+    }
+    .send-button:hover img {
+        filter: brightness(0.5);
+    }
 
-.typing-indicator .message-bubble p span { /* (No changes) */
-    display: inline-block;
-    width: 5px;
-    height: 5px;
-    background-color: #3377DD;
-    border-radius: 50%;
-    margin: 0 1.5px;
-    animation: typing-dots 1.3s infinite ease-in-out;
-}
-.typing-indicator .message-bubble p span:nth-child(1) { animation-delay: 0s; }
-.typing-indicator .message-bubble p span:nth-child(2) { animation-delay: 0.2s; }
-.typing-indicator .message-bubble p span:nth-child(3) { animation-delay: 0.4s; }
+    .typing-indicator .message-bubble p span { /* (No changes) */
+        display: inline-block;
+        width: 5px;
+        height: 5px;
+        background-color: #3377DD;
+        border-radius: 50%;
+        margin: 0 1.5px;
+        animation: typing-dots 1.3s infinite ease-in-out;
+    }
+    .typing-indicator .message-bubble p span:nth-child(1) { animation-delay: 0s; }
+    .typing-indicator .message-bubble p span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-indicator .message-bubble p span:nth-child(3) { animation-delay: 0.4s; }
 
-@keyframes typing-dots {
-    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
-    30% { transform: translateY(-4px); opacity: 1; }
-}
+    @keyframes typing-dots {
+        0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+        30% { transform: translateY(-4px); opacity: 1; }
+    }
 
-.left-sidebar .menu-section ul#sidebar-menu li.active a { /* (No changes) */
-    background-color: #3377DD;
-    color: #FFFFFF;
-}
-.left-sidebar .menu-section ul#sidebar-menu li.active a .menu-icon { /* (No changes) */
-    filter: brightness(0) invert(1);
-}
+    .left-sidebar .menu-section ul#sidebar-menu li.active a { /* (No changes) */
+        background-color: #3377DD;
+        color: #FFFFFF;
+    }
+    .left-sidebar .menu-section ul#sidebar-menu li.active a .menu-icon { /* (No changes) */
+        filter: brightness(0) invert(1);
+    }
