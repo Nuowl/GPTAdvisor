@@ -1,45 +1,43 @@
-/* Main_Page/style.css */
-
-html, body { /* 최상위에서 높이와 overflow를 제어 */
-    height: 100%;
+body {
     margin: 0;
-    padding: 0;
-    overflow: hidden; /* 페이지 전체 스크롤바 방지 */
     font-family: 'Noto Sans KR', 'Mulish', sans-serif;
-    background-color: #F5FAFF; /* body에도 배경색 지정 */
+    background-color: #F5FAFF;
     color: #333;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
 }
 
 .main-dashboard-container {
     display: flex;
     width: 100%;
-    height: 100%; /* body 높이를 상속하여 전체 화면 사용 */
-    max-width: 1920px; /* 최대 너비 제한은 유지 */
+    max-width: 1920px; /* Or your preferred max width */
     box-sizing: border-box;
+}
+
+.sidebar {
+    background-color: #FFFFFF;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
 }
 
 /* Left Sidebar */
 .left-sidebar {
-    width: 260px;
-    background-color: #FFFFFF;
+    width: 260px; /* Adjusted width */
     border-right: 1px solid #E0E0E0;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    flex-shrink: 0; /* 너비 고정, 줄어들지 않음 */
-    overflow-y: auto; /* 사이드바 내용 많을 시 스크롤 */
-    box-sizing: border-box;
 }
 
 .profile-section {
     text-align: center;
-    margin-bottom: 25px; /* 간격 조정 */
-    padding-top: 15px;  /* 간격 조정 */
+    margin-bottom: 30px;
+    padding-top: 20px;
 }
 
 .profile-pic {
-    width: 100px;
-    height: 100px;
+    width: 150px;
+    height: 150px;
     border-radius: 50%;
     border: 3px solid #3377DD;
     margin-bottom: 10px;
@@ -47,7 +45,7 @@ html, body { /* 최상위에서 높이와 overflow를 제어 */
 }
 
 .user-nickname {
-    font-size: 20px;
+    font-size: 30px;
     font-weight: bold;
     color: #333;
 }
@@ -59,7 +57,7 @@ html, body { /* 최상위에서 높이와 overflow를 제어 */
 }
 
 .menu-section li {
-    margin-bottom: 8px; /* 간격 조정 */
+    margin-bottom: 10px;
 }
 
 .menu-section li a {
@@ -67,10 +65,10 @@ html, body { /* 최상위에서 높이와 overflow를 제어 */
     align-items: center;
     text-decoration: none;
     color: #555;
-    padding: 10px 15px; /* 패딩 조정 */
+    padding: 12px 15px;
     border-radius: 8px;
-    font-size: 15px; /* 폰트 크기 조정 */
-    transition: background-color 0.2s, color 0.2s;
+    font-size: 16px;
+    transition: background-color 0.3s, color 0.3s;
 }
 
 .menu-section li a:hover,
@@ -80,255 +78,347 @@ html, body { /* 최상위에서 높이와 overflow를 제어 */
 }
 
 .menu-icon {
-    width: 18px; /* 아이콘 크기 조정 */
-    height: 18px;
-    margin-right: 12px; /* 간격 조정 */
-    filter: grayscale(50%) opacity(0.7);
+    width: 20px;
+    height: 20px;
+    margin-right: 15px;
+    filter: grayscale(50%) opacity(0.7); /* Default icon style */
 }
 
 .menu-section li a:hover .menu-icon,
 .menu-section li.active a .menu-icon {
-    filter: brightness(0) invert(1);
+    filter: brightness(0) invert(1); /* Icon color change on hover/active */
 }
 
+
 .logo-section {
-    margin-top: auto;
+    margin-top: auto; /* Pushes logo to the bottom */
     text-align: center;
-    padding-top: 20px; /* 위쪽 메뉴와의 간격 확보 */
-    padding-bottom: 10px; /* 하단 여백 조정 */
+    padding-bottom: -200px;
 }
 
 .advisor-logo {
-    width: 140px; /* 로고 크기 조정 */
+    width: 180px;
 }
 
-/* Center Content - 여기가 중요! */
+/* Center Content */
 .main-content {
-    flex-grow: 1; /* 핵심: 좌우 사이드바를 제외한 나머지 가로 공간을 모두 차지 */
-    padding: 25px 30px; /* 내부 여백 조정 */
-    overflow-y: auto; /* 내용이 세로로 길어지면 이 안에서 스크롤 */
-    background-color: #F5FAFF; /* body 배경과 동일하게 또는 구분되게 */
-    box-sizing: border-box;
-    display: flex; /* 내부 요소 정렬을 위해 */
-    flex-direction: column; /* 내부 섹션들을 수직으로 쌓음 */
+    flex-grow: 1;
+    padding: 30px 40px;
+    overflow-y: auto;
 }
 
-.welcome-header {
-    margin-bottom: 20px; /* 간격 조정 */
-    flex-shrink: 0; /* 환영 메시지 영역은 줄어들지 않도록 */
-}
 .welcome-header h1 {
-    font-size: 26px; /* 폰트 크기 조정 */
+    font-size: 28px;
     color: #333;
     margin-top: 0;
-    margin-bottom: 0; /* h1 자체 마진 제거, 부모에서 제어 */
+    margin-bottom: 25px;
     font-weight: 700;
 }
-.welcome-header h1 span.username-highlight {
+.welcome-header h1 span {
     color: #3377DD;
-    font-weight: bold;
 }
 
 .health-summary {
     background-color: #FFFFFF;
-    padding: 20px; /* 패딩 조정 */
-    border-radius: 12px; /* 모서리 둥글기 조정 */
-    box-shadow: 0 3px 10px rgba(0,0,0,0.07);
-    margin-bottom: 25px; /* 간격 조정 */
-    flex-shrink: 0; /* 이 섹션은 내용에 따라 크기가 변하지 않도록 */
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    margin-bottom: 30px;
 }
 
 .summary-title-container h2 {
-    font-size: 20px; /* 폰트 크기 조정 */
+    font-size: 22px;
     color: #333;
     margin-top: 0;
-    margin-bottom: 20px; /* 간격 조정 */
+    margin-bottom: 25px;
     font-weight: 700;
 }
 
 .scores-container {
     display: flex;
-    align-items: flex-start; /* 상단 정렬 */
-    justify-content: space-between; /* 양쪽 정렬 후 공간 배분 */
-    gap: 15px; /* 아이템 간 간격 조정 */
-    flex-wrap: wrap; /* 공간 부족 시 다음 줄로 */
+    align-items: center;
+    justify-content: space-around; /* Distribute space */
+    gap: 20px; /* Gap between blocks */
 }
 
 .main-score-block {
     text-align: center;
     color: #3377DD;
-    /* flex-basis: 150px; 최소 너비 또는 기본 너비 설정 가능 */
 }
-.main-score-block #health-score-value { font-size: 60px; font-weight: bold; }
-.main-score-block .unit { font-size: 20px; font-weight: bold; margin-left: 4px;}
+.main-score-block #health-score-value {
+    font-size: 72px; /* Large score */
+    font-weight: bold;
+}
+.main-score-block .unit {
+    font-size: 24px;
+    font-weight: bold;
+    margin-left: 5px;
+}
 
 .detailed-scores-block {
     display: flex;
     flex-direction: column;
-    gap: 10px; /* 내부 아이템 간 간격 조정 */
-    flex-grow: 1; /* 가능한 공간 차지 */
-    min-width: 200px; /* 최소 너비 */
+    gap: 18px; /* Gap between sleep, meal, exercise */
 }
+
 .score-item {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     background-color: #F8F9FA;
-    padding: 8px 12px; /* 패딩 조정 */
-    border-radius: 6px; /* 모서리 둥글기 조정 */
+    padding: 10px 15px;
+    border-radius: 8px;
 }
-.score-icon { width: 20px; height: 20px; }
-.score-text { font-size: 14px; color: #555; }
-.score-text .score-label { font-weight: bold; color: #333; display: block; margin-bottom: 2px;}
-.score-text span[id^="display-"] { font-weight: bold; color: #3377DD;}
+
+.score-icon {
+    width: 30px; /* Smaller icons for details */
+    height: 30px;
+}
+
+.score-text {
+    font-size: 15px;
+    color: #555;
+}
+.score-text .score-label {
+    font-weight: bold;
+    color: #333;
+    display: block;
+    margin-bottom: 3px;
+}
+.score-text span[id^="display-"] {
+    font-weight: bold;
+    color: #3377DD;
+}
+
 
 .stress-score-block {
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     padding: 15px;
     background-color: #F8F9FA;
-    border-radius: 8px; /* 모서리 둥글기 조정 */
-    min-width: 160px; /* 최소 너비 조정 */
-    /* flex-basis: 180px; */
+    border-radius: 10px;
 }
-.score-icon-large { width: 28px; height: 28px; margin-bottom: 6px;}
-.stress-score-text .score-label { font-size: 15px; font-weight: bold; color: #333; display: block; }
-.stress-score-text .score-label-small { font-size: 11px; color: #666; display: block; margin-top: 1px;}
-.stress-score-value { margin-top: 6px; }
-.stress-score-value #stress-score-value { font-size: 28px; font-weight: bold; color: #333; } /* 스트레스 점수 색상 변경 가능 */
-.stress-score-value .unit { font-size: 14px; font-weight: bold; color: #333; margin-left: 3px;}
+.score-icon-large { /* For stress icon */
+    width: 40px;
+    height: 40px;
+    margin-bottom: 8px;
+}
+.score-icon-feedback { /* For stress icon */
+    width: 40px;
+    height: 40px;
+    margin-bottom: -7px;
+}
+.stress-score-text .score-label {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    display: block;
+}
+.stress-score-text .score-label-small {
+    font-size: 13px;
+    color: #555;
+    display: block;
+    margin-top: -3px;
+}
+.stress-score-value #stress-score-value {
+    font-size: 36px;
+    font-weight: bold;
+    color: #E57373; /* Different color for stress */
+}
+.stress-score-value .unit {
+    font-size: 16px;
+    font-weight: bold;
+    color: #E57373;
+    margin-left: 3px;
+}
 
-/* Daily Feedback Section */
 .daily-feedback {
-    margin-top: 25px; /* 간격 조정 */
-    /* flex-grow: 1; 만약 이 섹션이 남은 공간을 채우게 하려면. 단, 내용이 많을 때만 유용 */
+    margin-top: 30px;
 }
 .daily-feedback h2 {
-    font-size: 20px; /* 폰트 크기 조정 */
-    margin-bottom: 15px; /* 간격 조정 */
+    font-size: 22px;
+    margin-bottom: 20px;
     font-weight: 700;
-    display: flex;
-    align-items: center;
-}
-.score-icon-feedback { /* HTML에 해당 클래스 사용하는 img 태그가 있다면 */
-    width: 24px; height: 24px; margin-right: 8px;
 }
 .feedback-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); /* 최소 너비 조정 */
-    gap: 15px; /* 간격 조정 */
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
 }
 .feedback-box {
     background-color: #FFFFFF;
-    padding: 15px; /* 패딩 조정 */
-    border-radius: 8px; /* 모서리 둥글기 조정 */
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 .feedback-box h3 {
-    font-size: 16px; /* 폰트 크기 조정 */
-    color: #3377DD; margin-top: 0; margin-bottom: 8px;
-    display: flex; align-items: center;
+    font-size: 18px;
+    color: #3377DD;
+    margin-top: 0;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
 }
-.feedback-icon { width: 18px; height: 18px; margin-right: 8px;}
-.feedback-box p { font-size: 14px; line-height: 1.6; color: #555; margin: 0;}
-
+.feedback-icon {
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+    filter: grayscale(30%) opacity(0.8);
+}
+.feedback-box p {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #555;
+}
 
 /* Right Sidebar */
 .right-sidebar {
-    width: 320px;
+    width: 340px; /* Adjusted width */
     background-color: #FFFFFF;
     border-left: 1px solid #E0E0E0;
     overflow-y: auto;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    flex-shrink: 0; /* 너비 고정 */
-    box-sizing: border-box;
 }
 .right-sidebar-title {
-    font-size: 18px; /* 폰트 크기 조정 */
-    font-weight: bold; color: #333;
-    margin-top: 5px; /* 간격 조정 */
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    margin-top: 10px;
     margin-bottom: 15px;
-    text-align: center; padding-bottom: 10px; /* 간격 조정 */
+    text-align: center;
+    padding-bottom: 10px;
     border-bottom: 1px solid #eee;
 }
-.date-display {
-    display: flex; align-items: center; justify-content: center;
-    font-size: 15px; /* 폰트 크기 조정 */
-    color: #333; background-color: #F0F0F0;
-    padding: 8px; /* 패딩 조정 */
-    border-radius: 6px; /* 모서리 둥글기 조정 */
-    margin-bottom: 15px; /* 간격 조정 */
-}
-.date-display #current-date { margin-left: 8px; font-weight: bold; }
 
-#daily-record-form {
+.date-display {
     display: flex;
-    flex-direction: column;
-    flex-grow: 1; /* 이 폼이 우측 사이드바의 남은 공간을 채움 */
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: #333;
+    background-color: #EFEFEF;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 20px;
 }
-#daily-record-form .form-group { margin-bottom: 15px; /* 간격 조정 */ }
+.date-display #current-date {
+    margin-left: 8px;
+    font-weight: bold;
+}
+
+#daily-record-form .form-group {
+    margin-bottom: 18px;
+}
 #daily-record-form label {
-    display: flex; align-items: center;
-    font-size: 14px; /* 폰트 크기 조정 */
-    font-weight: bold; color: #444; margin-bottom: 6px; /* 간격 조정 */
+    display: flex;
+    align-items: center;
+    font-size: 15px;
+    font-weight: bold;
+    color: #444;
+    margin-bottom: 8px;
 }
-.sidebar-icon { width: 18px; height: 18px; margin-right: 8px;}
+.sidebar-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
 
 #daily-record-form input[type="number"],
 #daily-record-form textarea {
-    width: 100%; /* 부모(.time-inputs, .kcal-input 또는 .form-group)에 맞춤 */
-    padding: 8px 10px; /* 패딩 조정 */
-    border: 1px solid #DDD; border-radius: 6px; /* 모서리 둥글기 조정 */
-    background-color: #FDFDFD; font-size: 13px; /* 폰트 크기 조정 */
-    outline: none; transition: border-color 0.2s; box-sizing: border-box;
+    width: calc(100% - 24px); /* Account for padding */
+    padding: 10px 12px;
+    border: 1px solid #DDD;
+    border-radius: 8px;
+    background-color: #FDFDFD;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s;
 }
 #daily-record-form input[type="number"]:focus,
-#daily-record-form textarea:focus { border-color: #3377DD; }
+#daily-record-form textarea:focus {
+    border-color: #3377DD;
+}
 
-.time-inputs, .kcal-input { display: flex; align-items: center; gap: 6px; /* 간격 조정 */ }
-.time-inputs input[type="number"] { /* flex-grow: 1; */ text-align: center; } /* width는 부모에 의해 결정되도록 함 */
-.kcal-input input[type="number"] { /* flex-grow: 1; */ }
-.time-inputs span, .kcal-input span { font-size: 13px; color: #555; white-space: nowrap;}
-.kcal-input { margin-bottom: 6px; }
-.kcal-input:last-of-type { margin-bottom: 0; }
+.time-inputs, .kcal-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.time-inputs input[type="number"] {
+    width: 60px; /* Specific width for time/min inputs */
+    text-align: center;
+}
+.kcal-input input[type="number"] {
+    flex-grow: 1;
+}
+.time-inputs span, .kcal-input span {
+    font-size: 14px;
+    color: #555;
+}
 
-
-#daily-record-form textarea { min-height: 70px; resize: vertical;} /* 높이 조정 */
-.char-counter { display: block; text-align: right; font-size: 11px; color: #777; margin-top: 4px;}
+#daily-record-form textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+.char-counter {
+    display: block;
+    text-align: right;
+    font-size: 12px;
+    color: #777;
+    margin-top: 5px;
+}
 
 .submit-button {
-    width: 100%; padding: 10px; /* 패딩 조정 */
-    background-color: #3377DD; color: #FFFFFF; border: none; border-radius: 8px; /* 모서리 둥글기 조정 */
-    font-size: 15px; /* 폰트 크기 조정 */
-    font-weight: bold; cursor: pointer; transition: background-color 0.2s;
-    margin-top: auto; /* 폼의 맨 아래에 붙도록 */
+    width: 100%;
+    padding: 12px;
+    background-color: #3377DD;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 10px;
 }
-.submit-button:hover { background-color: #285ead; }
+.submit-button:hover {
+    background-color: #285ead;
+}
 
-/* Responsive adjustments (기본 예시 유지, 필요시 상세 조정) */
+/* Responsive adjustments (basic example) */
 @media (max-width: 1200px) {
-    .main-content { padding: 20px; }
-    .scores-container { flex-direction: column; align-items: stretch; }
-    .main-score-block, .stress-score-block, .detailed-scores-block { width: 100%; margin-bottom: 15px; }
-    .feedback-grid { grid-template-columns: 1fr; } /* 작은 화면에서는 1열로 */
-}
-@media (max-width: 992px) { /* 우측 사이드바 숨김 처리 예시 (더 작은 화면) */
-    .right-sidebar { display: none; }
-    /* 중앙 콘텐츠가 전체 너비 사용하도록 추가 설정 가능 */
-    .main-content { /* padding-right: 20px; */ /* 우측 사이드바 없으므로 패딩 조정 */}
+    .main-content {
+        padding: 20px;
+    }
+    .scores-container {
+        flex-direction: column;
+        align-items: stretch; /* Stretch items in column */
+    }
+    .main-score-block, .stress-score-block {
+        margin-bottom: 20px;
+    }
+    .detailed-scores-block {
+        width: 100%; /* Take full width in column layout */
+    }
 }
 @media (max-width: 768px) {
-    .main-dashboard-container { flex-direction: column; height: auto; min-height: 100vh; } /* 모바일에서는 수직으로 쌓고, 높이 자동 */
+    .main-dashboard-container {
+        flex-direction: column;
+    }
     .left-sidebar, .right-sidebar {
         width: 100%;
-        height: auto; /* 높이 자동 */
-        overflow-y: visible; /* 내부 스크롤 대신 전체 페이지 스크롤 */
-        border-right: none; border-left: none; border-bottom: 1px solid #E0E0E0;
+        height: auto;
+        overflow-y: visible;
+        box-shadow: none;
+        border-bottom: 1px solid #E0E0E0;
     }
-    .main-content { overflow-y: visible; } /* 메인 콘텐츠도 전체 페이지 스크롤에 포함 */
-    .logo-section { display: none; }
-    .profile-section { padding-top: 15px; margin-bottom: 20px;}
-    .menu-section li a { padding: 10px; font-size: 14px; }
-    .right-sidebar { display: block; order: 3; } /* 필요하다면 다시 보이게 */
+    .left-sidebar { order: 1; } /* Example for mobile ordering */
+    .main-content { order: 2; }
+    .right-sidebar { order: 3; }
+
+    .logo-section { display: none; } /* Hide logo on small screens to save space */
+    .profile-section { padding-top: 10px; margin-bottom: 15px;}
+    .menu-section li a { padding: 10px; font-size: 15px; }
 }
