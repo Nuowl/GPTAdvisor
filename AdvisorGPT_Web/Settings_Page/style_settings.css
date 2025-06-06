@@ -1,12 +1,14 @@
 /* Settings Page Specific Styles */
+/* ... (기존 .settings-page-container, .settings-interface, .settings-profile-header 등 스타일은 이전과 동일) ... */
+/* ... (기존 .settings-section, form 관련 스타일, 버튼 기본 스타일 등은 이전과 동일) ... */
+
 .settings-page-container {
-    padding: 20px; /* 유지 또는 약간 줄임: 예 15px */
+    padding: 20px; 
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    overflow: hidden; /* 중요: 이 컨테이너가 스크롤되지 않도록 */
-    /* height: calc(100vh - 40px); 이 부분은 부모 레이아웃에 따라 달라질 수 있음. 
-       만약 main-dashboard-container가 flex이고 이 요소가 flex-grow라면 명시적 height가 없어도 됨 */
+    overflow: hidden;
+    height: calc(100vh - 40px); 
     box-sizing: border-box;
 }
 
@@ -15,224 +17,98 @@
     border: 2.5px solid #3377DD;
     border-radius: 15px;
     width: 100%;
-    flex-grow: 1; /* 부모(.main-content 또는 .settings-page-container)의 가용 공간을 채움 */
+    flex-grow: 1; 
     display: flex;
     flex-direction: column;
-    padding: 20px 30px; /* 내부 콘텐츠를 위한 패딩 */
+    padding: 20px 30px; 
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    overflow-y: auto; /* !!!! 이 부분이 핵심: 내용이 넘치면 이 요소 내부에서 스크롤 !!!! */
-    box-sizing: border-box;
+    overflow-y: auto; 
 }
 
 .settings-profile-header {
     display: flex;
     align-items: center;
-    /* margin-bottom: 40px; 이전 값 */
-    margin-bottom: 25px; /* 프로필 헤더와 다음 섹션 사이 간격 줄임 */
+    margin-bottom: 20px; 
+    flex-shrink: 0; 
 }
-
 .profile-image-container {
-    position: relative;
-    width: 100px; /* 프로필 이미지 크기를 약간 줄임 (선택 사항) */
-    height: 100px;
-    /* margin-right: 30px; 이전 값 */
-    margin-right: 20px; /* 프로필 이미지와 이름 사이 간격 줄임 */
-    cursor: pointer;
+    width: 80px; height: 80px; margin-right: 15px; 
+    position: relative; cursor: pointer;
 }
-
-/* #settings-profile-img-display 와 .profile-image-overlay 는 이전과 동일하게 유지 */
-#settings-profile-img-display {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    object-fit: cover;
-    display: block;
-    opacity: 0.5;
-}
-.profile-image-container .profile-image-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    background-color: #939393;
-    opacity: 0.69;
-    mix-blend-mode: multiply;
-    pointer-events: none;
-}
-
-.edit-profile-icon {
-    position: absolute;
-    bottom: 3px; /* 아이콘 위치 미세 조정 */
-    right: 3px;
-    width: 30px; /* 아이콘 크기 약간 줄임 */
-    height: 30px;
-    background-color: rgba(255, 255, 255, 0.8);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-}
-.edit-profile-icon i.fa-cog {
-    font-size: 16px; /* 아이콘 내부 톱니바퀴 크기 */
-    color: #505050;
-}
-
-#settings-username-display {
-    font-size: 28px; /* 이름 글꼴 크기 약간 줄임 */
-    font-weight: 700;
-    color: #333;
-}
+#settings-profile-img-display { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: block; opacity: 0.5;}
+.profile-image-container .profile-image-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; background-color: #939393; opacity: 0.69; mix-blend-mode: multiply; pointer-events: none; }
+.edit-profile-icon { width: 28px; height: 28px; bottom: 2px; right: 2px; position: absolute; background-color: rgba(255, 255, 255, 0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+.edit-profile-icon i.fa-cog { font-size: 14px; color: #505050; }
+#settings-username-display { font-size: 24px; font-weight: 700; color: #333; }
 
 .settings-section {
-    /* margin-bottom: 35px; 이전 값 */
-    margin-bottom: 25px; /* 각 섹션 사이 간격 줄임 */
+    margin-bottom: 20px; 
+    flex-shrink: 0; 
 }
-.settings-section:last-of-type { /* 마지막 섹션의 하단 마진은 더 줄이거나 제거 */
-    margin-bottom: 15px;
-}
+.settings-section:last-of-type { margin-bottom: 10px; }
+.settings-section h2 { font-size: 16px; margin-bottom: 10px; padding-bottom: 6px; font-weight: 700; color: #3377DD; border-bottom: 1px solid #E0E7FF; }
 
-.settings-section h2 {
-    font-size: 18px; /* 섹션 제목 글꼴 크기 줄임 */
-    font-weight: 700;
-    color: #3377DD;
-    /* margin-bottom: 20px; 이전 값 */
-    margin-bottom: 15px; /* 제목과 내용 사이 간격 줄임 */
-    /* padding-bottom: 10px; 이전 값 */
-    padding-bottom: 8px; /* 제목 밑줄과의 간격 줄임 */
-    border-bottom: 1px solid #E0E7FF;
-}
-
-#account-info-form .form-group {
-    /* margin-bottom: 20px; 이전 값 */
-    margin-bottom: 15px; /* 폼 그룹 사이 간격 줄임 */
-}
-#account-info-form label {
-    display: block;
-    font-size: 13px; /* 레이블 글꼴 크기 줄임 */
-    color: #555;
-    /* margin-bottom: 8px; 이전 값 */
-    margin-bottom: 6px; /* 레이블과 입력 필드 사이 간격 줄임 */
-    font-weight: 600;
-}
+#account-info-form .form-group { margin-bottom: 12px;  }
+#account-info-form label { font-size: 12px; margin-bottom: 4px; display: block; color: #555; font-weight: 600;}
 #account-info-form input[type="text"],
-#account-info-form input[type="number"] {
-    width: 100%;
-    /* padding: 12px 15px; 이전 값 */
-    padding: 10px 12px; /* 입력 필드 내부 패딩 줄임 */
-    border: none;
-    border-radius: 8px; /* 보더 반경 약간 줄임 */
-    background-color: #EFEFEF;
-    font-size: 14px; /* 입력 필드 글꼴 크기 줄임 */
-    color: #333;
-    outline: none;
-    box-sizing: border-box;
-}
-#account-info-form input::placeholder {
-    color: #909498;
-}
+#account-info-form input[type="number"] { padding: 8px 10px; font-size: 13px; border-radius: 6px; width: 100%; border: none; background-color: #EFEFEF; color: #333; outline: none; box-sizing: border-box;}
+#account-info-form input::placeholder { color: #909498; }
+.form-group-inline { display: flex; gap: 10px;  }
+.form-group-inline .form-group { flex: 1; }
+.gender-buttons { display: flex; gap: 6px;  }
+.gender-button { padding: 8px; font-size: 13px; border-radius: 6px; flex: 1; border: 2px solid #3377DD; background-color: #FFFFFF; color: #333; cursor: pointer; font-weight: 600; transition: background-color 0.2s, color 0.2s;}
+.gender-button.selected { background-color: #3377DD; color: #FFFFFF; }
 
-.form-group-inline {
-    display: flex;
-    /* gap: 20px; 이전 값 */
-    gap: 15px; /* 인라인 폼 그룹 사이 간격 줄임 */
-}
-.form-group-inline .form-group {
-    flex: 1;
-}
-
-.gender-buttons {
-    display: flex;
-    /* gap: 10px; 이전 값 */
-    gap: 8px; /* 성별 버튼 사이 간격 줄임 */
-}
-.gender-button {
-    flex: 1;
-    /* padding: 12px; 이전 값 */
-    padding: 10px; /* 성별 버튼 내부 패딩 줄임 */
-    border: 2px solid #3377DD;
-    border-radius: 8px; /* 보더 반경 약간 줄임 */
-    background-color: #FFFFFF;
-    color: #333;
-    cursor: pointer;
-    font-size: 14px; /* 성별 버튼 글꼴 크기 줄임 */
-    font-weight: 600;
-    transition: background-color 0.2s, color 0.2s;
-}
-.gender-button.selected {
-    background-color: #3377DD;
-    color: #FFFFFF;
-}
-
-/* Button Styles */
 .settings-button-primary,
-.settings-button-secondary {
-    display: inline-block;
-    width: auto;
-    min-width: 120px; /* 최소 너비 줄임 */
-    /* padding: 12px 25px; 이전 값 */
-    padding: 10px 20px; /* 버튼 내부 패딩 줄임 */
-    font-size: 15px; /* 버튼 글꼴 크기 줄임 */
-    font-weight: 600;
-    border-radius: 8px; /* 보더 반경 약간 줄임 */
-    cursor: pointer;
-    text-align: center;
-    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+.settings-button-secondary { min-width: 100px; padding: 8px 15px; font-size: 14px; border-radius: 6px; display: inline-block; width: auto; font-weight: 600; cursor: pointer; text-align: center; transition: background-color 0.2s, border-color 0.2s, color 0.2s;}
+.settings-button-primary { background-color: #FFFFFF; color: #3377DD; border: 2px solid #3377DD; }
+.settings-button-primary:hover:not(:disabled) { background-color: #3377DD; color: #FFFFFF; }
+.settings-button-primary:disabled { background-color: #E0E0E0; color: #A0A0A0; border-color: #E0E0E0; cursor: not-allowed; }
+.settings-button-secondary { background-color: #FFFFFF; color: #3377DD; border: 2px solid #3377DD; }
+.settings-button-secondary:hover { background-color: #3377DD; color: #FFFFFF; }
+
+
+/* 로그아웃 및 계정 탈퇴 버튼을 위한 컨테이너 */
+.account-actions-section {
+    display: flex;
+    gap: 10px; /* 버튼 사이 간격 */
+    margin-top: 20px; /* 이전 섹션과의 간격 */
 }
 
-.settings-button-primary {
-    background-color: #FFFFFF;
-    color: #3377DD;
-    border: 2px solid #3377DD;
-}
-.settings-button-primary:hover:not(:disabled) {
-    background-color: #3377DD;
-    color: #FFFFFF;
-}
-.settings-button-primary:disabled {
-    background-color: #E0E0E0;
-    color: #A0A0A0;
-    border-color: #E0E0E0;
-    cursor: not-allowed;
-}
-
-.settings-button-secondary {
-    background-color: #FFFFFF;
-    color: #3377DD;
-    border: 2px solid #3377DD;
-}
-.settings-button-secondary:hover {
-    background-color: #3377DD;
-    color: #FFFFFF;
-}
-
-.settings-button-logout {
-    display: block;
-    width: 100%;
-    /* padding: 12px; 이전 값 */
-    padding: 10px; /* 로그아웃 버튼 내부 패딩 줄임 */
-    background-color: #3377DD;
-    color: #FFFFFF;
-    font-size: 15px; /* 로그아웃 버튼 글꼴 크기 줄임 */
+.settings-button-logout.half-width,
+.settings-button-delete.half-width {
+    flex: 1; /* 두 버튼이 공간을 동일하게 나눠 가짐 */
+    /* width: calc(50% - 5px); /* 명시적 너비 설정도 가능 (gap 고려) */
+    padding: 10px;
+    font-size: 15px;
     font-weight: 600;
     border: none;
-    border-radius: 8px; /* 보더 반경 약간 줄임 */
+    border-radius: 8px;
     cursor: pointer;
     text-align: center;
     transition: background-color 0.2s;
-}
-.settings-button-logout:hover {
-    background-color: #285ead;
+    box-sizing: border-box;
 }
 
-/* Sidebar active state (유지) */
-.left-sidebar .menu-section ul#sidebar-menu li.active a {
-    background-color: #3377DD;
+.settings-button-logout.half-width {
+    background-color: #3377DD; /* 기존 로그아웃 버튼 색상 */
     color: #FFFFFF;
 }
-.left-sidebar .menu-section ul#sidebar-menu li.active a .menu-icon {
-    filter: brightness(0) invert(1);
+.settings-button-logout.half-width:hover {
+    background-color: #285ead; 
 }
+
+.settings-button-delete.half-width {
+    background-color: #E53935; /* 빨간색 계열 */
+    color: #FFFFFF;
+    border: 2px solid #D32F2F; /* 약간 더 어두운 빨간색 테두리 (선택 사항) */
+}
+.settings-button-delete.half-width:hover {
+    background-color: #C62828; /* 호버 시 더 어두운 빨간색 */
+    border-color: #B71C1C;
+}
+
+
+/* Sidebar active state (유지) */
+.left-sidebar .menu-section ul#sidebar-menu li.active a { background-color: #3377DD; color: #FFFFFF; }
+.left-sidebar .menu-section ul#sidebar-menu li.active a .menu-icon { filter: brightness(0) invert(1); }
