@@ -40,7 +40,7 @@
     padding: 0px 20px; /* Adjusted padding */
     display: flex;
     flex-direction: column;
-    gap: 45px;
+    gap: 40px;
     /* This area itself does not grow indefinitely. Its parent (.chatbot-interface) has a fixed or constrained height. */
 }
 
