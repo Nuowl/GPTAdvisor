@@ -12,18 +12,41 @@
 
         <div class="login-box">
             <h2>로그인</h2>
-            <form>
-                <input type="email" placeholder="E - 메일" required>
-                <input type="password" placeholder="비밀번호" required>
+            <form id="login-form"> {/* id 추가 */}
+                <input type="email" id="login-email" placeholder="E - 메일" required> {/* id 추가 */}
+                <input type="password" id="login-password" placeholder="비밀번호" required> {/* id 추가 */}
         
-            <div class="forgot-password">
-                비밀번호를 기억나지 않으신가요? <a href="../PasswordReset/password_reset.html">여기</a>
-            </div>
+                <div class="forgot-password">
+                    비밀번호를 기억나지 않으신가요? <a href="../PasswordReset/password_reset.html">여기</a>
+                </div>
 
-            <button type="submit" class="login-button" onclick="location.href='../Main_Page/main.html'">로그인</button>
-            <button type="button" class="signup-button" onclick="location.href='../Register/register.html'">계정 생성</button>
-        </form>
+                <button type="submit" class="login-button">로그인</button> {/* onclick 제거 */}
+                <button type="button" class="signup-button" onclick="location.href='../Register/register.html'">계정 생성</button>
+            </form>
+        </div>
     </div>
-    </div>
-</body>
+    </body>
+        <script>
+        document.getElementById('login-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            const users = JSON.parse(localStorage.getItem('advisorGptUsers')) || [];
+            const foundUser = users.find(user => user.email === email && user.password === password);
+
+            if (foundUser) {
+                alert('로그인 성공!');
+                localStorage.setItem('loggedInUserEmail', foundUser.email);
+                localStorage.setItem('userNickname', foundUser.nickname);
+                // 사용자별 프로필 이미지 로드 (설정 페이지에서 저장한 키 사용)
+                localStorage.setItem('userProfileImage', localStorage.getItem('userProfileImage_' + foundUser.email) || '../image/user_profile_default.png');
+                
+                window.location.href = '../Main_Page/main.html';
+            } else {
+                alert('이메일 또는 비밀번호가 일치하지 않습니다.');
+            }
+        });
+    </script>
 </html>
