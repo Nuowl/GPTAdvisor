@@ -9,9 +9,7 @@ app = Flask(__name__)
 CORS(app)
 
 # GOOGLE_API_KEY = "AIzaSyBZM_8jC-dk7nHK3RHsinC8nZx5ALh7gk0" # 이 줄 대신
-GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
-if not GOOGLE_API_KEY:
-    raise ValueError("GOOGLE_API_KEY 환경 변수가 설정되지 않았습니다.")
+GOOGLE_API_KEY = "AIzaSyBZM_8jC-dk7nHK3RHsinC8nZx5ALh7gk0"
 genai.configure(api_key=GOOGLE_API_KEY)
 
 
