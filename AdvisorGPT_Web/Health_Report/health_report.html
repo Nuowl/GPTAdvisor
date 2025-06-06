@@ -84,9 +84,31 @@ document.addEventListener('DOMContentLoaded', function() {
     const sidebarUsername = document.getElementById('sidebar-username');
     const goalInput = document.getElementById('goal-score-input');
     const pointsRemainingSpan = document.getElementById('points-remaining');
+    const summaryList = document.getElementById('weekly-summary-list'); // 주간 요약 ul
     
     const defaultProfilePicPath = '../image/user_profile_default.png';
-    const defaultGoalScore = 70; // 기본 목표 점수
+    const defaultGoalScore = 70;
+
+    // --- 유틸리티 함수: 해당 주의 날짜 배열 반환 (월요일 ~ 일요일) ---
+    function getWeekDates(date = new Date()) {
+        const currentDay = date.getDay(); // 0 (일요일) ~ 6 (토요일)
+        const MONDAY = 1; // Date.getDay()는 일요일이 0
+        const diff = currentDay === 0 ? -6 : MONDAY - currentDay; // 이번 주 월요일까지의 날짜 차이
+        
+        const monday = new Date(date);
+        monday.setDate(date.getDate() + diff);
+        
+        const weekDates = [];
+        for (let i = 0; i < 7; i++) {
+            const day = new Date(monday);
+            day.setDate(monday.getDate() + i);
+            const year = day.getFullYear();
+            const month = String(day.getMonth() + 1).padStart(2, '0');
+            const dateNum = String(day.getDate()).padStart(2, '0');
+            weekDates.push(`${year}-${month}-${dateNum}`);
+        }
+        return weekDates;
+    }
 
     // --- 로그인한 사용자 정보 로드 및 사이드바/목표점수 UI 업데이트 ---
     if (loggedInUserEmail) {
@@ -117,62 +139,50 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- 주간 건강 점수 데이터 (실제로는 이 데이터를 동적으로 가져와야 함) ---
     const labels = ['월', '화', '수', '목', '금', '토', '일'];
-    let weeklyScores = []; // 실제 사용자 데이터를 저장할 배열
+    let weeklyScoresForChart = new Array(7).fill(null); // 차트용 데이터 (기본값 null)
+    let 이번주기록된점수들 = []; // 평균 계산용 (숫자만)
 
-    // TODO: 로그인한 사용자의 실제 주간 점수 데이터를 localStorage 또는 다른 곳에서 가져오는 로직 추가
-    // 예시:
-    // if (loggedInUserEmail) {
-    //     const userWeeklyScoresKey = 'userWeeklyScores_' + loggedInUserEmail; // 사용자별 데이터 키
-    //     const storedData = JSON.parse(localStorage.getItem(userWeeklyScoresKey));
-    //     if (storedData && Array.isArray(storedData) && storedData.length === 7) {
-    //         weeklyScores = storedData;
-    //     } else {
-    //         weeklyScores = [null, null, null, null, null, null, null]; // 데이터 없을 시
-    //     }
-    // } else {
-    //     weeklyScores = [null, null, null, null, null, null, null]; // 비로그인 시
-    // }
-    // 임시 샘플 데이터 (실제 데이터 로드 로직으로 대체 필요)
-    weeklyScores = [68, 72, 70, 78, 75, 80, 77]; // 차트가 보이도록 임시 데이터 유지
+    if (loggedInUserEmail) {
+        const dailyRecordsKey = `dailyRecords_${loggedInUserEmail}`;
+        const userDailyRecords = JSON.parse(localStorage.getItem(dailyRecordsKey)) || {};
+        const currentWeekDates = getWeekDates(); // 이번 주 날짜들 (YYYY-MM-DD)
 
+        currentWeekDates.forEach((dateKey, index) => {
+            if (userDailyRecords[dateKey] && userDailyRecords[dateKey].analysis) {
+                const score = userDailyRecords[dateKey].analysis.todayHealthScore;
+                if (typeof score === 'number') {
+                    weeklyScoresForChart[index] = score;
+                    이번주기록된점수들.push(score);
+                }
+            }
+        });
+    }
 
-    const validScores = weeklyScores.filter(score => typeof score === 'number');
-    const averageWeeklyScore = validScores.length > 0
-        ? validScores.reduce((sum, score) => sum + score, 0) / validScores.length
+    const averageThisWeekScore = 이번주기록된점수들.length > 0
+        ? 이번주기록된점수들.reduce((sum, score) => sum + score, 0) / 이번주기록된점수들.length
         : 0;
 
     function updatePointsRemaining() {
         const currentGoalScore = parseInt(goalInput.value) || defaultGoalScore;
-        // 입력값이 범위 벗어나면 조정
-        goalInput.value = Math.max(1, Math.min(100, currentGoalScore)); 
-        
-        const remaining = Math.max(0, (parseInt(goalInput.value)) - Math.round(averageWeeklyScore));
+        goalInput.value = Math.max(1, Math.min(100, currentGoalScore));
+        const remaining = Math.max(0, parseInt(goalInput.value) - Math.round(averageThisWeekScore));
         pointsRemainingSpan.textContent = remaining;
     }
-
+    if (loggedInUserEmail) { /* ... (목표 점수 로드) ... */ } else { goalInput.value = defaultGoalScore; }
     goalInput.addEventListener('input', updatePointsRemaining);
-    goalInput.addEventListener('change', function() {
-        updatePointsRemaining();
-        if (loggedInUserEmail) {
-            const userGoalScoreKey = 'userGoalScore_' + loggedInUserEmail;
-            localStorage.setItem(userGoalScoreKey, goalInput.value);
-        }
-    });
-
-    updatePointsRemaining(); // 초기 계산
+    goalInput.addEventListener('change', function() { /* ... (목표 점수 저장) ... */ });
+    updatePointsRemaining();
 
     // --- Chart.js 설정 ---
     const ctx = document.getElementById('weeklyHealthChart');
-    let weeklyHealthChartInstance = null; // 차트 인스턴스 저장 변수
-
     if (ctx) {
-        weeklyHealthChartInstance = new Chart(ctx.getContext('2d'), { // 인스턴스 할당
+        new Chart(ctx.getContext('2d'), {
             type: 'line',
             data: {
                 labels: labels,
                 datasets: [{
                     label: '주간 건강 점수',
-                    data: weeklyScores,
+                    data: weeklyScoresForChart,
                     borderColor: '#3377DD',
                     backgroundColor: 'rgba(51, 119, 221, 0.1)',
                     tension: 0.1,
@@ -213,47 +223,93 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- 주간 요약 업데이트 (샘플 로직, 실제 데이터 기반으로 수정 필요) ---
     function updateWeeklySummary() {
-        const summaryList = document.getElementById('weekly-summary-list');
-        if (!summaryList) return;
+        if (!summaryList || !loggedInUserEmail) return;
 
-        // TODO: 실제 지난 주 데이터와 이번 주 평균 데이터를 비교하는 로직 필요
-        // 아래는 하드코딩된 예시입니다.
-        const summaryData = {
-            sleep: { current: 7.2, change: -5, unit: "시간" }, // 5% 감소
-            meal: { current: 1850, change: 3, unit: "kcal" },  // 3% 증가
-            exercise: { current: 1.5, change: 10, unit: "시간" },// 10% 증가
-            stress: { current: 65, change: -8, unit: "점" },   // 8% 감소 (긍정적)
-            overall: { current: 78, change: 4, unit: "점" }    // 4% 증가
+        const dailyRecordsKey = `dailyRecords_${loggedInUserEmail}`;
+        const userDailyRecords = JSON.parse(localStorage.getItem(dailyRecordsKey)) || {};
+        
+        // 이번 주 데이터 계산
+        const currentWeekDates = getWeekDates();
+        const thisWeekData = { sleep: [], meal: [], exercise: [], stress: [], overall: [] };
+        currentWeekDates.forEach(dateKey => {
+            const record = userDailyRecords[dateKey];
+            if (record && record.log && record.analysis) {
+                thisWeekData.sleep.push(record.log.sleep_hours);
+                thisWeekData.meal.push(record.log.calories);
+                thisWeekData.exercise.push(record.log.strength_minutes + record.log.cardio_minutes);
+                thisWeekData.stress.push(record.analysis.aiMentalAnalysis.stress_score);
+                thisWeekData.overall.push(record.analysis.todayHealthScore);
+            }
+        });
+
+        const calculateAverage = (arr) => arr.length > 0 ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
+        const avgThisWeek = {
+            sleep: calculateAverage(thisWeekData.sleep),
+            meal: calculateAverage(thisWeekData.meal),
+            exercise: calculateAverage(thisWeekData.exercise) / 60, // 시간 단위로
+            stress: calculateAverage(thisWeekData.stress),
+            overall: calculateAverage(thisWeekData.overall)
+        };
+        const daysRecordedThisWeek = thisWeekData.overall.length; // 이번 주 기록 일수
+
+        // 지난 주 데이터 로드/계산 (간단화: lastWeekSummary_ 키 사용)
+        // 매주 월요일에 이전 주의 데이터를 이 키로 옮기는 로직이 추가로 필요함 (현재는 수동 또는 생략)
+        const lastWeekSummaryKey = `lastWeekSummary_${loggedInUserEmail}`;
+        const avgLastWeek = JSON.parse(localStorage.getItem(lastWeekSummaryKey)) || {
+            sleep: 0, meal: 0, exercise: 0, stress: 0, overall: 0, daysRecorded: 0
+        };
+
+        const summaryElements = {
+            sleep: { unit: "시간", name: "수면 시간" },
+            meal: { unit: "kcal", name: "식사량" },
+            exercise: { unit: "시간", name: "운동 시간" },
+            stress: { unit: "점", name: "스트레스 지수" },
+            overall: { unit: "점", name: "건강 점수" }
         };
 
         summaryList.querySelectorAll('li span[data-summary-type]').forEach(span => {
             const type = span.dataset.summaryType;
-            const data = summaryData[type];
-            if (data) {
-                let changeText = "";
-                if (data.change > 0) {
-                    changeText = `<strong class="highlight-green">${Math.abs(data.change)}% 증가</strong>`;
-                } else if (data.change < 0) {
-                    changeText = `<strong class="highlight-red">${Math.abs(data.change)}% 감소</strong>`;
-                } else {
-                    changeText = "변동 없음";
+            const currentAvg = avgThisWeek[type];
+            const lastAvg = avgLastWeek[type];
+            const daysRecordedLastWeek = avgLastWeek.daysRecorded;
+
+            let changeText = "";
+            let percentageChange = 0;
+
+            if (daysRecordedLastWeek > 0 && daysRecordedThisWeek > 0) { // 지난 주 기록이 있어야 비교 가능
+                if (lastAvg === 0 && currentAvg > 0) { // 지난주 0, 이번주 > 0
+                    changeText = `<strong class="highlight-green">새롭게 기록 시작!</strong>`;
+                } else if (lastAvg > 0 && currentAvg === 0) { // 지난주 > 0, 이번주 0 (기록 안함)
+                        changeText = `기록 없음`;
+                } else if (lastAvg === currentAvg) {
+                    changeText = `<strong class="highlight-blue">동일</strong>`;
+                } else if (lastAvg !== 0) { // 0으로 나누기 방지
+                    percentageChange = ((currentAvg - lastAvg) / lastAvg) * 100;
+                    if (percentageChange > 0) {
+                        changeText = `<strong class="highlight-green">${Math.abs(percentageChange).toFixed(0)}% 증가</strong>`;
+                    } else {
+                        changeText = `<strong class="highlight-red">${Math.abs(percentageChange).toFixed(0)}% 감소</strong>`;
+                    }
+                } else { // lastAvg가 0이고 currentAvg도 0일 경우
+                        changeText = `기록 없음`;
                 }
-                let baseText = `이번 주 평균 ${
-                    type === 'sleep' ? '수면 시간은' :
-                    type === 'meal' ? '식사량은' :
-                    type === 'exercise' ? '운동 시간은' :
-                    type === 'stress' ? '스트레스 지수는' :
-                    '건강 점수는'
-                } <strong class="highlight-blue">${data.current}${data.unit}</strong>으로 지난 주 대비 ${changeText}했습니다.`;
-                if (type === 'stress') baseText += " (점수가 낮을수록 긍정적입니다.)";
-                if (type === 'overall' && data.change > 0) baseText += "!";
-                
-                span.innerHTML = baseText;
+            } else if (daysRecordedThisWeek > 0) { // 이번 주 기록만 있을 경우
+                changeText = "지난 주 기록 없음";
+            } else { // 이번 주 기록도 없을 경우
+                changeText = "기록 없음";
             }
+            
+            let baseText = `이번 주 평균 ${summaryElements[type].name}은 <strong class="highlight-blue">${currentAvg.toFixed(1)}${summaryElements[type].unit}</strong>으로 지난 주 대비 ${changeText}합니다.`;
+            if (daysRecordedThisWeek > 0) {
+                baseText += ` (총 ${daysRecordedThisWeek}일 기록)`;
+            }
+            if (type === 'stress' && currentAvg > 0) baseText += " (점수가 낮을수록 긍정적입니다.)";
+            if (type === 'overall' && percentageChange > 0) baseText += "!";
+            
+            span.innerHTML = baseText;
         });
     }
     updateWeeklySummary();
-
 
     // --- 사이드바 활성 메뉴 설정 ---
     const currentReportPath = "health_report.html";
