@@ -58,78 +58,179 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // --- 기존 챗봇 페이지 JS 코드 시작 ---
     const chatDisplay = document.getElementById('chat-display');
     const messageInput = document.getElementById('chat-message-input');
     const sendButton = document.getElementById('send-message-button');
     const initialLogoContainer = document.querySelector('.chat-initial-logo-container');
     let isFirstUserMessage = true;
-    // --- 기존 챗봇 페이지 JS 코드 끝 ---
 
-    // --- 로그인한 사용자 정보 로드 및 사이드바 UI 업데이트 ---
+    // --- 로그인한 사용자 정보 로드 및 사이드바 UI 업데이트 (이전과 동일) ---
     const loggedInUserEmail = localStorage.getItem('loggedInUserEmail');
-    const sidebarProfilePic = document.getElementById('sidebar-profile-pic'); // HTML에 id="sidebar-profile-pic" 추가 필요
-    const sidebarUsername = document.getElementById('sidebar-username'); // HTML에 id="sidebar-username"은 이미 있음
+    const sidebarProfilePic = document.getElementById('sidebar-profile-pic');
+    const sidebarUsername = document.getElementById('sidebar-username');
     const defaultProfilePicPath = '../image/user_profile_default.png';
 
     if (loggedInUserEmail) {
         const nickname = localStorage.getItem('userNickname') || 'User';
-        // 사용자별 프로필 이미지를 가져오거나, 없으면 전체 프로필 이미지, 그것도 없으면 기본 이미지
         const userSpecificProfileKey = 'userProfileImage_' + loggedInUserEmail;
         const profilePic = localStorage.getItem(userSpecificProfileKey) || localStorage.getItem('userProfileImage') || defaultProfilePicPath;
-
-        if (sidebarProfilePic) {
-            sidebarProfilePic.src = profilePic;
-            sidebarProfilePic.alt = nickname + " 프로필";
-        }
-        if (sidebarUsername) {
-            sidebarUsername.textContent = nickname;
-        }
+        if (sidebarProfilePic) { sidebarProfilePic.src = profilePic; sidebarProfilePic.alt = nickname + " 프로필"; }
+        if (sidebarUsername) { sidebarUsername.textContent = nickname; }
     } else {
-        // 로그인하지 않은 사용자를 위한 기본값 설정 또는 로그인 페이지로 리디렉션
         if (sidebarProfilePic) sidebarProfilePic.src = defaultProfilePicPath;
         if (sidebarUsername) sidebarUsername.textContent = 'User';
-        // console.log("로그인 정보 없음, 기본 프로필 표시");
-        // alert("로그인이 필요한 서비스입니다.");
-        // window.location.href = '../Advisor_login/index.html';
     }
 
-    // --- 사이드바 활성 메뉴 설정 ---
-    // (기존 챗봇 페이지의 사이드바 활성 메뉴 로직은 그대로 유지)
+    // --- 사이드바 활성 메뉴 설정 (이전과 동일) ---
     const currentChatbotPath = "gpt_chatbot.html";
     const sidebarLinks = document.querySelectorAll('#sidebar-menu li a');
-    sidebarLinks.forEach(link => {
-        link.parentElement.classList.remove('active');
-    });
+    sidebarLinks.forEach(link => { link.parentElement.classList.remove('active'); });
     const chatbotLink = Array.from(sidebarLinks).find(a => {
         const linkHref = a.getAttribute('href');
         const iconSrc = a.parentElement.querySelector('.menu-icon') ? a.parentElement.querySelector('.menu-icon').src : '';
         return (linkHref && linkHref.includes(currentChatbotPath)) ||
-               (linkHref === "../GPT_Chatbot/gpt_chatbot.html") || // 직접 비교
+                (linkHref === "../GPT_Chatbot/gpt_chatbot.html") ||
                 (linkHref === "#" && iconSrc.includes('icon_gpt_chatbot'));
     });
-    if (chatbotLink) {
-        chatbotLink.parentElement.classList.add('active');
-    } else { // Fallback for stricter matching
-        document.querySelector('#sidebar-menu li a[href*="gpt_chatbot.html"]')?.parentElement.classList.add('active');
+    if (chatbotLink) { chatbotLink.parentElement.classList.add('active');
+    } else { document.querySelector('#sidebar-menu li a[href*="gpt_chatbot.html"]')?.parentElement.classList.add('active'); }
+
+
+    // --- 챗봇 기능 구현 ---
+
+    // Textarea 자동 높이 조절
+    messageInput.addEventListener('input', function() {
+        this.style.height = 'auto';
+        let scrollHeight = this.scrollHeight;
+        const maxHeight = 58; // 약 2줄 높이 (calc(2.8em + 16px) 와 유사)
+
+        if (scrollHeight > maxHeight) {
+            this.style.height = maxHeight + 'px';
+            this.style.overflowY = 'auto'; 
+        } else {
+            this.style.height = scrollHeight + 'px';
+            this.style.overflowY = 'hidden'; 
+        }
+    });
+
+    // 메시지 전송 함수
+    async function sendMessage() {
+        const messageText = messageInput.value.trim();
+        if (messageText === "") return; // 빈 메시지 전송 방지
+
+        if (isFirstUserMessage && initialLogoContainer) {
+            // initialLogoContainer.style.display = 'none'; // 로고 숨기기 (선택 사항)
+            isFirstUserMessage = false;
+        }
+
+        appendMessage(messageText, 'user'); // 사용자 메시지 화면에 표시
+        messageInput.value = ""; // 입력창 비우기
+        messageInput.style.height = 'auto'; // 입력창 높이 초기화
+        messageInput.style.overflowY = 'hidden';
+        messageInput.focus(); // 메시지 보낸 후에도 입력창에 포커스 유지
+
+        appendTypingIndicator(); // GPT 응답 대기 중 표시
+        try {
+            const gptResponse = await getGptResponse(messageText); // GPT 응답 가져오기 (플레이스홀더)
+            removeTypingIndicator(); // 응답 대기 표시 제거
+            appendMessage(gptResponse, 'gpt'); // GPT 응답 화면에 표시
+        } catch (error) {
+            removeTypingIndicator();
+            appendMessage("죄송합니다. 응답을 가져오는 중 오류가 발생했습니다.", 'gpt', true);
+            console.error("Error getting GPT response:", error);
+        }
     }
 
+    // 채팅 화면에 메시지 추가 함수
+    function appendMessage(text, sender, isError = false) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('chat-message', sender);
+        if (isError) messageDiv.classList.add('error');
 
-    // --- 기존 챗봇 페이지 JS 코드 (이벤트 리스너, 함수 등) ---
-    // Auto-resize textarea (이전과 동일)
-    messageInput.addEventListener('input', function() { /* ... */ });
-    // Send Message Function (이전과 동일)
-    async function sendMessage() { /* ... */ }
-    // Append message to chat display (이전과 동일)
-    function appendMessage(text, sender, isError = false) { /* ... */ }
-    // Typing Indicator (이전과 동일)
-    function appendTypingIndicator() { /* ... */ }
-    function removeTypingIndicator() { /* ... */ }
-    // Get GPT Response (Placeholder - 이전과 동일)
-    async function getGptResponse(userMessage) { /* ... */ }
-    // Event Listeners (이전과 동일)
+        if (sender === 'gpt') {
+            const avatarImg = document.createElement('img');
+            avatarImg.src = '../image/chatbot_avatar.png'; // GPT 아바타 이미지 경로
+            avatarImg.alt = 'GPT Avatar';
+            avatarImg.classList.add('chat-avatar');
+            messageDiv.appendChild(avatarImg);
+        }
+
+        const bubbleDiv = document.createElement('div');
+        bubbleDiv.classList.add('message-bubble');
+        const p = document.createElement('p');
+        p.textContent = text; // XSS 방지를 위해 innerHTML 대신 textContent 사용 권장
+        bubbleDiv.appendChild(p);
+        messageDiv.appendChild(bubbleDiv);
+
+        chatDisplay.appendChild(messageDiv);
+        chatDisplay.scrollTop = chatDisplay.scrollHeight; // 새 메시지 추가 시 스크롤 맨 아래로
+    }
+
+    // "입력 중..." 표시기 추가 함수
+    function appendTypingIndicator() {
+        const typingDiv = document.createElement('div');
+        typingDiv.classList.add('chat-message', 'gpt', 'typing-indicator');
+        typingDiv.id = 'typing-indicator'; // 제거를 위한 ID
+        
+        const avatarImg = document.createElement('img');
+        avatarImg.src = '../image/chatbot_avatar.png';
+        avatarImg.alt = 'GPT Avatar';
+        avatarImg.classList.add('chat-avatar');
+        typingDiv.appendChild(avatarImg);
+
+        const bubbleDiv = document.createElement('div');
+        bubbleDiv.classList.add('message-bubble');
+        const p = document.createElement('p');
+        p.innerHTML = '<span>.</span><span>.</span><span>.</span>'; // 간단한 점 애니메이션
+        bubbleDiv.appendChild(p);
+        typingDiv.appendChild(bubbleDiv);
+        
+        chatDisplay.appendChild(typingDiv);
+        chatDisplay.scrollTop = chatDisplay.scrollHeight;
+    }
+
+    // "입력 중..." 표시기 제거 함수
+    function removeTypingIndicator() {
+        const typingIndicator = document.getElementById('typing-indicator');
+        if (typingIndicator) {
+            typingIndicator.remove();
+        }
+    }
+
+    // GPT 응답 가져오기 (플레이스홀더 함수 - 실제로는 API 호출)
+    async function getGptResponse(userMessage) {
+        // API 호출 지연 시뮬레이션
+        await new Promise(resolve => setTimeout(resolve, 800 + Math.random() * 700));
+
+        const lowerMessage = userMessage.toLowerCase();
+        if (lowerMessage.includes("안녕")) {
+            return "안녕하세요! AdvisorGPT입니다. 무엇을 도와드릴까요?";
+        } else if (lowerMessage.includes("운동 추천") || lowerMessage.includes("운동 뭐할까")) {
+            return "좋은 질문입니다! 가벼운 조깅이나 빠르게 걷기 같은 유산소 운동과 함께, 스쿼트나 플랭크 같은 근력 운동을 주 2-3회 병행해보시는 건 어떠신가요? 자세한 추천을 원하시면 현재 건강 상태나 선호하는 운동 종류를 알려주세요.";
+        } else if (lowerMessage.includes("스트레스 해소") || lowerMessage.includes("스트레스 받아")) {
+            return "스트레스는 관리가 중요하죠. 깊게 숨을 쉬는 복식 호흡이나 짧은 명상을 시도해보세요. 좋아하는 음악을 듣거나 가벼운 산책도 도움이 될 수 있습니다. 어떤 상황에서 스트레스를 느끼시는지 말씀해주시면 더 구체적인 조언을 드릴 수 있습니다.";
+        } else if (lowerMessage.includes("고마워") || lowerMessage.includes("감사합니다")) {
+            return "천만에요! 더 궁금한 점이 있으시면 언제든지 다시 물어보세요. 건강한 하루 보내세요!";
+        } else {
+            return `"${userMessage}"에 대해 좀 더 생각해보고 답변드릴게요. (이 부분은 실제 GPT가 답변합니다.)`;
+        }
+    }
+
+    // 이벤트 리스너 등록
     sendButton.addEventListener('click', sendMessage);
-    messageInput.addEventListener('keydown', function(event) { /* ... */ });
+
+    messageInput.addEventListener('keydown', function(event) {
+        // Enter 키만 눌렀을 때 (Shift 키 없이) 메시지 전송
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault(); // textarea에서 Enter 시 기본 동작(줄바꿈) 방지
+            sendMessage();
+        }
+        // Shift + Enter는 textarea의 기본 동작(줄바꿈)을 따름
+    });
+
+    // 페이지 로드 시 채팅창 스크롤 맨 아래로 (초기 메시지 보이도록)
     if(chatDisplay) chatDisplay.scrollTop = chatDisplay.scrollHeight; 
 });
 </script>
+</body>
+</html>
