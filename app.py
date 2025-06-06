@@ -9,8 +9,19 @@ app = Flask(__name__)
 CORS(app)
 
 # GOOGLE_API_KEY = "AIzaSyBZM_8jC-dk7nHK3RHsinC8nZx5ALh7gk0" # 이 줄 대신
-GOOGLE_API_KEY = "AIzaSyBZM_8jC-dk7nHK3RHsinC8nZx5ALh7gk0"
-genai.configure(api_key=GOOGLE_API_KEY)
+# GOOGLE_API_KEY = "AIzaSyBZM_8jC-dk7nHK3RHsinC8nZx5ALh7gk0" #
+GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY") # 환경 변수에서 가져오기
+
+if not GOOGLE_API_KEY:
+    print("CRITICAL: GOOGLE_API_KEY 환경 변수가 설정되지 않았습니다. 앱이 정상적으로 작동하지 않을 수 있습니다.")
+    # 또는 raise ValueError("GOOGLE_API_KEY 환경 변수가 설정되지 않았습니다.") 로 앱 시작 중단
+else:
+    try:
+        genai.configure(api_key=GOOGLE_API_KEY)
+        print("Gemini API Key configured successfully.")
+    except Exception as e:
+        print(f"CRITICAL: Gemini API Key 구성 중 오류 발생: {e}")
+        # 이 경우에도 앱이 정상 작동하지 않을 가능성이 높음
 
 
 # --- 2. AI 통합 분석 함수 (모든 것을 한 번에 처리!) ---
@@ -90,4 +101,6 @@ def create_ai_driven_report():
     return jsonify(report)
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+    # 로컬 개발 시에만 사용. Render에서는 Gunicorn이 실행하므로 이 부분은 실행되지 않음.
+    # Render는 PORT 환경 변수를 통해 동적으로 포트를 할당하므로, 여기서 포트를 고정할 필요 없음.
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5001)), debug=True)
