@@ -1,6 +1,5 @@
 pip freeze > requirements.txt
-Flask==2.x.x
-Flask-CORS==3.x.x
-google-generativeai==0.x.x
-gunicorn==20.x.x  # 웹 서버로 Gunicorn을 사용할 경우
-# 기타 필요한 라이브러리
+Flask==2.3.2
+Flask-CORS==3.0.10
+google-generativeai==0.3.2
+gunicorn==20.1.0
