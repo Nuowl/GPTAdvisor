@@ -12,11 +12,12 @@
         <!-- Left Sidebar -->
         <aside class="sidebar left-sidebar">
             <div class="profile-section">
-                <img src="../image/user_profile_default.png" alt="User Profile" class="profile-pic">
-                <p class="user-nickname" id="sidebar-username">User</p>
+                <!-- ID 추가 및 기본 src 설정 -->
+                <img src="../image/user_profile_default.png" alt="User Profile" class="profile-pic" id="sidebar-profile-pic">
+                <p class="user-nickname" id="sidebar-username">User</p> <!-- ID는 이미 존재 -->
             </div>
             <nav class="menu-section">
-                <ul>
+                <ul id="sidebar-menu"> <!-- 사이드바 메뉴에 ID 추가 (활성 상태 제어용) -->
                     <li class="active"><a href="../Main_Page/main.html"><img src="../image/icon_my_today.png" alt="" class="menu-icon"> 나의 오늘</a></li>
                     <li><a href="../Health_Report/health_report.html"><img src="../image/icon_health_report.png" alt="" class="menu-icon"> 건강 리포트</a></li>
                     <li><a href="../GPT_Chatbot/gpt_chatbot.html"><img src="../image/icon_gpt_chatbot.png" alt="" class="menu-icon"> GPT Chatbot</a></li>
@@ -31,7 +32,8 @@
         <!-- Center Content -->
         <main class="main-content">
             <header class="welcome-header">
-                <h1>환영합니다, <span id="main-username">User</span>!</h1>
+                <!-- h1 태그 내용 변경 및 span 태그 id 추가 -->
+                <h1>환영합니다, <span class="username-highlight" id="main-username-placeholder">User</span>님!</h1>
             </header>
             <section class="health-summary">
                 <div class="summary-title-container">
@@ -101,8 +103,9 @@
             </section>
         </main>
 
-        <!-- Right Sidebar -->
+        <!-- Right Sidebar (이전과 동일) -->
         <aside class="sidebar right-sidebar">
+            <!-- ... (우측 사이드바 내용 이전과 동일) ... -->
             <h3 class="right-sidebar-title">오늘의 기록</h3>
             <div class="date-display">
                 <img src="../image/icon_calendar.png" alt="Calendar" class="sidebar-icon">
@@ -165,78 +168,112 @@
             </div>
             <button type="submit" class="submit-button">기록 완료</button>
         </form>
-    </aside>
+        </aside>
     </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Set current date
+    // --- 로그인한 사용자 정보 로드 및 UI 업데이트 ---
+    const loggedInUserEmail = localStorage.getItem('loggedInUserEmail');
+    const sidebarProfilePic = document.getElementById('sidebar-profile-pic');
+    const sidebarUsername = document.getElementById('sidebar-username');
+    const mainUsernamePlaceholder = document.getElementById('main-username-placeholder');
+    const defaultProfilePicPath = '../image/user_profile_default.png';
+
+    if (loggedInUserEmail) {
+        // localStorage에서 사용자 전체 정보 가져오기 (선택적, 닉네임과 프로필만 필요하면 개별 키 사용)
+        // const users = JSON.parse(localStorage.getItem('advisorGptUsers')) || [];
+        // const currentUser = users.find(user => user.email === loggedInUserEmail);
+
+        const nickname = localStorage.getItem('userNickname') || 'User'; // 개별 키에서 닉네임 가져오기
+        const profilePic = localStorage.getItem('userProfileImage') || defaultProfilePicPath; // 개별 키에서 프로필 사진 가져오기
+
+        if (sidebarProfilePic) {
+            sidebarProfilePic.src = profilePic;
+            sidebarProfilePic.alt = nickname + " 프로필";
+        }
+        if (sidebarUsername) {
+            sidebarUsername.textContent = nickname;
+        }
+        if (mainUsernamePlaceholder) {
+            mainUsernamePlaceholder.textContent = nickname;
+            // mainUsernamePlaceholder.style.color = '#3377DD'; // CSS로 처리하는 것이 더 좋음
+        }
+    } else {
+        // 로그인하지 않은 사용자에 대한 처리 (예: 로그인 페이지로 리디렉션)
+        // alert("로그인이 필요한 서비스입니다.");
+        // window.location.href = '../Advisor_login/index.html'; 
+        // 또는 기본값(User, 기본 프로필) 유지
+    }
+
+    // --- 사이드바 활성 메뉴 설정 ---
+    const currentPage = "main.html"; // 현재 페이지 파일명
+    const sidebarLinks = document.querySelectorAll('#sidebar-menu li a');
+    sidebarLinks.forEach(link => {
+        link.parentElement.classList.remove('active');
+        const linkHref = link.getAttribute('href');
+        if (linkHref && linkHref.includes(currentPage)) {
+            link.parentElement.classList.add('active');
+        }
+    });
+
+
+    // --- 기존 스크립트 내용 (날짜, 기록 폼 처리 등) ---
     const dateElement = document.getElementById('current-date');
     const today = new Date();
     const year = today.getFullYear();
     const month = String(today.getMonth() + 1).padStart(2, '0');
     const day = String(today.getDate()).padStart(2, '0');
-    dateElement.textContent = `${year} / ${month} / ${day}`;
+    if (dateElement) dateElement.textContent = `${year} / ${month} / ${day}`;
 
-    // Character counter for textarea
     const moodStressText = document.getElementById('mood-stress-text');
     const charCounter = document.getElementById('char-counter');
-    moodStressText.addEventListener('input', function() {
-        const currentLength = moodStressText.value.length;
-        charCounter.textContent = `${currentLength} /500 자`;
-    });
+    if (moodStressText && charCounter) {
+        moodStressText.addEventListener('input', function() {
+            const currentLength = moodStressText.value.length;
+            charCounter.textContent = `${currentLength} /500 자`;
+        });
+    }
 
-    // Handle form submission
     const form = document.getElementById('daily-record-form');
-    form.addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevent actual form submission
+    if (form) {
+        form.addEventListener('submit', function(event) {
+            event.preventDefault(); 
 
-        // Get values - Sleep
-        const sleepHours = parseInt(document.getElementById('sleep-hours').value) || 0;
-        const sleepMins = parseInt(document.getElementById('sleep-mins').value) || 0;
-        document.getElementById('display-sleep-hours').textContent = sleepHours;
-        document.getElementById('display-sleep-mins').textContent = sleepMins;
+            const sleepHours = parseInt(document.getElementById('sleep-hours').value) || 0;
+            const sleepMins = parseInt(document.getElementById('sleep-mins').value) || 0;
+            if(document.getElementById('display-sleep-hours')) document.getElementById('display-sleep-hours').textContent = sleepHours;
+            if(document.getElementById('display-sleep-mins')) document.getElementById('display-sleep-mins').textContent = sleepMins;
 
-        // Get values - Meals (summing up kcal)
-        const bfKcal = parseInt(document.getElementById('meal-breakfast').value) || 0;
-        const lunchKcal = parseInt(document.getElementById('meal-lunch').value) || 0;
-        const dinnerKcal = parseInt(document.getElementById('meal-dinner').value) || 0;
-        const totalKcal = bfKcal + lunchKcal + dinnerKcal;
-        document.getElementById('display-meal-kcal').textContent = totalKcal;
+            const bfKcal = parseInt(document.getElementById('meal-breakfast').value) || 0;
+            const lunchKcal = parseInt(document.getElementById('meal-lunch').value) || 0;
+            const dinnerKcal = parseInt(document.getElementById('meal-dinner').value) || 0;
+            const totalKcal = bfKcal + lunchKcal + dinnerKcal;
+            if(document.getElementById('display-meal-kcal')) document.getElementById('display-meal-kcal').textContent = totalKcal;
 
-        // Get values - Exercise (summing up time)
-        const strengthHours = parseInt(document.getElementById('exercise-strength-hours').value) || 0;
-        const strengthMins = parseInt(document.getElementById('exercise-strength-mins').value) || 0;
-        const cardioHours = parseInt(document.getElementById('exercise-cardio-hours').value) || 0;
-        const cardioMins = parseInt(document.getElementById('exercise-cardio-mins').value) || 0;
-        
-        let totalExerciseHours = strengthHours + cardioHours;
-        let totalExerciseMins = strengthMins + cardioMins;
-        totalExerciseHours += Math.floor(totalExerciseMins / 60);
-        totalExerciseMins = totalExerciseMins % 60;
-        document.getElementById('display-exercise-hours').textContent = totalExerciseHours;
-        document.getElementById('display-exercise-mins').textContent = totalExerciseMins;
+            const strengthHours = parseInt(document.getElementById('exercise-strength-hours').value) || 0;
+            const strengthMins = parseInt(document.getElementById('exercise-strength-mins').value) || 0;
+            const cardioHours = parseInt(document.getElementById('exercise-cardio-hours').value) || 0;
+            const cardioMins = parseInt(document.getElementById('exercise-cardio-mins').value) || 0;
+            
+            let totalExerciseHours = strengthHours + cardioHours;
+            let totalExerciseMins = strengthMins + cardioMins;
+            totalExerciseHours += Math.floor(totalExerciseMins / 60);
+            totalExerciseMins = totalExerciseMins % 60;
+            if(document.getElementById('display-exercise-hours')) document.getElementById('display-exercise-hours').textContent = totalExerciseHours;
+            if(document.getElementById('display-exercise-mins')) document.getElementById('display-exercise-mins').textContent = totalExerciseMins;
 
-        // Set fixed scores as per request
-        document.getElementById('health-score-value').textContent = '82';
-        document.getElementById('stress-score-value').textContent = '75';
-        
-        // Update nickname in main content if it's dynamic later (currently static)
-        // const nickname = document.getElementById('sidebar-username').textContent;
-        // document.getElementById('main-username').textContent = nickname;
+            if(document.getElementById('health-score-value')) document.getElementById('health-score-value').textContent = '82'; // 고정값
+            if(document.getElementById('stress-score-value')) document.getElementById('stress-score-value').textContent = '75'; // 고정값
+            
+            if(document.getElementById('physical-analysis-text')) document.getElementById('physical-analysis-text').textContent = "AI 분석: 오늘의 기록을 바탕으로 신체적 상태를 분석 중입니다...";
+            if(document.getElementById('physical-tips-text')) document.getElementById('physical-tips-text').textContent = "AI 피드백: 건강한 습관을 위한 맞춤형 팁을 생성 중입니다...";
+            if(document.getElementById('mental-analysis-text')) document.getElementById('mental-analysis-text').textContent = "AI 정신 분석: 오늘의 기분/스트레스 내용을 바탕으로 분석 중입니다...";
+            if(document.getElementById('mental-tips-text')) document.getElementById('mental-tips-text').textContent = "AI 정신 피드백: 마음 건강을 위한 조언을 준비 중입니다...";
 
-
-        // Update feedback text (placeholders for now)
-        document.getElementById('physical-analysis-text').textContent = "AI 분석: 수면 패턴과 식단, 운동량에 대한 신체적 분석 결과가 여기에 표시됩니다. (예: 수면시간 적절, 칼로리 섭취량 보통, 운동량 충분)";
-        document.getElementById('physical-tips-text').textContent = "AI 피드백: 전반적으로 좋은 건강 상태를 유지하고 계십니다. 꾸준히 현재 생활 습관을 이어가세요. (예: 물을 충분히 마시는 것을 잊지 마세요.)";
-        document.getElementById('mental-analysis-text').textContent = "AI 정신 분석: 입력하신 기분/스트레스 내용을 바탕으로 정신 건강 상태 분석 결과가 여기에 표시됩니다.";
-        document.getElementById('mental-tips-text').textContent = "AI 정신 피드백: 스트레스 해소를 위한 명상이나 가벼운 산책을 추천합니다.";
-
-        // Optionally, clear the form or give a success message
-        // form.reset();
-        // charCounter.textContent = '0/500 자';
-        alert('오늘의 기록이 중앙 패널에 반영되었습니다!');
-    });
+            alert('오늘의 기록이 중앙 패널에 반영되었습니다!');
+        });
+    }
 });
 </script>
 </body>
