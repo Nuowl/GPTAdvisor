@@ -160,6 +160,12 @@ html, body {
 }
 .submit-button:hover { background-color: #285ead; }
 
+.submit-button:disabled {
+    background-color: #cccccc;
+    color: #666666;
+    cursor: not-allowed;
+}
+
 /* Responsive adjustments */
 @media (max-width: 1420px) { /* .main-content max-width + 양쪽 사이드바 너비 근처 */
     .main-dashboard-container {
