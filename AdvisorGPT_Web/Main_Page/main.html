@@ -240,7 +240,10 @@ document.addEventListener('DOMContentLoaded', function() {
             };
 
             try {
-                const response = await fetch('http://127.0.0.1:5001/api/health-report', {
+                const API_ENDPOINT_URL = 'https://https://gptadvisor.onrender.com/api/health-report'; 
+                // 예시: const API_ENDPOINT_URL = 'https://advisor-gpt-api.onrender.com/api/health-report';
+    
+                const response = await fetch(API_ENDPOINT_URL, { // 변경된 URL 사용
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(requestData)
