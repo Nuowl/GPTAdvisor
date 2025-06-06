@@ -99,8 +99,10 @@ def create_ai_driven_report():
         }
     }
     return jsonify(report)
-    def home():
-        return "Flask API 서버가 정상적으로 실행 중입니다. API 엔드포인트는 /api/health-report 입니다."
+    
+@app.route('/')
+def home():
+    return "Flask API 서버가 정상적으로 실행 중입니다. API 엔드포인트는 /api/health-report 입니다."
 
 if __name__ == '__main__':
     # 로컬 개발 시에만 사용. Render에서는 Gunicorn이 실행하므로 이 부분은 실행되지 않음.
