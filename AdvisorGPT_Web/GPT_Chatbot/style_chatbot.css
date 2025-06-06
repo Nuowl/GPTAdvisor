@@ -27,7 +27,7 @@
 .chat-display-area {
     flex-grow: 1; /* Allows this area to take available space */
     overflow-y: auto; /* Enables vertical scrolling *within this area* */
-    padding: 0px 20px 15px 20px; /* Adjusted padding */
+    padding: 0px 20px 0px 20px; /* Adjusted padding */
     display: flex;
     flex-direction: column;
     gap: 15px;
@@ -52,35 +52,19 @@
 /* Message styles (remain mostly the same) */
 .chat-message {
     display: flex;
-    width: fit-content;
     max-width: 75%;
     align-items: flex-end;
     word-wrap: break-word;
 }
-.message-bubble {
-    padding: 10px 15px;
-    border-radius: 18px;
-    line-height: 1.5;
-    max-width: 100%; /* 부모 .chat-message의 max-width를 따르도록 */
-    box-sizing: border-box;
-}
-.message-bubble p {
-    margin: 0;
-    font-size: 15px;
-    word-wrap: break-word; /* 2. 긴 단어 강제 줄 바꿈 (overflow-wrap과 동일) */
-    overflow-wrap: break-word; /* 2. 표준 속성 */
-    white-space: pre-wrap;    /* 1. 입력된 공백 및 줄 바꿈 유지 */
-    /* max-width와 overflow-wrap으로 인해 가로 스크롤은 생기지 않아야 함 */
-}
 
 .chat-message.user {
     align-self: flex-end;
-    margin-left: auto;
 }
 .chat-message.user .message-bubble {
     background-color: #3377DD;
     color: #FFFFFF;
     border-radius: 18px 18px 5px 18px;
+    padding: 10px 15px;
 }
 .chat-message.user .message-bubble p {
     margin: 0;
@@ -90,7 +74,6 @@
 
 .chat-message.gpt {
     align-self: flex-start;
-    margin-right: auto;
 }
 .chat-message.gpt .chat-avatar {
     width: 40px;
@@ -109,6 +92,7 @@
     color: #000000;
     border: 2.5px solid #3377DD;
     border-radius: 18px 18px 18px 5px;
+    padding: 10px 15px;
 }
 .chat-message.gpt .message-bubble p {
     margin: 0;
