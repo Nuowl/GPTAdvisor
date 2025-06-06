@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdvisorGPT 건강 리포트</title>
+    <link rel="stylesheet" href="../Main_Page/style.css"> <!-- 기본 스타일 상속 -->
+    <link rel="stylesheet" href="style_report.css"> <!-- 리포트 페이지 전용 스타일 -->
+    <link href="https://fonts.googleapis.com/css2?family=Mulish&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="main-dashboard-container">
+        <!-- Left Sidebar -->
+        <aside class="sidebar left-sidebar">
+            <div class="profile-section">
+                <img src="../image/user_profile_default.png" alt="User Profile" class="profile-pic">
+                <p class="user-nickname" id="sidebar-username">User</p>
+            </div>
+            <nav class="menu-section">
+                <ul id="sidebar-menu">
+                    <li><a href="../Main_Page/main.html"><img src="../image/icon_my_today.png" alt="" class="menu-icon"> 나의 오늘</a></li>
+                    <li class="active"><a href="../Health_Report/health_report.html"><img src="../image/icon_health_report.png" alt="" class="menu-icon"> 건강 리포트</a></li>
+                    <li><a href="../GPT_Chatbot/gpt_chatbot.html"><img src="../image/icon_gpt_chatbot.png" alt="" class="menu-icon"> GPT Chatbot</a></li>
+                    <li><a href="../Settings_Page/settings.html"><img src="../image/icon_settings.png" alt="" class="menu-icon"> 설정</a></li>
+                </ul>
+            </nav>
+            <div class="logo-section">  
+                <img src="../image/AdvisorGPT_Logo_big.png" alt="AdvisorGPT Logo" class="advisor-logo">
+            </div>
+        </aside>
+
+        <!-- Main Content for Health Report -->
+        <main class="main-content report-content">
+            <section class="goal-status-section">
+                <p class="goal-text">
+                    나의 목표 점수 
+                    <input type="number" id="goal-score-input" min="1" max="100" value="90">점까지 
+                    <span id="points-remaining">XX</span>점 남았습니다.
+                </p>
+                <p class="gpt-comment">GPT 격려 코멘트: 목표를 향해 꾸준히 나아가세요! 작은 변화가 큰 결과를 만듭니다.</p>
+            </section>
+
+            <section class="weekly-chart-section">
+                <h2>주간 건강 점수</h2>
+                <div class="chart-container">
+                    <canvas id="weeklyHealthChart"></canvas>
+                </div>
+            </section>
+
+            <section class="weekly-summary-section">
+                <h2>주간 요약</h2>
+                <ul class="summary-list">
+                    <li>
+                        <img src="../image/icon_sleep_moon_right.png" alt="수면" class="summary-icon">
+                        <span>이번 주 평균 수면 시간은 <strong class="highlight-blue">7.2시간</strong>으로 지난 주 대비 <strong class="highlight-red">5% 감소</strong>했습니다.</span>
+                    </li>
+                    <li>
+                        <img src="../image/icon_meal_bowl_center.png" alt="식사량" class="summary-icon">
+                        <span>이번 주 평균 식사량은 <strong class="highlight-blue">1850kcal</strong>으로 지난 주 대비 <strong class="highlight-green">3% 증가</strong>했습니다.</span>
+                    </li>
+                    <li>
+                        <img src="../image/icon_exercise_dumbbell_center.png" alt="운동 시간" class="summary-icon">
+                        <span>이번 주 평균 운동 시간은 <strong class="highlight-blue">1.5시간</strong>으로 지난 주 대비 <strong class="highlight-green">10% 증가</strong>했습니다.</span>
+                    </li>
+                    <li>
+                        <img src="../image/icon_stress_head_center.png" alt="스트레스 지수" class="summary-icon">
+                        <span>이번 주 평균 스트레스 지수는 <strong class="highlight-blue">65점</strong>으로 지난 주 대비 <strong class="highlight-green                                                         ">8% 감소</strong>했습니다. (점수가 낮을수록 긍정적입니다.)</span>
+                    </li>
+                    <li>
+                        <img src="../image/icon_health_score.png" alt="건강 점수" class="summary-icon">
+                        <span>이번 주 평균 건강 점수는 <strong class="highlight-blue">78점</strong>으로 지난 주 대비 <strong class="highlight-green">4% 증가</strong>했습니다!</span>
+                    </li>
+                </ul>
+            </section>
+        </main>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Sample data for the chart (replace with actual data)
+    const weeklyScores = [68, 72, 70, 78, 75, 80, 77]; // 월, 화, 수, 목, 금, 토, 일
+    const labels = ['월', '화', '수', '목', '금', '토', '일'];
+
+    // Calculate average weekly score
+    const averageWeeklyScore = weeklyScores.reduce((sum, score) => sum + score, 0) / weeklyScores.length;
+
+    // Goal score functionality
+    const goalInput = document.getElementById('goal-score-input');
+    const pointsRemainingSpan = document.getElementById('points-remaining');
+
+    function updatePointsRemaining() {
+        const goalScore = parseInt(goalInput.value) || 0;
+        if (goalScore < 1) goalInput.value = 1;
+        if (goalScore > 100) goalInput.value = 100;
+        
+        const remaining = Math.max(0, goalScore - Math.round(averageWeeklyScore));
+        pointsRemainingSpan.textContent = remaining;
+    }
+
+    goalInput.addEventListener('input', updatePointsRemaining);
+    goalInput.addEventListener('change', updatePointsRemaining); // Handles up/down arrow changes better
+
+    // Initial calculation
+    updatePointsRemaining();
+
+    // Chart.js configuration
+    const ctx = document.getElementById('weeklyHealthChart').getContext('2d');
+    const weeklyHealthChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: '주간 건강 점수',
+                data: weeklyScores,
+                borderColor: '#3377DD',
+                backgroundColor: 'rgba(51, 119, 221, 0.1)',
+                tension: 0.1,
+                fill: true,
+                pointBackgroundColor: '#3377DD',
+                pointBorderColor: '#FFFFFF',
+                pointHoverBackgroundColor: '#FFFFFF',
+                pointHoverBorderColor: '#3377DD',
+                pointRadius: 5,
+                pointHoverRadius: 7,
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        stepSize: 10,
+                        color: '#555',
+                            font: {
+                                family: "'Noto Sans KR', sans-serif"
+                        }
+                    },
+                    grid: {
+                        color: '#E0E0E0',
+                        drawBorder: false,
+                    }
+                },
+                x: {
+                        ticks: {
+                            color: '#555',
+                            font: {
+                                family: "'Noto Sans KR', sans-serif"
+                        }
+                    },
+                    grid: {
+                        display: false, // Hides vertical grid lines on x-axis if not desired
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false // Hides the legend if not needed as per image
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0,0,0,0.7)',
+                    titleFont: { family: "'Noto Sans KR', sans-serif", size: 14 },
+                    bodyFont: { family: "'Noto Sans KR', sans-serif", size: 12 },
+                    padding: 10,
+                    cornerRadius: 6,
+                    displayColors: false, // Hides color box in tooltip
+                        callbacks: {
+                            label: function(context) {
+                                return `점수: ${context.parsed.y}`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+     // Ensure correct sidebar link is active (main page style might override)
+    const currentReportPath = "health_report.html"; // Or the specific path for this page
+    const sidebarLinks = document.querySelectorAll('#sidebar-menu li a');
+    sidebarLinks.forEach(link => {
+        link.parentElement.classList.remove('active'); // Remove active from all
+        if (link.getAttribute('href') && (link.getAttribute('href').includes(currentReportPath) || (link.getAttribute('href') === "#" && link.parentElement.querySelector('.menu-icon').src.includes('icon_health_report')))) {
+            link.parentElement.classList.add('active');
+        }
+    });
+    // If the "나의 오늘" link goes to main.html, ensure it's not active here
+    const myTodayLink = document.querySelector('#sidebar-menu li a[href*="main.html"]');
+    if (myTodayLink) {
+        myTodayLink.parentElement.classList.remove('active');
+    }
+    const healthReportLink = Array.from(sidebarLinks).find(a => a.textContent.includes("건강 리포트"));
+    if (healthReportLink) {
+        healthReportLink.parentElement.classList.add('active');
+    }
+
+
+});
+</script>
+</body>
+</html>

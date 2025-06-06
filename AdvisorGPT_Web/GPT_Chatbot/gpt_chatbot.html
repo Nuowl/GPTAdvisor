@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdvisorGPT 챗봇</title>
+    <link rel="stylesheet" href="../Main_Page/style.css"> <!-- 기본 스타일 상속 -->
+    <link rel="stylesheet" href="style_chatbot.css"> <!-- 챗봇 페이지 전용 스타일 -->
+    <link href="https://fonts.googleapis.com/css2?family=Mulish&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="main-dashboard-container">
+        <!-- Left Sidebar -->
+        <aside class="sidebar left-sidebar">
+            <div class="profile-section">
+                <img src="../image/user_profile_default.png" alt="User Profile" class="profile-pic">
+                <p class="user-nickname" id="sidebar-username">User</p>
+            </div>
+            <nav class="menu-section">
+                <ul id="sidebar-menu">
+                    <li><a href="../Main_Page/main.html"><img src="../image/icon_my_today.png" alt="" class="menu-icon"> 나의 오늘</a></li>
+                    <li><a href="../Health_Report/health_report.html"><img src="../image/icon_health_report.png" alt="" class="menu-icon"> 건강 리포트</a></li>
+                    <li class="active"><a href="../GPT_Chatbot/gpt_chatbot.html"><img src="../image/icon_gpt_chatbot.png" alt="" class="menu-icon"> GPT Chatbot</a></li>
+                    <li><a href="../Settings_Page/settings.html"><img src="../image/icon_settings.png" alt="" class="menu-icon"> 설정</a></li>
+                </ul>
+            </nav>
+            <div class="logo-section">
+                <img src="../image/AdvisorGPT_Logo_big.png" alt="AdvisorGPT Logo" class="advisor-logo">
+            </div>
+        </aside>
+
+        <!-- Main Content for Chatbot -->
+        <main class="main-content chatbot-page-container">
+            <div class="chatbot-interface">
+                <div class="chat-display-area" id="chat-display">
+                    <div class="chat-initial-logo-container">
+                        <img src="../image/AdvisorGPT_Logo_big.png" alt="AdvisorGPT Initial Logo" class="chat-initial-logo">
+                    </div>
+                    <div class="chat-message gpt">
+                        <img src="../image/chatbot_avatar.png" alt="GPT Avatar" class="chat-avatar">
+                        <div class="message-bubble">
+                            <p>안녕하세요! AdvisorGPT입니다. 무엇을 도와드릴까요? 건강 관련 질문이나 고민을 말씀해주세요.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-input-wrapper">
+                    <div class="chat-input-area">
+                        <textarea id="chat-message-input" placeholder="메시지를 입력하세요..." rows="1"></textarea>
+                        <button id="send-message-button" class="send-button">
+                            <img src="../image/icon_send_message.png" alt="Send">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chatDisplay = document.getElementById('chat-display');
+    const messageInput = document.getElementById('chat-message-input');
+    const sendButton = document.getElementById('send-message-button');
+    const initialLogoContainer = document.querySelector('.chat-initial-logo-container');
+    let isFirstUserMessage = true;
+
+    // Sidebar Active State
+    const currentChatbotPath = "gpt_chatbot.html"; 
+    const sidebarLinks = document.querySelectorAll('#sidebar-menu li a');
+    sidebarLinks.forEach(link => {
+        link.parentElement.classList.remove('active');
+    });
+    const chatbotLink = Array.from(sidebarLinks).find(a => {
+        const linkHref = a.getAttribute('href');
+        return (linkHref && linkHref.includes(currentChatbotPath)) || 
+                (linkHref === "#" && a.parentElement.querySelector('.menu-icon').src.includes('icon_gpt_chatbot'));
+    });
+    if (chatbotLink) {
+        chatbotLink.parentElement.classList.add('active');
+    }
+
+    // Auto-resize textarea
+    messageInput.addEventListener('input', function() {
+        this.style.height = 'auto';
+        let scrollHeight = this.scrollHeight;
+        // For line-height: 1.4 and font-size: 15px, a line is ~21px.
+        // Padding: 8px top/bottom for textarea = 16px.
+        // 1 line: 21 + 16 = 37px.
+        // 2 lines: (2*21) + 16 = 42 + 16 = 58px.
+        const maxHeight = 58; // Target for approx 2 lines + padding
+
+        if (scrollHeight > maxHeight) {
+            this.style.height = maxHeight + 'px';
+            this.style.overflowY = 'auto'; 
+        } else {
+            this.style.height = scrollHeight + 'px';
+            this.style.overflowY = 'hidden'; 
+        }
+    });
+
+    // Send Message Function (remains the same)
+    async function sendMessage() {
+        const messageText = messageInput.value.trim();
+        if (messageText === "") return;
+
+        if (isFirstUserMessage && initialLogoContainer) {
+            isFirstUserMessage = false;
+        }
+
+        appendMessage(messageText, 'user');
+        messageInput.value = "";
+        messageInput.style.height = 'auto'; 
+        messageInput.style.overflowY = 'hidden';
+
+        appendTypingIndicator();
+        try {
+            const gptResponse = await getGptResponse(messageText);
+            removeTypingIndicator();
+            appendMessage(gptResponse, 'gpt');
+        } catch (error) {
+            removeTypingIndicator();
+            appendMessage("죄송합니다. 응답을 가져오는 중 오류가 발생했습니다.", 'gpt', true);
+            console.error("Error getting GPT response:", error);
+        }
+    }
+
+    // Append message to chat display (remains the same)
+    function appendMessage(text, sender, isError = false) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('chat-message', sender);
+        if (isError) messageDiv.classList.add('error');
+
+        if (sender === 'gpt') {
+            const avatarImg = document.createElement('img');
+            avatarImg.src = '../image/chatbot_avatar.png';
+            avatarImg.alt = 'GPT Avatar';
+            avatarImg.classList.add('chat-avatar');
+            messageDiv.appendChild(avatarImg);
+        }
+
+        const bubbleDiv = document.createElement('div');
+        bubbleDiv.classList.add('message-bubble');
+        const p = document.createElement('p');
+        p.textContent = text;
+        bubbleDiv.appendChild(p);
+        messageDiv.appendChild(bubbleDiv);
+
+        chatDisplay.appendChild(messageDiv);
+        chatDisplay.scrollTop = chatDisplay.scrollHeight;
+    }
+
+    // Typing Indicator (remains the same)
+    function appendTypingIndicator() {
+        const typingDiv = document.createElement('div');
+        typingDiv.classList.add('chat-message', 'gpt', 'typing-indicator');
+        typingDiv.id = 'typing-indicator';
+        
+        const avatarImg = document.createElement('img');
+        avatarImg.src = '../image/chatbot_avatar.png';
+        avatarImg.alt = 'GPT Avatar';
+        avatarImg.classList.add('chat-avatar');
+        typingDiv.appendChild(avatarImg);
+
+        const bubbleDiv = document.createElement('div');
+        bubbleDiv.classList.add('message-bubble');
+        const p = document.createElement('p');
+        p.innerHTML = '<span>.</span><span>.</span><span>.</span>';
+        bubbleDiv.appendChild(p);
+        typingDiv.appendChild(bubbleDiv);
+        
+        chatDisplay.appendChild(typingDiv);
+        chatDisplay.scrollTop = chatDisplay.scrollHeight;
+    }
+
+    function removeTypingIndicator() {
+        const typingIndicator = document.getElementById('typing-indicator');
+        if (typingIndicator) {
+            typingIndicator.remove();
+        }
+    }
+
+    // Get GPT Response (Placeholder - remains the same)
+    async function getGptResponse(userMessage) {
+        await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 1000));
+        const lowerMessage = userMessage.toLowerCase();
+        if (lowerMessage.includes("안녕")) return "안녕하세요! 무엇을 도와드릴까요?";
+        if (lowerMessage.includes("운동")) return "꾸준한 운동은 건강에 매우 중요합니다. 어떤 종류의 운동에 관심 있으신가요?";
+        if (lowerMessage.includes("식단")) return "균형 잡힌 식단은 에너지 수준을 유지하고 전반적인 건강을 증진시키는 데 도움이 됩니다. 특별히 궁금한 식단 정보가 있나요?";
+        if (lowerMessage.includes("고마워")) return "도움이 되어 기쁩니다! 언제든지 다른 질문이 있으시면 말씀해주세요.";
+        return `"${userMessage}"에 대해 더 자세히 알아보고 답변을 준비하겠습니다. (실제로는 GPT가 답변합니다)`;
+    }
+
+    // Event Listeners (remains the same)
+    sendButton.addEventListener('click', sendMessage);
+    messageInput.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            sendMessage();
+        }
+    });
+
+    chatDisplay.scrollTop = chatDisplay.scrollHeight; // Initial scroll to bottom
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+body {
+    margin: 0;
+    font-family: 'Mulish', sans-serif;
+    background-color: #F5FAFF;
+    display: flex;
+    justify-content: flex-start; /* 기존 로그인 페이지 스타일과 일관성 유지 */
+    align-items: center;
+    min-height: 100vh;
+    flex-direction: column;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%; /* 컨테이너가 화면 너비를 채우도록 */
+}
+
+.logo {
+    width: 370px; /* 로그인 페이지 로고 크기와 동일하게 */
+    margin-bottom: 50px; /* 로그인 페이지와 동일하게 */
+    margin-top: -100px;  /* 로그인 페이지와 동일하게 (화면 상단으로 끌어올리는 효과) */
+}
+
+.form-box { /* .login-box 대신 .form-box 로 명명 (일반적인 폼 박스 의미) */
+    background-color: #FFFFFF;
+    border: 3px solid #3377DD;
+    border-radius: 15px;
+    padding: 40px 30px;
+    width: 360px; 
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    text-align: center;
+    margin-top: -100px; /* 로그인 페이지와 동일하게 (로고와 겹치는 효과) */
+}
+
+.form-box h2 {
+    margin-top: 0; /* 기본 h2 마진 제거 */
+    margin-bottom: 25px; /* 제목과 첫 입력 필드 사이 간격 */
+    font-size: 26px;
+    color: #000;
+}
+
+.form-box form {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-box input[type="email"],
+.form-box input[type="password"] {
+    width: 91%; /* 기존 페이지 input 스타일과 일관성 유지 */
+    padding: 12px 15px;
+    margin-bottom: 20px; /* 입력 필드 간 간격 (기존 15px보다 약간 늘림) */
+    border: none;
+    border-radius: 10px;
+    background-color: #EFEFEF;
+    font-size: 14px;
+    outline: none;
+}
+
+.form-box input::placeholder {
+    color: #909498; /* Placeholder 텍스트 색상 */
+}
+
+.form-box input:focus,
+.form-box input:not(:placeholder-shown) {
+    color: #333; /* 입력 중이거나 값이 있을 때 텍스트 색상 */
+}
+
+.submit-button { /* 로그인 버튼과 유사한 스타일 */
+    background-color: #FFFFFF;
+    color: #000000;
+    font-size: 16px;
+    font-weight: normal; /* 기존 버튼들과 일관성 */
+    border: 2px solid #3377DD;
+    border-radius: 10px;
+    padding: 12px;
+    cursor: pointer;
+    width: 100%; /* 폼 너비에 맞춤 */
+    margin-top: 10px; /* 마지막 입력 필드와 버튼 사이 간격 */
+}
+
+.submit-button:hover {
+    background-color: #285ead; /* 버튼 호버 시 색상 변경 */
+}

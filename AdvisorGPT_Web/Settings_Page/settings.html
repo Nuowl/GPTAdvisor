@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdvisorGPT 설정</title>
+    <link rel="stylesheet" href="../Main_Page/style.css"> <!-- 기본 스타일 상속 -->
+    <link rel="stylesheet" href="style_settings.css"> <!-- 설정 페이지 전용 스타일 -->
+    <link href="https://fonts.googleapis.com/css2?family=Mulish&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- jsPDF CDN (for PDF download) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <div class="main-dashboard-container">
+        <!-- Left Sidebar -->
+        <aside class="sidebar left-sidebar">
+            <div class="profile-section">
+                <img src="../image/user_profile_default.png" alt="User Profile" class="profile-pic" id="sidebar-profile-pic">
+                <p class="user-nickname" id="sidebar-username">User</p>
+            </div>
+            <nav class="menu-section">
+                <ul id="sidebar-menu">
+                    <li><a href="../Main_Page/main.html"><img src="../image/icon_my_today.png" alt="" class="menu-icon"> 나의 오늘</a></li>
+                    <li><a href="../Health_Report/health_report.html"><img src="../image/icon_health_report.png" alt="" class="menu-icon"> 건강 리포트</a></li>
+                    <li><a href="../GPT_Chatbot/gpt_chatbot.html"><img src="../image/icon_gpt_chatbot.png" alt="" class="menu-icon"> GPT Chatbot</a></li>
+                    <li class="active"><a href="../Settings_Page/settings.html"><img src="../image/icon_settings.png" alt="" class="menu-icon"> 설정</a></li>
+                </ul>
+            </nav>
+        <div class="logo-section">
+            <img src="../image/AdvisorGPT_Logo_big.png" alt="AdvisorGPT Logo" class="advisor-logo">
+        </div>
+    </aside>
+
+    <!-- Main Content for Settings -->
+    <main class="main-content settings-page-container">
+        <div class="settings-interface">
+            <div class="settings-profile-header">
+                <div class="profile-image-container">
+                    <img src="../image/user_profile_default.png" alt="User Profile" id="settings-profile-img-display">
+                    <div class="profile-image-overlay"></div>
+                    <label for="profile-image-upload" class="edit-profile-icon">
+                        <i class="fas fa-cog"></i>
+                    </label>
+                    <input type="file" id="profile-image-upload" accept=".jpg, .jpeg, .png" style="display: none;">
+                </div>
+                <h1 id="settings-username-display">User</h1>
+            </div>
+
+            <div class="settings-section">
+                <h2>계정 정보 변경</h2>
+                <form id="account-info-form">
+                    <div class="form-group">
+                        <label for="nickname">사용자 별명</label>
+                        <input type="text" id="nickname" name="nickname" placeholder="사용자 별명">
+                    </div>
+                    <div class="form-group-inline">
+                        <div class="form-group">
+                            <label for="height">키 (cm)</label>
+                            <input type="number" id="height" name="height" placeholder="키 (cm)">
+                        </div>
+                        <div class="form-group">
+                            <label for="weight">몸무게 (kg)</label>
+                            <input type="number" id="weight" name="weight" placeholder="몸무게 (kg)">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>성별</label>
+                        <div class="gender-buttons">
+                            <button type="button" class="gender-button" data-gender="male">남자</button>
+                            <button type="button" class="gender-button" data-gender="female">여자</button>
+                        </div>
+                    </div>
+                    <button type="submit" id="save-info-button" class="settings-button-primary" disabled>정보 변경</button>
+                </form>
+            </div>
+
+            <div class="settings-section">
+                <h2>데이터 로컬 저장</h2>
+                <button id="download-data-button" class="settings-button-secondary">다운로드 (PDF)</button>
+            </div>
+
+            <div class="settings-section">
+                <button id="logout-button" class="settings-button-logout">로그아웃</button>
+            </div>
+
+            </div>
+        </main>
+    </div>
+
+<script src="settings_script.js"></script>
+</body>
+</html>

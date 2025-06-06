@@ -1,0 +1,125 @@
+/* Health Report Specific Styles */
+/* Ensure this file is linked AFTER the main style.css in HTML to override if needed */
+.goal-status-section {
+    background-color: #F8F9FA; /* Light background for this section */
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    border: 1px solid #E0E7FF;
+}
+
+.goal-text {
+    font-size: 18px;
+    color: #333;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.goal-text input[type="number"] {
+    width: 60px;
+    padding: 5px 8px;
+    border: 1px solid #B0C4DE;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    color: #3377DD;
+    margin: 0 5px;
+}
+.goal-text input[type="number"]:focus {
+    outline: none;
+    border-color: #3377DD;
+    box-shadow: 0 0 0 2px rgba(51, 119, 221, 0.2);
+}
+
+
+.goal-text #points-remaining {
+    font-weight: bold;
+    color: #D32F2F; /* Red for remaining points */
+}
+
+.gpt-comment {
+    font-size: 15px;
+    color: #555;
+    margin-bottom: 0;
+    padding-left: 5px;
+    font-style: italic;
+}
+
+.weekly-chart-section,
+.weekly-summary-section {
+    background-color: #FFFFFF;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    margin-bottom: 30px;
+}
+
+.weekly-chart-section h2,
+.weekly-summary-section h2 {
+    font-size: 22px;
+    color: #333;
+    margin-top: 0;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #EEE;
+    padding-bottom: 10px;
+}
+
+.chart-container {
+    position: relative;
+    height: 350px; /* Adjust height as needed */
+    width: 100%;
+}
+
+.summary-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.summary-list li {
+    display: flex;
+    align-items: center;
+    font-size: 15px;
+    color: #444;
+    padding: 12px 0;
+    border-bottom: 1px solid #F0F0F0;
+}
+
+.summary-list li:last-child {
+    border-bottom: none;
+}
+
+.summary-icon {
+    width: 24px; /* Slightly larger icons for summary */
+    height: 24px;
+    margin-right: 15px;
+    opacity: 0.8;
+}
+
+.summary-list li span {
+    line-height: 1.6;
+}
+
+.highlight-blue {
+    color: #3377DD;
+    font-weight: bold;
+}
+.highlight-red { /* For decrease or negative changes */
+    color: #D32F2F;
+    font-weight: bold;
+}
+.highlight-green { /* For increase or positive changes */
+    color: #388E3C;
+    font-weight: bold;
+}
+
+/* Sidebar active state override if main.css is too general */
+/* This ensures the Health Report link is active on this page */
+.left-sidebar .menu-section ul#sidebar-menu li.active a {
+    background-color: #3377DD;
+    color: #FFFFFF;
+}
+.left-sidebar .menu-section ul#sidebar-menu li.active a .menu-icon {
+    filter: brightness(0) invert(1);
+}
