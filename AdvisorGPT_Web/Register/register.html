@@ -87,6 +87,10 @@
 
             users.push(newUser);
             localStorage.setItem('advisorGptUsers', JSON.stringify(users));
+            if (email) { // 이메일이 정상적으로 있을 때만
+                const userGoalScoreKey = 'userGoalScore_' + email;
+                localStorage.setItem(userGoalScoreKey, '70'); // 기본 목표 점수 70으로 설정
+            }
 
             alert('계정이 성공적으로 생성되었습니다. 로그인 페이지로 이동합니다.');
             window.location.href = '../Advisor_login/index.html';
