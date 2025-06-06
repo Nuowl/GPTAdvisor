@@ -1,4 +1,4 @@
-/* Main_Page/style.css - 피드백 반영 수정안 */
+/* Main_Page/style.css - 최종 피드백 반영 */
 
 html, body {
     height: 100%; margin: 0; padding: 0; overflow: hidden;
@@ -19,27 +19,32 @@ html, body {
     flex-shrink: 0; box-sizing: border-box;
 }
 
-/* Left Sidebar Specifics - 요청하신 크기로 복원 */
+/* Left Sidebar Specifics */
 .left-sidebar {
-    width: 260px; /* 요청하신 너비 */
-    border-right: 1px solid #E0E0E0; /* 요청하신 테두리 */
-    /* overflow-y: auto; 1. 스크롤 제거 요청 반영 (내용이 넘치지 않도록 관리 필요) */
-    overflow-y: hidden; 
+    width: 280px; /* 3. 왼쪽 사이드바 너비 확대 (기존 260px + 여백 감소분 20px 예시) */
+    border-right: 1px solid #E0E0E0;
+    overflow-y: hidden; /* 스크롤 제거 유지 */
 }
 
 .profile-section {
-    text-align: center; margin-bottom: 30px; padding-top: 20px;
+    text-align: center;
+    margin-bottom: 15px; /* 4. 프로필과 닉네임 간격 줄임 (기존 30px 또는 25px) */
+    padding-top: 20px;
 }
-.profile-pic { /* 요청하신 크기로 복원 */
+.profile-pic {
     width: 150px; height: 150px;
     border-radius: 50%; border: 3px solid #3377DD;
-    margin-bottom: 10px; object-fit: cover;
+    margin-bottom: 5px;  /* 4. 프로필 사진과 닉네임 간격 더 줄임 */
+    object-fit: cover;
 }
-.user-nickname { /* 요청하신 크기로 복원 */
+.user-nickname {
     font-size: 30px; font-weight: bold; color: #333;
+    margin-bottom: 20px; /* 4. 닉네임과 메뉴 섹션 사이 간격 조정 (기존에는 menu-section의 margin-top으로 제어) */
 }
 
-.menu-section { margin-top: 20px; }
+.menu-section {
+    /* margin-top: 20px; <- .user-nickname의 margin-bottom으로 제어 */
+}
 .menu-section ul { list-style: none; padding: 0; margin: 0; }
 .menu-section li { margin-bottom: 10px; }
 .menu-section li a {
@@ -55,17 +60,14 @@ html, body {
 .advisor-logo { width: 180px; }
 
 
-/* Right Sidebar Specifics - 요청하신 크기로 복원 */
+/* Right Sidebar Specifics (너비 유지) */
 .right-sidebar {
-    width: 340px; /* 요청하신 너비 */
-    background-color: #FFFFFF;
-    border-left: 1px solid #E0E0E0;
-    overflow-y: auto; /* 우측 사이드바는 내용이 길 수 있으므로 스크롤 유지 */
-    padding: 20px;
-    display: flex; flex-direction: column;
+    width: 340px;
+    background-color: #FFFFFF; border-left: 1px solid #E0E0E0;
+    overflow-y: auto; padding: 20px; display: flex; flex-direction: column;
     flex-shrink: 0; box-sizing: border-box;
 }
-/* ... 우측 사이드바 내부 스타일은 이전과 거의 동일 ... */
+/* ... 우측 사이드바 내부 스타일은 이전과 동일 ... */
 .right-sidebar-title { font-size: 20px; font-weight: bold; color: #333; margin-top: 10px; margin-bottom: 15px; text-align: center; padding-bottom: 15px; border-bottom: 1px solid #eee; }
 .date-display { display: flex; align-items: center; justify-content: center; font-size: 16px; color: #333; background-color: #F0F0F0; padding: 10px; border-radius: 8px; margin-bottom: 20px; }
 .date-display #current-date { margin-left: 8px; font-weight: bold; }
@@ -86,31 +88,31 @@ html, body {
 .submit-button:hover { background-color: #285ead; }
 
 
-/* Center Content - 너비 및 내부 요소 배치 수정 */
+/* Center Content */
 .main-content {
     flex-grow: 1;
-    padding: 25px 20px; /* 좌우 패딩을 줄여 중앙 콘텐츠가 너무 넓어지는 것 방지 */
+    padding: 25px 15px; /* 3. 좌우 패딩을 더 줄여 사이드바와의 여백 축소 */
     overflow-y: auto;
     background-color: #F5FAFF;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    align-items: center; /* 내부 섹션들을 가로축 중앙 정렬 */
+    /* align-items: center; 1. 전체 중앙 정렬 제거 */
 }
 
 .welcome-header {
-    width: 100%;
-    max-width: 800px; /* 2. 중앙 콘텐츠 최대 너비 더 줄임 (기존 900px) */
+    width: 100%; /* 부모(.main-content) 너비에 맞춤 */
+    /* max-width: 800px; <- 이 제한을 풀거나, 더 넓게 설정하여 좌측 정렬 시 자연스럽게 */
     margin-bottom: 25px;
     flex-shrink: 0;
-    text-align: center; /* 환영 메시지 중앙 정렬 */
+    text-align: left; /* 1. 환영 메시지 좌측 정렬 */
 }
 .welcome-header h1 { font-size: 28px; color: #333; margin: 0; font-weight: 700; }
 .welcome-header h1 span.username-highlight { color: #3377DD; font-weight: bold; }
 
-.health-summary { /* 2. 건강 점수 섹션 너비 제한 */
-    width: 100%;
-    max-width: 800px; /* 2. 중앙 콘텐츠 최대 너비 더 줄임 */
+.health-summary {
+    width: 100%; /* 부모(.main-content) 너비에 맞춤 */
+    /* max-width: 800px; <- 이 제한을 풀거나, 더 넓게 설정 */
     background-color: #FFFFFF;
     padding: 25px;
     border-radius: 15px;
@@ -119,48 +121,51 @@ html, body {
     flex-shrink: 0;
     box-sizing: border-box;
 }
-.summary-title-container h2 { font-size: 22px; color: #333; margin-top: 0; margin-bottom: 25px; font-weight: 700; text-align: center; }
+.summary-title-container h2 {
+    font-size: 22px; color: #333; margin-top: 0; margin-bottom: 25px; font-weight: 700;
+    text-align: left; /* 1. "오늘의 건강 점수는..." 좌측 정렬 */
+}
 
 .scores-container {
     display: flex;
     align-items: center;
-    justify-content: center; /* 2. 중앙 정렬로 변경하여 양쪽 여백 동일하게 */
-    gap: 15px; /* 2. 블록 간 간격을 줄임 */
-    flex-wrap: wrap; /* 화면 작을 시 줄바꿈 허용 (반응형 부분에서 더 상세히 제어) */
+    justify-content: space-around; /* 2. 블록 간 간격 유지를 위해 space-around 또는 space-evenly 사용 */
+    gap: 20px; /* 최소 간격 유지 */
+    /* flex-wrap: wrap; */ /* 넓은 화면에서는 한 줄에 표시되도록 함 */
 }
 
 .main-score-block {
     text-align: center; color: #3377DD;
-    /* flex: 0 1 auto; /* 크기 자동, 줄어들 수 있음 */
-    padding: 0 10px; /* 2. 좌우 패딩 줄임 */
+    flex-shrink: 0; /* 크기 고정 */
+    padding: 0 15px; /* 좌우 여백으로 간격 조절 */
 }
-.main-score-block #health-score-value { font-size: 60px; font-weight: bold; }
-.main-score-block .unit { font-size: 20px; font-weight: bold; margin-left: 5px; }
+.main-score-block #health-score-value { font-size: 78px; /* 2. 건강 점수 폰트 크기 확대 */ font-weight: bold; }
+.main-score-block .unit { font-size: 24px; font-weight: bold; margin-left: 5px; }
 
 .detailed-scores-block {
     display: flex;
     flex-direction: column;
-    gap: 10px; /* 2. 내부 아이템 간 간격 줄임 */
-    /* min-width: auto; /* 최소 너비 제거 또는 더 작게 */
-    /* flex-basis: 200px; /* 2. 기본 너비를 줄임 */
+    gap: 15px; /* 내부 아이템 간 간격 */
+    flex-shrink: 0; /* 크기 고정 */
+    /* min-width: 200px; 불필요한 최소 너비 제거 또는 조정 */
 }
 .score-item {
-    display: flex; align-items: center; gap: 10px; /* 2. 아이콘과 텍스트 간격 */
-    background-color: #F8F9FA; padding: 10px 12px; /* 2. 내부 패딩 줄임 */
+    display: flex; align-items: center; gap: 10px;
+    background-color: #F8F9FA; padding: 10px 12px;
     border-radius: 8px;
-    /* min-width: 200px; /* 2. "분" 뒤 여백 줄이기 위해 최소 너비 조정 또는 제거 */
+    /* min-width 제거 또는 조정하여 내용에 맞게 */
 }
 .score-icon { width: 24px; height: 24px; }
-.score-text { font-size: 14px; /* 2. 폰트 약간 줄임 */ color: #555; white-space: nowrap; /* 2. 텍스트 줄바꿈 방지 */ }
+.score-text { font-size: 14px; color: #555; white-space: nowrap; }
 .score-text .score-label { font-weight: bold; color: #333; display: block; margin-bottom: 2px; }
 .score-text span[id^="display-"] { font-weight: bold; color: #3377DD; }
 
 .stress-score-block {
-    text-align: center; padding: 15px 20px; /* 2. 내부 패딩 조정 */
+    text-align: center; padding: 15px 20px;
     background-color: #F8F9FA; border-radius: 10px;
-    /* min-width: auto; /* 최소 너비 제거 또는 더 작게 */
-    /* flex-basis: 160px; /* 2. 기본 너비를 줄임 */
+    flex-shrink: 0; /* 크기 고정 */
 }
+/* ... 스트레스 블록 내부 스타일 이전과 동일 ... */
 .score-icon-large { width: 32px; height: 32px; margin-bottom: 8px; }
 .stress-score-text .score-label { font-size: 15px; font-weight: bold; color: #333; display: block; }
 .stress-score-text .score-label-small { font-size: 11px; color: #666; display: block; margin-top: 1px; }
@@ -168,67 +173,49 @@ html, body {
 .stress-score-value #stress-score-value { font-size: 30px; font-weight: bold; color: #E57373; }
 .stress-score-value .unit { font-size: 15px; font-weight: bold; color: #E57373; margin-left: 3px; }
 
-/* 3. Daily Feedback Section - 컨테이너 박스 스타일 제거 */
+
+/* 3. Daily Feedback Section - 컨테이너 박스 스타일 제거 (이전과 동일) */
 .daily-feedback {
     width: 100%;
-    max-width: 800px; /* 2. 중앙 콘텐츠 최대 너비 더 줄임 */
+    /* max-width: 800px; */ /* 너비 제한은 유지하되, .main-content의 align-items:center 에 의해 중앙 정렬됨 */
     margin-top: 30px;
-    /* 배경색, 패딩, 그림자, 테두리 제거 */
-    /* background-color: #FFFFFF; */
-    /* padding: 25px; */
-    /* border-radius: 15px; */
-    /* box-shadow: 0 4px 12px rgba(0,0,0,0.08); */
-    /* margin-bottom: 30px; */ /* 하단 마진은 유지 또는 조정 */
     box-sizing: border-box;
 }
-.daily-feedback h2 { /* 제목 스타일은 유지하되, 컨테이너 박스가 없으므로 주변과 어울리게 */
+.daily-feedback h2 {
     font-size: 22px; margin-bottom: 20px; font-weight: 700;
     display: flex; align-items: center;
-    /* text-align: center; /* 필요시 제목 중앙 정렬 */
+    text-align: left; /* 제목 좌측 정렬 */
 }
+/* ... .score-icon-feedback, .feedback-grid, .feedback-box 등 내부 스타일은 이전과 거의 동일 ... */
 .score-icon-feedback { width: 28px; height: 28px; margin-right: 10px; }
-
-.feedback-grid { /* 그리드 자체는 유지 */
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-}
-.feedback-box { /* 피드백 박스는 개별 스타일 유지 */
-    background-color: #FFFFFF; padding: 20px;
-    border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-}
-/* ... .feedback-box h3, .feedback-icon, .feedback-box p 스타일은 이전과 유사하게 유지 ... */
+.feedback-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+.feedback-box { background-color: #FFFFFF; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
 .feedback-box h3 { font-size: 18px; color: #3377DD; margin-top: 0; margin-bottom: 12px; display: flex; align-items: center; }
 .feedback-icon { width: 20px; height: 20px; margin-right: 10px; }
 .feedback-box p { font-size: 15px; line-height: 1.7; color: #555; margin: 0;}
 
 
 /* Responsive adjustments */
-@media (max-width: 1200px) { /* 1,2번 이미지에서처럼 scores-container가 좀 더 일찍 세로로 변하도록 */
+@media (max-width: 1300px) { /* 점수 컨테이너 세로 변경 지점 */
     .scores-container {
         flex-direction: column;
-        align-items: center; /* 세로로 쌓일 때 중앙 정렬 */
+        align-items: center; /* 중앙 정렬 유지 */
     }
     .main-score-block, .detailed-scores-block, .stress-score-block {
-        width: auto; /* 너비 자동 */
-        max-width: 350px; /* 각 블록의 최대 너비 (조정 가능) */
+        width: auto;
+        max-width: 350px;
         margin-bottom: 20px;
     }
-    .detailed-scores-block {
-       align-items: center; /* 내부 아이템들도 중앙 정렬 */
-    }
-    .score-item {
-        justify-content: center; /* 내부 아이템 중앙 정렬 */
-        min-width: 200px; /* 최소 너비 유지 */
-    }
-    .feedback-grid { grid-template-columns: 1fr; }
+    .detailed-scores-block { align-items: center; }
+    .score-item { justify-content: center; min-width: 200px; }
 }
-
-/* 나머지 반응형 스타일은 이전과 유사하게 유지 또는 필요에 따라 조정 */
-@media (max-width: 992px) {
+/* ... 나머지 반응형 스타일 이전과 유사하게 유지 ... */
+@media (max-width: 1024px) {
+    .feedback-grid { grid-template-columns: 1fr; }
     .right-sidebar { display: none; }
-    .main-content { padding: 20px; align-items: stretch; }
-    .health-summary, .daily-feedback { max-width: 100%; }
+    .main-content { padding: 20px; /* align-items: stretch; <- 다시 전체 너비 사용 */ }
+    .welcome-header, .health-summary, .daily-feedback { max-width: 100%; text-align: left; } /* 작은 화면에서는 좌측 정렬 및 전체 너비 */
+    .summary-title-container h2 { text-align: left;}
 }
 @media (max-width: 768px) {
     .main-dashboard-container { flex-direction: column; height: auto; min-height: 100vh; }
@@ -238,5 +225,7 @@ html, body {
     .profile-section { padding-top: 15px; margin-bottom: 20px;}
     .menu-section li a { padding: 10px; font-size: 14px; }
     .right-sidebar { display: block; order: 3; width: 100%; height: auto; overflow-y: visible; border-left: none; border-bottom: 1px solid #E0E0E0; }
-    .score-item { width: auto; /* 모바일에서는 너비 자동 */ }
+    .scores-container { align-items: center; }
+    .detailed-scores-block { align-items: center; }
+    .score-item { width: auto; }
 }
