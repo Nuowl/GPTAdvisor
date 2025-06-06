@@ -1,25 +1,26 @@
 /* Main_Page/style.css */
 
 html, body {
-    height: 100vh; /* 뷰포트 높이에 맞춤 */
+    height: 100vh; 
     margin: 0;
     padding: 0;
     font-family: 'Noto Sans KR', 'Mulish', sans-serif;
     background-color: #F5FAFF;
     color: #333;
-    overflow: hidden; /* 페이지 레벨에서 스크롤바 생기는 것 방지 */
+    overflow: hidden; 
 }
 
 .main-dashboard-container {
     display: flex;
     width: 100%;
-    height: 100%; /* 부모(body)의 높이를 100% 사용 */
-    max-width: 1920px; /* 원하는 최대 너비 설정 */
+    height: 100%; 
+    max-width: 1920px; 
     box-sizing: border-box;
-    margin: 0 auto; /* 최대 너비 지정 시 중앙 정렬 */
+    margin: 0 auto; 
+    justify-content: center; /* !!!! .main-content 고정 너비 시 중앙 정렬을 위해 추가 !!!! */
 }
 
-.sidebar { /* 공통 사이드바 스타일 */
+.sidebar { 
     background-color: #FFFFFF;
     padding: 20px;
     box-shadow: 2px 0 5px rgba(0,0,0,0.05);
@@ -31,13 +32,14 @@ html, body {
 /* Left Sidebar */
 .left-sidebar {
     width: 260px;
-    flex-basis: 260px; /* 명시적 기본 크기 */
-    flex-shrink: 0;   /* 너비 축소 방지 */
-    flex-grow: 0;     /* 너비 확장 방지 */
+    flex-basis: 260px; 
+    flex-shrink: 0;  
+    flex-grow: 0;    
     border-right: 1px solid #E0E0E0;
-    overflow-y: auto; /* 내용이 넘치면 이 사이드바 내부에서 스크롤 */
+    overflow-y: auto; 
 }
 
+/* ... (왼쪽 사이드바 내부 스타일은 이전과 동일하게 유지) ... */
 .profile-section { text-align: center; margin-bottom: 10px; padding-top: 20px; flex-shrink: 0; }
 .profile-pic { width: 100px; height: 100px; border-radius: 50%; border: 3px solid #3377DD; margin-bottom: 10px; object-fit: cover; }
 .user-nickname { font-size: 20px; font-weight: bold; color: #333; margin-bottom: 20px; }
@@ -51,25 +53,33 @@ html, body {
 .logo-section { margin-top: auto; padding-top: 10px; text-align: center; padding-bottom: 0; flex-shrink: 0; }
 .advisor-logo { width: 180px; }
 
+
 /* Center Content */
 .main-content {
-    flex-grow: 1;   /* !!!! 중요: 사용 가능한 나머지 너비를 모두 차지 !!!! */
-    min-width: 0;   /* !!!! 중요: 내부 콘텐츠가 부모를 초과하여 늘어나는 것을 방지 !!!! */
-    /* max-width: 900px; /* !!!! 이 줄을 삭제하거나 주석 처리 !!!! */
-    /* margin: 0 auto;   /* !!!! max-width가 없으므로 이 줄도 삭제하거나 주석 처리 !!!! */
-    padding: 25px 30px; /* 내부 여백은 유지 또는 필요에 따라 조정 */
-    overflow-y: auto; /* 내용이 높이를 초과하면 이 중앙 콘텐츠 영역 내부에 스크롤바 생성 */
-    overflow-x: hidden; /* 가로 스크롤바는 생기지 않도록 명시적 숨김 */
+    /* flex-grow: 1; /* !!!! 이 줄을 삭제하거나 주석 처리 !!!! */
+    width: 800px; /* !!!! 원하는 고정 너비(px)를 직접 입력 !!!! (예: 800px, 900px 등) */
+    flex-shrink: 0; /* !!!! 너비가 줄어들지 않도록 설정 !!!! */
+    flex-grow: 0;   /* !!!! 너비가 늘어나지 않도록 설정 !!!! */
+    /* min-width: 0; /* 고정 너비 사용 시 min-width는 불필요하거나 width와 동일하게 설정 */
+    /* max-width: 900px; /* width로 고정했으므로 max-width 불필요 */
+    /* margin: 0 auto;   /* 부모(.main-dashboard-container)에 justify-content:center가 있으므로 불필요 */
+    
+    padding: 25px 30px; 
+    overflow-y: auto; 
+    overflow-x: hidden; 
     display: flex;
     flex-direction: column; 
     box-sizing: border-box;
+    background-color: #fff; /* 구분 위해 임시 배경색 (디자인에 따라 삭제 또는 변경) */
+    border-left: 1px solid #E0E0E0; /* 오른쪽 사이드바와 구분선 (선택 사항) */
+    border-right: 1px solid #E0E0E0;/* 왼쪽 사이드바와 구분선 (선택 사항) */
 }
 
 /* .main-content 내부의 섹션들이 부모 너비를 초과하지 않도록 */
 .welcome-header,
 .health-summary,
 .daily-feedback {
-    width: 100%; 
+    width: 100%; /* 부모(.main-content)의 고정된 너비에 맞춤 */
     box-sizing: border-box;
     flex-shrink: 0; 
 }
@@ -104,13 +114,10 @@ html, body {
 .feedback-grid {
     display: grid;
     /* 한 줄에 2개의 박스가 보이도록 minmax(최소너비, 최대너비) 값 조정 */
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); /* 각 박스의 최소 너비를 늘려 2열 유도 */
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* 각 박스의 최소 너비를 늘려 2열 유도 */
     gap: 20px;
 }
-.feedback-box {
-    background-color: #FFFFFF; padding: 20px; border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; 
-}
+
 .feedback-box { background-color: #FFFFFF; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; }
 .feedback-box h3 { font-size: 17px; color: #3377DD; margin-top: 0; margin-bottom: 10px; display: flex; align-items: center; }
 .feedback-icon { width: 18px; height: 18px; margin-right: 8px; filter: grayscale(30%) opacity(0.8); }
@@ -123,7 +130,7 @@ html, body {
     flex-shrink: 0;   
     flex-grow: 0;     
     background-color: #FFFFFF;
-    border-left: 1px solid #E0E0E0;
+    border-left: 1px solid #E0E0E0; /* .main-content에 border-right가 있다면 중복될 수 있으니 확인 */
     overflow-y: auto; 
     padding: 20px;
     display: flex; 
@@ -163,26 +170,25 @@ html, body {
 .submit-button:hover { background-color: #285ead; }
 
 /* Responsive adjustments */
-@media (max-width: 1350px) { /* .main-content max-width + 양쪽 사이드바 너비 근처 */
-    .main-content {
-        max-width: none; /* 화면이 좁아지면 .main-content의 max-width 제한 해제 */
+@media (max-width: 1420px) { /* .main-content max-width + 양쪽 사이드바 너비 근처 */
+    .main-dashboard-container {
+        justify-content: flex-start; /* 화면이 좁아지면 왼쪽부터 채움 (중앙 정렬 해제) */
     }
-    .feedback-grid {
-        /* 이 너비에서는 여전히 2열 또는 1열 유동적으로 */
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    }
+    /* .main-content의 고정 너비로 인해 이 시점에서는 특별히 변경할 것이 없을 수 있음.
+       하지만 화면이 더 좁아지면 .main-content 너비도 %로 바꾸거나,
+       사이드바를 숨기는 등의 처리가 필요할 수 있음. */
 }
 
 @media (max-width: 992px) { 
     .main-content { 
         padding: 15px 20px; 
+        width: auto; /* 고정 너비 해제하고 flex-grow로 남은 공간 차지 (선택 사항) */
+        /* 또는 width: 100%; 로 하고, 부모인 .main-dashboard-container가 column 방향일 때 */
+        flex-grow: 1; /* 화면이 좁아지면 다시 유동적으로 */
+        border-left: none; /* 모바일에서는 불필요 */
+        border-right: none;
     }
-    .scores-container { flex-direction: column; align-items: stretch; }
-    .main-score-block, .stress-score-block { margin-bottom: 20px; }
-    .detailed-scores-block { width: 100%; }
-    .feedback-grid {
-        grid-template-columns: 1fr; /* 화면이 더 좁아지면 피드백 박스를 1열로 강제 */
-    }
+    /* ... (이전 992px 반응형 스타일 유지 또는 조정) ... */
 }
 
 @media (max-width: 768px) {
@@ -191,15 +197,16 @@ html, body {
         flex-direction: column;
         height: auto; 
         min-height: 100vh; 
+        justify-content: flex-start; /* 모바일에서는 상단 정렬 */
     }
     .left-sidebar, .right-sidebar, .main-content {
-        width: 100%;
+        width: 100%; /* 모바일에서는 전체 너비 사용 */
         height: auto; 
         overflow-y: visible; 
         flex-shrink: 1; 
         min-width: initial; 
         border-bottom: 1px solid #E0E0E0; 
-        max-width: none !important; /* 모바일에서는 항상 max-width 제한 해제 */
+        max-width: none !important; 
     }
     .left-sidebar { order: 1; border-right: none; }
     .main-content { order: 2; padding: 15px; overflow-x: hidden; }
