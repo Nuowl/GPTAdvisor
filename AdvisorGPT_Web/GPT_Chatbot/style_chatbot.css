@@ -2,9 +2,16 @@
 
 /* 챗봇 페이지의 .main-content 에 적용될 추가/덮어쓰기 스타일 */
 .main-content.chatbot-page-container {
-    padding: 15px; /* 챗봇 페이지용 패딩 (Main_Page/style.css의 패딩을 덮어씀) */
-    /* min-width: 0; /* 이 규칙은 Main_Page/style.css의 .main-content로 이동 */
-    /* height: calc(100vh - 40px); /* 이 부분은 삭제하고 flex-grow로 높이 관리 */
+    flex-grow: 1;
+    /* !!!! 챗봇 페이지에서만 .main-content가 늘어나는 것을 방지 !!!! */
+    min-width: 0; /* 이 규칙이 Main_Page/style.css 에 없다면 여기서라도 적용 시도 */
+                   /* 하지만 Main_Page/style.css 에 있는 것이 더 근본적인 해결책입니다. */
+    
+    display: flex; /* 내부 .chatbot-interface가 높이를 100% 사용할 수 있도록 */
+    flex-direction: column;
+    padding: 15px; /* 챗봇 페이지용 패딩 */
+    overflow: hidden; /* 이 컨테이너 자체는 스크롤되지 않도록 */
+    box-sizing: border-box;
 }
 
 .chatbot-interface {
@@ -56,13 +63,13 @@
 .chat-message.user {
     align-self: flex-end;
     margin-left: auto;
-    max-width: 70%; /* .chat-display-area 너비의 70% */
+    max-width: 55%; /* .chat-display-area 너비의 70% */
 }
 
 .chat-message.gpt {
     align-self: flex-start;
     margin-right: auto;
-    max-width: 70%; /* .chat-display-area 너비의 70% (아바타 포함 전체) */
+    max-width: 55%; /* .chat-display-area 너비의 70% (아바타 포함 전체) */
 }
 
 .chat-message.gpt .chat-avatar {
@@ -84,6 +91,7 @@
     line-height: 1.5;
     max-width: 100%; /* 부모(.chat-message)의 max-width를 넘지 않도록 함 */
     box-sizing: border-box;
+    overflow: hidden; /* 내부 p 태그가 넘치는 것을 방지 (텍스트는 p에서 줄바꿈) */
     /* overflow-wrap 과 white-space 는 p 태그에서 처리 */
 }
 
