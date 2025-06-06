@@ -1,2 +1,0 @@
-web: gunicorn app:app
-```        *   `app:app`은 `app.py` 파일 내의 `app = Flask(__name__)` 객체를 의미합니다. (파일명:Flask인스턴스명)
