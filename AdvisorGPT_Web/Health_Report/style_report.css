@@ -1,208 +1,137 @@
-/* GPT Chatbot Specific Styles */
+/* Health Report Specific Styles */
 
-.main-content.chatbot-page-container {
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    overflow: hidden; /* Important for containing the fixed-height chatbot-interface */
-    height: calc(100vh - 40px); /* Example: Adjust if you have top/bottom margins/paddings on body or other containers */
-    box-sizing: border-box;
-}
-
-.chatbot-interface {
-    background-color: #FFFFFF;
-    border: 2.5px solid #3377DD;
-    border-radius: 15px;
-    width: 100%;
-    height: 100%; /* Ensure this takes the height from chatbot-page-container */
-    flex-grow: 1; /* Make chatbot-interface fill the chatbot-page-container */
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    overflow: hidden; /* Crucial for clipping children and for fixed height behavior */
+/* .main-content.report-content 선택자는 Main_Page/style.css의 .main-content 스타일을 상속하고,
+   padding 등 필요한 부분만 여기서 덮어씁니다.
+   Main_Page/style.css 에서 .main-content 가 flex-grow:1; display:flex; flex-direction:column; overflow:hidden;
+   등으로 설정되어 전체 레이아웃을 잡고 있다고 가정합니다. */
+.main-content.report-content {
+    /* padding: 25px 35px; /* 필요시 페이지별 패딩 조정 */
+    overflow-y: auto; /* 이 페이지 내용이 길어지면 여기서 스크롤 */
 }
 
-/* 2. Chat Display Area: This is the 'transparent window' that scrolls. */
-.chat-display-area {
-    flex-grow: 1; /* Allows this area to take available space */
-    overflow-y: auto; /* Enables vertical scrolling *within this area* */
-    padding: 0px 20px 15px 20px; /* Adjusted padding */
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    /* This area itself does not grow indefinitely. Its parent (.chatbot-interface) has a fixed or constrained height. */
+.goal-status-section {
+    background-color: #F8F9FA;
+    padding: 15px 20px; /* 패딩 약간 줄임 */
+    border-radius: 10px;
+    margin-bottom: 25px; /* 간격 약간 줄임 */
+    border: 1px solid #E0E7FF;
 }
 
-.chat-initial-logo-container {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start; /* Align logo to the top */
-    padding-top: 0px;      /* 3. Small top padding */
-    padding-bottom: 0px;
-    /* margin-bottom will be handled by gap in .chat-display-area */
+.goal-text {
+    font-size: 17px; /* 약간 줄임 */
+    color: #333;
+    margin-top: 0;
+    margin-bottom: 8px; /* 간격 약간 줄임 */
 }
 
-.chat-initial-logo {
-    width: 300px; /* 3. Increased size for initial top logo */
-    height: auto;  
-    opacity: 0.9;
+.goal-text input[type="number"] {
+    width: 55px; /* 약간 줄임 */
+    padding: 4px 7px; /* 약간 줄임 */
+    border: 1px solid #B0C4DE;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 17px; /* 약간 줄임 */
+    font-weight: bold;
+    color: #3377DD;
+    margin: 0 5px;
 }
-
-/* Message styles (remain mostly the same) */
-.chat-message {
-    display: flex;
-    width: fit-content;
-    max-width: 65%;
-    align-items: flex-end;
-    word-wrap: break-word;
-}
-.message-bubble {
-    padding: 10px 15px;
-    border-radius: 18px;
-    line-height: 1.5;
-    /* max-width: 100%; /* 부모 .chat-message의 max-width를 따르도록 */
-    /* 여기서 직접 최대 너비를 지정하여, 부모인 .chat-message 가 늘어나는 것을 방지 */
-    /* 예를 들어, 채팅 표시 영역의 너비를 기준으로 계산할 수 있지만,
-       간단하게는 픽셀 단위나, 부모 너비의 일정 비율로 지정 */
-    max-width: 450px; /* 예시: 최대 너비를 고정값으로 설정 (필요에 따라 조절) */
-                      /* 또는 max-width: calc(100% - 20px); 와 같이 부모(.chat-message) 패딩 고려 */
-    box-sizing: border-box;
-}
-
-.message-bubble p {
-    margin: 0;
-    font-size: 15px;
-    word-wrap: break-word; 
-    overflow-wrap: break-word; 
-    white-space: pre-wrap;
-}
-
-.chat-message.user {
-    align-self: flex-end;
-    margin-left: auto;
-    max-width: 75%;
-}
-.chat-message.user .message-bubble {
-    background-color: #3377DD;
-    color: #FFFFFF;
-    border-radius: 18px 18px 5px 18px;
-}
-.chat-message.user .message-bubble p {
-    margin: 0;
-    font-size: 15px;
-    line-height: 1.5;
-}
-
-.chat-message.gpt {
-    align-self: flex-start;
-    margin-right: auto;
-    max-width: calc(100% - 50px);
-}
-.chat-message.gpt .chat-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: 2.0px solid #3377DD;
-    margin-right: 10px;
-    object-fit: contain;
-    padding: 3px;
-    background-color: #fff;
-    flex-shrink: 0;
-    box-sizing: border-box;
-}
-.chat-message.gpt .message-bubble {
-    background-color: #FFFFFF;
-    color: #000000;
-    border: 2.5px solid #3377DD;
-    border-radius: 18px 18px 18px 5px;
-}
-.chat-message.gpt .message-bubble p {
-    margin: 0;
-    font-size: 15px;
-    line-height: 1.5;
-}
-.chat-message.gpt.error .message-bubble {
-    border-color: #D32F2F;
-    background-color: #FFEBEE;
-    color: #C62828;
-}
-
-.chat-input-wrapper {
-    padding: 10px 15px;
-    flex-shrink: 0; /* Prevent input area from shrinking */
-}
-
-.chat-input-area {
-    background-color: #FFFFFF;
-    border: 2.5px solid #3377DD;
-    border-radius: 25px;
-    padding: 5px 5px 5px 15px;
-    display: flex;
-    align-items: center;
-}
-
-#chat-message-input {
-    flex-grow: 1;
-    background-color: transparent;
-    color: #333333;
-    border: none;
-    padding: 8px 0;
-    font-size: 15px;
-    line-height: 1.4; /* Base line height */
-    resize: none;
-    overflow-y: hidden;
-    min-height: calc(1.4em + 16px);   /* Min height for one line + padding (1.4 * 15px + 2*8px) ~ 37px */
-    max-height: calc(2.8em + 16px); /* 1. Max height for approx two lines + padding (2 * 1.4 * 15px + 2*8px) ~ 58px */
-    font-family: 'Noto Sans KR', 'Mulish', sans-serif;
+.goal-text input[type="number"]:focus {
     outline: none;
-    box-sizing: content-box; /* Padding is outside of height calculation for min/max */
+    border-color: #3377DD;
+    box-shadow: 0 0 0 2px rgba(51, 119, 221, 0.2);
 }
 
-.send-button {
-    background-color: transparent;
-    border: none;
+.goal-text #points-remaining {
+    font-weight: bold;
+    color: #D32F2F;
+}
+
+.gpt-comment {
+    font-size: 14px; /* 약간 줄임 */
+    color: #555;
+    margin-bottom: 0;
+    padding-left: 5px;
+    font-style: italic;
+}
+
+.weekly-chart-section,
+.weekly-summary-section {
+    background-color: #FFFFFF;
+    padding: 20px 25px; /* 패딩 약간 줄임 */
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    margin-bottom: 25px; /* 간격 약간 줄임 */
+}
+
+.weekly-chart-section h2,
+.weekly-summary-section h2 {
+    font-size: 20px; /* 약간 줄임 */
+    color: #333;
+    margin-top: 0;
+    margin-bottom: 15px; /* 간격 약간 줄임 */
+    border-bottom: 1px solid #EEE;
+    padding-bottom: 8px; /* 간격 약간 줄임 */
+}
+
+/* !!!! 차트 컨테이너에 명시적인 높이 설정 !!!! */
+.chart-container {
+    position: relative;
+    height: 280px; /* 스크린샷에 맞게 높이 조정, 300px 또는 350px 등 */
+    width: 100%;
+    /* background-color: #fdfdfd; /* 빈 차트 영역 구분을 위한 배경색 (선택적) */
+    /* border: 1px solid #eee;    /* 빈 차트 영역 테두리 (선택적) */
+    /* border-radius: 8px;         /* 컨테이너 모서리 둥글게 (선택적) */
+}
+/* 캔버스 요소가 부모 컨테이너를 채우도록 함 */
+#weeklyHealthChart {
+    display: block; /* 인라인 요소의 불필요한 여백 제거 */
+    width: 100% !important;  /* Chart.js가 인라인 스타일로 너비/높이 설정하는 것보다 우선 적용 */
+    height: 100% !important;
+}
+
+
+.summary-list {
+    list-style: none;
     padding: 0;
-    margin-left: 8px;
-    cursor: pointer;
-    width: 38px;
-    height: 38px;
+    margin: 0;
+}
+
+.summary-list li {
     display: flex;
     align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
+    font-size: 14px; /* 약간 줄임 */
+    color: #444;
+    padding: 10px 0; /* 약간 줄임 */
+    border-bottom: 1px solid #F0F0F0;
 }
-.send-button img {
-    width: 30px;
-    height: 30px;
-    filter: brightness(0.7); /* Adjust if using a dark icon on white input bg */
-}
-.send-button:hover img {
-    filter: brightness(0.5);
+.summary-list li:last-child {
+    border-bottom: none;
 }
 
-.typing-indicator .message-bubble p span { /* (No changes) */
-    display: inline-block;
-    width: 5px;
-    height: 5px;
-    background-color: #3377DD;
-    border-radius: 50%;
-    margin: 0 1.5px;
-    animation: typing-dots 1.3s infinite ease-in-out;
-}
-.typing-indicator .message-bubble p span:nth-child(1) { animation-delay: 0s; }
-.typing-indicator .message-bubble p span:nth-child(2) { animation-delay: 0.2s; }
-.typing-indicator .message-bubble p span:nth-child(3) { animation-delay: 0.4s; }
-
-@keyframes typing-dots {
-    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
-    30% { transform: translateY(-4px); opacity: 1; }
+.summary-icon {
+    width: 22px; /* 약간 줄임 */
+    height: 22px;
+    margin-right: 12px; /* 약간 줄임 */
+    opacity: 0.8;
+    flex-shrink: 0; /* 아이콘이 줄어들지 않도록 */
 }
 
-.left-sidebar .menu-section ul#sidebar-menu li.active a { /* (No changes) */
+.summary-list li span {
+    line-height: 1.5; /* 약간 줄임 */
+}
+
+.highlight-blue { color: #3377DD; font-weight: bold; }
+.highlight-red { color: #D32F2F; font-weight: bold; }
+.highlight-green { color: #388E3C; font-weight: bold; }
+
+/* 사이드바 활성 상태는 Main_Page/style.css 또는 페이지별 JS에서 주로 처리 */
+/* 특별히 이 페이지에서 덮어쓸 필요가 없다면 아래 규칙은 생략 가능 */
+/*
+.left-sidebar .menu-section ul#sidebar-menu li.active a {
     background-color: #3377DD;
     color: #FFFFFF;
 }
-.left-sidebar .menu-section ul#sidebar-menu li.active a .menu-icon { /* (No changes) */
+.left-sidebar .menu-section ul#sidebar-menu li.active a .menu-icon {
     filter: brightness(0) invert(1);
 }
+*/
