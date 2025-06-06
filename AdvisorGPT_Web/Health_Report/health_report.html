@@ -263,8 +263,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const linkHref = a.getAttribute('href');
         const iconSrc = a.parentElement.querySelector('.menu-icon') ? a.parentElement.querySelector('.menu-icon').src : '';
         return (linkHref && linkHref.includes(currentReportPath)) ||
-               (linkHref === "../Health_Report/health_report.html") ||
-               (linkHref === "#" && iconSrc.includes('icon_health_report'));
+                (linkHref === "../Health_Report/health_report.html") ||
+                (linkHref === "#" && iconSrc.includes('icon_health_report'));
     });
     if (healthReportLinkFromList) { healthReportLinkFromList.parentElement.classList.add('active');
     } else { document.querySelector('#sidebar-menu li a[href*="health_report.html"]')?.parentElement.classList.add('active'); }
