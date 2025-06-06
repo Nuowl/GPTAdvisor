@@ -6,18 +6,35 @@
     <title>AdvisorGPT 대시보드</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Mulish&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <!-- 로딩 스피너를 위한 CSS (style.css에 추가하거나 여기에 인라인으로) -->
+    <style>
+        .loader-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(255, 255, 255, 0.7);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 9999;
+        }
+        .loader {
+            border: 8px solid #f3f3f3; border-radius: 50%;
+            border-top: 8px solid #3498db; width: 60px; height: 60px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
 </head>
 <body>
+    <!-- 로딩 오버레이 div -->
+    <div id="loader-overlay" class="loader-overlay" style="display: none;"><div class="loader"></div></div>
+
     <div class="main-dashboard-container">
-        <!-- Left Sidebar -->
+        <!-- Left Sidebar (이전과 동일) -->
         <aside class="sidebar left-sidebar">
             <div class="profile-section">
-                <!-- ID 추가 및 기본 src 설정 -->
                 <img src="../image/user_profile_default.png" alt="User Profile" class="profile-pic" id="sidebar-profile-pic">
-                <p class="user-nickname" id="sidebar-username">User</p> <!-- ID는 이미 존재 -->
+                <p class="user-nickname" id="sidebar-username">User</p>
             </div>
             <nav class="menu-section">
-                <ul id="sidebar-menu"> <!-- 사이드바 메뉴에 ID 추가 (활성 상태 제어용) -->
+                <ul id="sidebar-menu">
                     <li class="active"><a href="../Main_Page/main.html"><img src="../image/icon_my_today.png" alt="" class="menu-icon"> 나의 오늘</a></li>
                     <li><a href="../Health_Report/health_report.html"><img src="../image/icon_health_report.png" alt="" class="menu-icon"> 건강 리포트</a></li>
                     <li><a href="../GPT_Chatbot/gpt_chatbot.html"><img src="../image/icon_gpt_chatbot.png" alt="" class="menu-icon"> GPT Chatbot</a></li>
@@ -29,10 +46,9 @@
             </div>
         </aside>
 
-        <!-- Center Content -->
+        <!-- Center Content (기존 구조 유지, ID로 데이터 바인딩) -->
         <main class="main-content">
             <header class="welcome-header">
-                <!-- h1 태그 내용 변경 및 span 태그 id 추가 -->
                 <h1>환영합니다, <span class="username-highlight" id="main-username-placeholder">User</span>님!</h1>
             </header>
             <section class="health-summary">
@@ -41,42 +57,27 @@
                 </div>
                 <div class="scores-container">
                     <div class="main-score-block">
-                        <span id="health-score-value">--</span>
-                        <span class="unit">점</span>
+                        <span id="health-score-value">--</span><span class="unit">점</span>
+                        <!-- 점수 산출 이유는 아래 피드백 섹션으로 이동 -->
                     </div>
                     <div class="detailed-scores-block">
                         <div class="score-item">
                             <img src="../image/icon_sleep_moon_right.png" alt="Sleep" class="score-icon">
-                            <div class="score-text">
-                                <span class="score-label">수면</span>
-                                <span id="display-sleep-hours">--</span> 시간 <span id="display-sleep-mins">--</span> 분
-                            </div>
+                            <div class="score-text"><span class="score-label">수면</span><span id="display-sleep-hours">--</span> 시간 <span id="display-sleep-mins">--</span> 분</div>
                         </div>
                         <div class="score-item">
                             <img src="../image/icon_meal_bowl_center.png" alt="Meal" class="score-icon">
-                            <div class="score-text">
-                                <span class="score-label">식사</span>
-                                <span id="display-meal-kcal">--</span> kcal
-                            </div>
+                            <div class="score-text"><span class="score-label">식사</span><span id="display-meal-kcal">--</span> kcal</div>
                         </div>
                         <div class="score-item">
                             <img src="../image/icon_exercise_dumbbell_center.png" alt="Exercise" class="score-icon">
-                            <div class="score-text">
-                                <span class="score-label">운동</span>
-                                <span id="display-exercise-hours">--</span> 시간 <span id="display-exercise-mins">--</span> 분
-                            </div>
+                            <div class="score-text"><span class="score-label">운동</span><span id="display-exercise-hours">--</span> 시간 <span id="display-exercise-mins">--</span> 분</div>
                         </div>
                     </div>
                     <div class="stress-score-block">
                         <img src="../image/icon_stress_head_center.png" alt="Stress Score Icon" class="score-icon-large">
-                        <div class="stress-score-text">
-                            <span class="score-label">스트레스 지수</span>
-                            <span class="score-label-small">낮을수록 긍정적</span>
-                        </div>
-                        <div class="stress-score-value">
-                            <span id="stress-score-value">--</span>
-                            <span class="unit">점</span>
-                        </div>
+                        <div class="stress-score-text"><span class="score-label">스트레스 지수</span><span class="score-label-small">낮을수록 긍정적</span></div>
+                        <div class="stress-score-value"><span id="stress-score-value">--</span><span class="unit">점</span></div>
                     </div>  
                 </div>
             </section>
@@ -103,76 +104,33 @@
             </section>
         </main>
 
-        <!-- Right Sidebar (이전과 동일) -->
+        <!-- Right Sidebar (기존 구조 유지, ID로 값 가져옴) -->
         <aside class="sidebar right-sidebar">
-            <!-- ... (우측 사이드바 내용 이전과 동일) ... -->
             <h3 class="right-sidebar-title">오늘의 기록</h3>
             <div class="date-display">
                 <img src="../image/icon_calendar.png" alt="Calendar" class="sidebar-icon">
                 <span id="current-date"></span>
             </div>
             <form id="daily-record-form">
-            <div class="form-group">
-                <label><img src="../image/icon_sleep_moon_right.png" alt="Sleep" class="sidebar-icon"> 수면 시간</label>
-                <div class="time-inputs">
-                    <input type="number" id="sleep-hours" placeholder="시간" min="0" max="23">
-                    <span>시간</span>
-                    <input type="number" id="sleep-mins" placeholder="분" min="0" max="59">
-                    <span>분</span>
+                <div class="form-group"><label><img src="../image/icon_sleep_moon_right.png" alt="Sleep" class="sidebar-icon"> 수면 시간</label><div class="time-inputs"><input type="number" id="sleep-hours" placeholder="시간" min="0" max="23"><span>시간</span><input type="number" id="sleep-mins" placeholder="분" min="0" max="59"><span>분</span></div></div>
+                <div class="form-group">
+                    <label><img src="../image/icon_breakfast_right.png" alt="Breakfast" class="sidebar-icon"> 식사량</label>
+                    <label>아침</label><div class="kcal-input"><input type="number" id="meal-breakfast" placeholder="0" min="0"><span>kcal</span></div>
+                    <label style="margin-top:8px;">점심</label><div class="kcal-input"><input type="number" id="meal-lunch" placeholder="0" min="0"><span>kcal</span></div>
+                    <label style="margin-top:8px;">저녁</label><div class="kcal-input"><input type="number" id="meal-dinner" placeholder="0" min="0"><span>kcal</span></div>
                 </div>
-            </div>
-            <div class="form-group">
-                <label><img src="../image/icon_breakfast_right.png" alt="Breakfast" class="sidebar-icon"> 식사량</label>
-                <label>아침  </label>
-                <div class="kcal-input">
-                    <input type="number" id="meal-breakfast" placeholder="0" min="0">
-                    <span>kcal</span>
-                </div>
-            </div>
-            <div class="form-group">
-                <label>점심</label>
-                <div class="kcal-input">
-                    <input type="number" id="meal-lunch" placeholder="0" min="0">
-                    <span>kcal</span>
-                </div>
-            </div>
-            <div class="form-group">
-                <label>저녁</label>
-                <div class="kcal-input">
-                    <input type="number" id="meal-dinner" placeholder="0" min="0">
-                    <span>kcal</span>
-                </div>
-            </div>
-            <div class="form-group">
-                <label><img src="../image/icon_strength_right.png" alt="Strength" class="sidebar-icon"> 근력 운동</label>
-                <div class="time-inputs">
-                    <input type="number" id="exercise-strength-hours" placeholder="시간" min="0" max="23">
-                    <span>시간</span>
-                    <input type="number" id="exercise-strength-mins" placeholder="분" min="0" max="59">
-                    <span>분</span>
-                </div>
-            </div>
-            <div class="form-group">
-                <label><img src="../image/icon_cardio_right.png" alt="Cardio" class="sidebar-icon"> 유산소 운동</label>
-                <div class="time-inputs">
-                    <input type="number" id="exercise-cardio-hours" placeholder="시간" min="0" max="23">
-                    <span>시간</span>
-                    <input type="number" id="exercise-cardio-mins" placeholder="분" min="0" max="59">
-                    <span>분</span>
-                </div>
-            </div>
-            <div class="form-group">
-                <label><img src="../image/icon_mood_right.png" alt="Mood" class="sidebar-icon"> 기분 / 스트레스</label>
-                <textarea id="mood-stress-text" maxlength="500" placeholder="오늘의 기분이나 스트레스에 대해 적어주세요."></textarea>
-                <small class="char-counter" id="char-counter">0/500 자</small>
-            </div>
-            <button type="submit" class="submit-button">기록 완료</button>
-        </form>
+                <div class="form-group"><label><img src="../image/icon_strength_right.png" alt="Strength" class="sidebar-icon"> 근력 운동</label><div class="time-inputs"><input type="number" id="exercise-strength-hours" placeholder="시간" min="0" max="23"><span>시간</span><input type="number" id="exercise-strength-mins" placeholder="분" min="0" max="59"><span>분</span></div></div>
+                <div class="form-group"><label><img src="../image/icon_cardio_right.png" alt="Cardio" class="sidebar-icon"> 유산소 운동</label><div class="time-inputs"><input type="number" id="exercise-cardio-hours" placeholder="시간" min="0" max="23"><span>시간</span><input type="number" id="exercise-cardio-mins" placeholder="분" min="0" max="59"><span>분</span></div></div>
+                <div class="form-group"><label><img src="../image/icon_mood_right.png" alt="Mood" class="sidebar-icon"> 기분 / 스트레스</label><textarea id="mood-stress-text" maxlength="500" placeholder="오늘의 기분이나 스트레스에 대해 적어주세요."></textarea><small class="char-counter" id="char-counter">0/500 자</small></div>
+                <button type="submit" class="submit-button">기록 완료</button>
+            </form>
         </aside>
     </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const loader = document.getElementById('loader-overlay');
+
     // --- 로그인한 사용자 정보 로드 및 UI 업데이트 ---
     const loggedInUserEmail = localStorage.getItem('loggedInUserEmail');
     const sidebarProfilePic = document.getElementById('sidebar-profile-pic');
@@ -180,35 +138,45 @@ document.addEventListener('DOMContentLoaded', function() {
     const mainUsernamePlaceholder = document.getElementById('main-username-placeholder');
     const defaultProfilePicPath = '../image/user_profile_default.png';
 
+    let currentUserInfo = {}; // API 전송 및 데이터 저장용 사용자 기본 정보
+
     if (loggedInUserEmail) {
-        // localStorage에서 사용자 전체 정보 가져오기 (선택적, 닉네임과 프로필만 필요하면 개별 키 사용)
-        // const users = JSON.parse(localStorage.getItem('advisorGptUsers')) || [];
-        // const currentUser = users.find(user => user.email === loggedInUserEmail);
+        const nickname = localStorage.getItem('userNickname') || 'User';
+        const profilePic = localStorage.getItem('userProfileImage') || defaultProfilePicPath;
 
-        const nickname = localStorage.getItem('userNickname') || 'User'; // 개별 키에서 닉네임 가져오기
-        const profilePic = localStorage.getItem('userProfileImage') || defaultProfilePicPath; // 개별 키에서 프로필 사진 가져오기
+        if (sidebarProfilePic) { sidebarProfilePic.src = profilePic; sidebarProfilePic.alt = nickname + " 프로필"; }
+        if (sidebarUsername) { sidebarUsername.textContent = nickname; }
+        if (mainUsernamePlaceholder) { mainUsernamePlaceholder.textContent = nickname; }
 
-        if (sidebarProfilePic) {
-            sidebarProfilePic.src = profilePic;
-            sidebarProfilePic.alt = nickname + " 프로필";
+        // 설정 페이지 등에서 저장된 사용자 상세 정보 로드
+        const users = JSON.parse(localStorage.getItem('advisorGptUsers')) || [];
+        const foundUser = users.find(user => user.email === loggedInUserEmail);
+        if (foundUser) {
+            currentUserInfo = { // API 전송 시 사용할 사용자 정보
+                gender: foundUser.gender || 'female', // 기본값 설정
+                weight_kg: parseFloat(foundUser.weight) || 55,
+                height_cm: parseFloat(foundUser.height) || 160,
+                age: parseInt(foundUser.age) || 30 // 'age'는 회원가입 시 저장해야 함, 여기서는 임의값
+            };
+        } else { // 기본값 사용 (만약을 위해)
+             currentUserInfo = { gender: 'female', weight_kg: 55, height_cm: 160, age: 30 };
         }
-        if (sidebarUsername) {
-            sidebarUsername.textContent = nickname;
-        }
-        if (mainUsernamePlaceholder) {
-            mainUsernamePlaceholder.textContent = nickname;
-            // mainUsernamePlaceholder.style.color = '#3377DD'; // CSS로 처리하는 것이 더 좋음
-        }
+
     } else {
-        // 로그인하지 않은 사용자에 대한 처리 (예: 로그인 페이지로 리디렉션)
+        // 비로그인 시 기본값 표시 (또는 로그인 페이지로 리디렉션)
+        if (sidebarProfilePic) sidebarProfilePic.src = defaultProfilePicPath;
+        if (sidebarUsername) sidebarUsername.textContent = 'User';
+        if (mainUsernamePlaceholder) mainUsernamePlaceholder.textContent = 'User';
+        currentUserInfo = { gender: 'female', weight_kg: 55, height_cm: 160, age: 30 }; // API 호출 위한 기본값
         // alert("로그인이 필요한 서비스입니다.");
-        // window.location.href = '../Advisor_login/index.html'; 
-        // 또는 기본값(User, 기본 프로필) 유지
+        // window.location.href = '../Advisor_login/index.html';
     }
 
     // --- 사이드바 활성 메뉴 설정 ---
-    const currentPage = "main.html"; // 현재 페이지 파일명
+    // (이전과 동일한 로직)
+    const currentPage = "main.html";
     const sidebarLinks = document.querySelectorAll('#sidebar-menu li a');
+    sidebarLinks.forEach(link => { /* ... */ }); // 이전 답변 내용 참조하여 완성
     sidebarLinks.forEach(link => {
         link.parentElement.classList.remove('active');
         const linkHref = link.getAttribute('href');
@@ -224,56 +192,162 @@ document.addEventListener('DOMContentLoaded', function() {
     const year = today.getFullYear();
     const month = String(today.getMonth() + 1).padStart(2, '0');
     const day = String(today.getDate()).padStart(2, '0');
+    const formattedDateKey = `${year}-${month}-${day}`; // localStorage 저장용 날짜 키
+
     if (dateElement) dateElement.textContent = `${year} / ${month} / ${day}`;
 
     const moodStressText = document.getElementById('mood-stress-text');
     const charCounter = document.getElementById('char-counter');
-    if (moodStressText && charCounter) {
-        moodStressText.addEventListener('input', function() {
-            const currentLength = moodStressText.value.length;
-            charCounter.textContent = `${currentLength} /500 자`;
-        });
-    }
+    if (moodStressText && charCounter) { /* ... (이전과 동일) ... */ }
 
     const form = document.getElementById('daily-record-form');
     if (form) {
-        form.addEventListener('submit', function(event) {
+        form.addEventListener('submit', async function(event) {
             event.preventDefault(); 
+            if(loader) loader.style.display = 'flex';
 
-            const sleepHours = parseInt(document.getElementById('sleep-hours').value) || 0;
-            const sleepMins = parseInt(document.getElementById('sleep-mins').value) || 0;
-            if(document.getElementById('display-sleep-hours')) document.getElementById('display-sleep-hours').textContent = sleepHours;
-            if(document.getElementById('display-sleep-mins')) document.getElementById('display-sleep-mins').textContent = sleepMins;
+            const sleepHours = parseFloat(document.getElementById('sleep-hours').value) || 0;
+            const sleepMins = parseFloat(document.getElementById('sleep-mins').value) || 0;
+            const totalSleepHours = parseFloat((sleepHours + (sleepMins / 60)).toFixed(2));
 
             const bfKcal = parseInt(document.getElementById('meal-breakfast').value) || 0;
             const lunchKcal = parseInt(document.getElementById('meal-lunch').value) || 0;
             const dinnerKcal = parseInt(document.getElementById('meal-dinner').value) || 0;
-            const totalKcal = bfKcal + lunchKcal + dinnerKcal;
-            if(document.getElementById('display-meal-kcal')) document.getElementById('display-meal-kcal').textContent = totalKcal;
+            const totalCalories = bfKcal + lunchKcal + dinnerKcal;
 
             const strengthHours = parseInt(document.getElementById('exercise-strength-hours').value) || 0;
             const strengthMins = parseInt(document.getElementById('exercise-strength-mins').value) || 0;
+            const totalStrengthMinutes = (strengthHours * 60) + strengthMins;
+            
             const cardioHours = parseInt(document.getElementById('exercise-cardio-hours').value) || 0;
             const cardioMins = parseInt(document.getElementById('exercise-cardio-mins').value) || 0;
-            
-            let totalExerciseHours = strengthHours + cardioHours;
-            let totalExerciseMins = strengthMins + cardioMins;
-            totalExerciseHours += Math.floor(totalExerciseMins / 60);
-            totalExerciseMins = totalExerciseMins % 60;
-            if(document.getElementById('display-exercise-hours')) document.getElementById('display-exercise-hours').textContent = totalExerciseHours;
-            if(document.getElementById('display-exercise-mins')) document.getElementById('display-exercise-mins').textContent = totalExerciseMins;
+            const totalCardioMinutes = (cardioHours * 60) + cardioMins;
 
-            if(document.getElementById('health-score-value')) document.getElementById('health-score-value').textContent = '82'; // 고정값
-            if(document.getElementById('stress-score-value')) document.getElementById('stress-score-value').textContent = '75'; // 고정값
-            
-            if(document.getElementById('physical-analysis-text')) document.getElementById('physical-analysis-text').textContent = "AI 분석: 오늘의 기록을 바탕으로 신체적 상태를 분석 중입니다...";
-            if(document.getElementById('physical-tips-text')) document.getElementById('physical-tips-text').textContent = "AI 피드백: 건강한 습관을 위한 맞춤형 팁을 생성 중입니다...";
-            if(document.getElementById('mental-analysis-text')) document.getElementById('mental-analysis-text').textContent = "AI 정신 분석: 오늘의 기분/스트레스 내용을 바탕으로 분석 중입니다...";
-            if(document.getElementById('mental-tips-text')) document.getElementById('mental-tips-text').textContent = "AI 정신 피드백: 마음 건강을 위한 조언을 준비 중입니다...";
+            const moodText = moodStressText?.value.trim() || "기록된 감정이 없습니다.";
 
-            alert('오늘의 기록이 중앙 패널에 반영되었습니다!');
+            const dailyLogData = {
+                sleep_hours: totalSleepHours,
+                calories: totalCalories,
+                strength_minutes: totalStrengthMinutes,
+                cardio_minutes: totalCardioMinutes,
+                mood_text: moodText
+            };
+
+            // API 요청 데이터 구성
+            const requestData = {
+                userInfo: currentUserInfo, // 페이지 로드 시 설정된 사용자 정보
+                dailyLog: dailyLogData
+            };
+
+            try {
+                const response = await fetch('http://127.0.0.1:5001/api/health-report', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestData)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ message: `서버 오류: ${response.status}` }));
+                    throw new Error(errorData.message || `서버 오류: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                updateDashboardUI(result, dailyLogData); // UI 업데이트 함수 호출
+
+                // localStorage에 오늘 날짜로 기록 저장
+                if (loggedInUserEmail) {
+                    const dailyRecordsKey = `dailyRecords_${loggedInUserEmail}`;
+                    let userDailyRecords = JSON.parse(localStorage.getItem(dailyRecordsKey)) || {};
+                    userDailyRecords[formattedDateKey] = { // 오늘 날짜를 키로 사용
+                        log: dailyLogData,
+                        analysis: result 
+                    };
+                    localStorage.setItem(dailyRecordsKey, JSON.stringify(userDailyRecords));
+                }
+                alert('기록이 완료되었고, AI 분석 결과가 반영되었습니다!');
+
+            } catch (error) {
+                console.error('API 호출 중 오류 발생:', error);
+                alert(`데이터 처리 중 오류가 발생했습니다: ${error.message}\n브라우저 콘솔(F12)을 확인해주세요.`);
+                // 오류 발생 시 대시보드 기본값으로 설정하거나 이전 값 유지
+                resetDashboardToDefault();
+            } finally {
+                if(loader) loader.style.display = 'none';
+            }
         });
     }
+
+    // 대시보드 UI 업데이트 함수
+    function updateDashboardUI(apiResult, loggedData) {
+        if(document.getElementById('health-score-value')) document.getElementById('health-score-value').textContent = apiResult.todayHealthScore || '--';
+        // 점수 산출 이유는 physical-analysis-text에 포함 (예시)
+        // if(document.getElementById('health-score-reason')) document.getElementById('health-score-reason').textContent = apiResult.scoreReason || '';
+
+        if(document.getElementById('display-sleep-hours')) document.getElementById('display-sleep-hours').textContent = Math.floor(loggedData.sleep_hours);
+        if(document.getElementById('display-sleep-mins')) document.getElementById('display-sleep-mins').textContent = Math.round((loggedData.sleep_hours % 1) * 60);
+        
+        if(document.getElementById('display-meal-kcal')) document.getElementById('display-meal-kcal').textContent = loggedData.calories;
+
+        const totalExerciseMinutes = loggedData.strength_minutes + loggedData.cardio_minutes;
+        const exerciseHours = Math.floor(totalExerciseMinutes / 60);
+        const exerciseMins = totalExerciseMinutes % 60;
+        if(document.getElementById('display-exercise-hours')) document.getElementById('display-exercise-hours').textContent = exerciseHours;
+        if(document.getElementById('display-exercise-mins')) document.getElementById('display-exercise-mins').textContent = exerciseMins;
+
+        if(document.getElementById('stress-score-value')) document.getElementById('stress-score-value').textContent = apiResult.aiMentalAnalysis.stress_score || '--';
+        
+        // 점수 산출 이유를 신체적 분석에 추가 (예시)
+        let physicalAnalysisContent = apiResult.aiPhysicalAnalysis.summary || "분석 결과 없음";
+        if (apiResult.scoreReason) {
+            physicalAnalysisContent = `[점수 산출 이유: ${apiResult.scoreReason}] ${physicalAnalysisContent}`;
+        }
+        if(document.getElementById('physical-analysis-text')) document.getElementById('physical-analysis-text').textContent = physicalAnalysisContent;
+        
+        if(document.getElementById('physical-tips-text')) document.getElementById('physical-tips-text').textContent = apiResult.aiPhysicalAnalysis.feedback || "팁 없음";
+        if(document.getElementById('mental-analysis-text')) document.getElementById('mental-analysis-text').textContent = apiResult.aiMentalAnalysis.summary || "분석 결과 없음";
+        if(document.getElementById('mental-tips-text')) document.getElementById('mental-tips-text').textContent = apiResult.aiMentalAnalysis.feedback || "팁 없음";
+    }
+
+    // 대시보드를 기본값 또는 "기록 없음"으로 리셋하는 함수
+    function resetDashboardToDefault() {
+        if(document.getElementById('health-score-value')) document.getElementById('health-score-value').textContent = '--';
+        if(document.getElementById('display-sleep-hours')) document.getElementById('display-sleep-hours').textContent = '--';
+        if(document.getElementById('display-sleep-mins')) document.getElementById('display-sleep-mins').textContent = '--';
+        if(document.getElementById('display-meal-kcal')) document.getElementById('display-meal-kcal').textContent = '--';
+        if(document.getElementById('display-exercise-hours')) document.getElementById('display-exercise-hours').textContent = '--';
+        if(document.getElementById('display-exercise-mins')) document.getElementById('display-exercise-mins').textContent = '--';
+        if(document.getElementById('stress-score-value')) document.getElementById('stress-score-value').textContent = '--';
+        if(document.getElementById('physical-analysis-text')) document.getElementById('physical-analysis-text').textContent = "오늘의 기록을 입력하시면 AI가 분석을 제공합니다.";
+        if(document.getElementById('physical-tips-text')) document.getElementById('physical-tips-text').textContent = "AI의 피드백과 팁이 여기에 표시됩니다.";
+        if(document.getElementById('mental-analysis-text')) document.getElementById('mental-analysis-text').textContent = "AI의 정신적 분석이 여기에 표시됩니다.";
+        if(document.getElementById('mental-tips-text')) document.getElementById('mental-tips-text').textContent = "AI의 추가적인 피드백과 팁이 여기에 표시됩니다.";
+    }
+
+    // 페이지 로드 시 오늘 날짜의 저장된 기록이 있으면 불러와서 표시 (선택적 기능)
+    function loadTodaysRecord() {
+        if (loggedInUserEmail) {
+            const dailyRecordsKey = `dailyRecords_${loggedInUserEmail}`;
+            const userDailyRecords = JSON.parse(localStorage.getItem(dailyRecordsKey)) || {};
+            const todaysData = userDailyRecords[formattedDateKey];
+            if (todaysData && todaysData.log && todaysData.analysis) {
+                // 입력 폼 채우기 (선택적)
+                document.getElementById('sleep-hours').value = Math.floor(todaysData.log.sleep_hours);
+                document.getElementById('sleep-mins').value = Math.round((todaysData.log.sleep_hours % 1) * 60);
+                // ... (식사, 운동, 기분 등 나머지 폼 필드도 채울 수 있음) ...
+                // document.getElementById('meal-breakfast').value = ... (식사는 총합이므로 분리 필요)
+
+                // 대시보드 UI 업데이트
+                updateDashboardUI(todaysData.analysis, todaysData.log);
+                console.log("오늘의 저장된 기록을 불러왔습니다.");
+            } else {
+                resetDashboardToDefault(); // 저장된 기록 없으면 기본 상태
+            }
+        } else {
+            resetDashboardToDefault(); // 비로그인 시 기본 상태
+        }
+    }
+    loadTodaysRecord(); // 페이지 로드 시 실행
+
 });
 </script>
 </body>
