@@ -7,12 +7,11 @@
     <link rel="stylesheet" href="../Main_Page/style.css"> <!-- 기본 스타일 상속 -->
     <link rel="stylesheet" href="style_report.css"> <!-- 리포트 페이지 전용 스타일 -->
     <link href="https://fonts.googleapis.com/css2?family=Mulish&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
-    <!-- Chart.js CDN은 head 태그 상단 또는 body 태그 맨 아래에 두는 것이 일반적입니다. -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="main-dashboard-container">
-        <!-- Left Sidebar (이전과 동일) -->
+        <!-- Left Sidebar -->
         <aside class="sidebar left-sidebar">
             <div class="profile-section">
                 <img src="../image/user_profile_default.png" alt="User Profile" class="profile-pic" id="sidebar-profile-pic">
@@ -31,12 +30,12 @@
             </div>
         </aside>
 
-        <!-- Main Content for Health Report (이전과 동일) -->
+        <!-- Main Content for Health Report -->
         <main class="main-content report-content">
             <section class="goal-status-section">
                 <p class="goal-text">
                     나의 목표 점수 
-                    <input type="number" id="goal-score-input" min="1" max="100" value="90">점까지 
+                    <input type="number" id="goal-score-input" min="1" max="100">점까지 
                     <span id="points-remaining">XX</span>점 남았습니다.
                 </p>
                 <p class="gpt-comment">GPT 격려 코멘트: 목표를 향해 꾸준히 나아가세요! 작은 변화가 큰 결과를 만듭니다.</p>
@@ -45,34 +44,33 @@
             <section class="weekly-chart-section">
                 <h2>주간 건강 점수</h2>
                 <div class="chart-container">
-                    <!-- Canvas 요소는 여기에 있어야 합니다. -->
                     <canvas id="weeklyHealthChart"></canvas>
                 </div>
             </section>
 
             <section class="weekly-summary-section">
-                <!-- ... (주간 요약 내용 이전과 동일) ... -->
                 <h2>주간 요약</h2>
-                <ul class="summary-list">
+                <ul class="summary-list" id="weekly-summary-list">
+                    <!-- 요약 내용은 JS로 동적으로 채울 수 있으나, 초기 구조는 유지 -->
                     <li>
                         <img src="../image/icon_sleep_moon_right.png" alt="수면" class="summary-icon">
-                        <span>이번 주 평균 수면 시간은 <strong class="highlight-blue">7.2시간</strong>으로 지난 주 대비 <strong class="highlight-red">5% 감소</strong>했습니다.</span>
+                        <span data-summary-type="sleep">지난 주 대비 수면 변화를 분석 중입니다...</span>
                     </li>
                     <li>
                         <img src="../image/icon_meal_bowl_center.png" alt="식사량" class="summary-icon">
-                        <span>이번 주 평균 식사량은 <strong class="highlight-blue">1850kcal</strong>으로 지난 주 대비 <strong class="highlight-green">3% 증가</strong>했습니다.</span>
+                        <span data-summary-type="meal">지난 주 대비 식사량 변화를 분석 중입니다...</span>
                     </li>
                     <li>
                         <img src="../image/icon_exercise_dumbbell_center.png" alt="운동 시간" class="summary-icon">
-                        <span>이번 주 평균 운동 시간은 <strong class="highlight-blue">1.5시간</strong>으로 지난 주 대비 <strong class="highlight-green">10% 증가</strong>했습니다.</span>
+                        <span data-summary-type="exercise">지난 주 대비 운동 시간 변화를 분석 중입니다...</span>
                     </li>
                     <li>
                         <img src="../image/icon_stress_head_center.png" alt="스트레스 지수" class="summary-icon">
-                        <span>이번 주 평균 스트레스 지수는 <strong class="highlight-blue">65점</strong>으로 지난 주 대비 <strong class="highlight-green                                                         ">8% 감소</strong>했습니다. (점수가 낮을수록 긍정적입니다.)</span>
+                        <span data-summary-type="stress">지난 주 대비 스트레스 지수 변화를 분석 중입니다...</span>
                     </li>
                     <li>
-                        <img src="../image/icon_health_score.png" alt="건강 점수" class="summary-icon">
-                        <span>이번 주 평균 건강 점수는 <strong class="highlight-blue">78점</strong>으로 지난 주 대비 <strong class="highlight-green">4% 증가</strong>했습니다!</span>
+                        <img src="../image/icon_health_score.png" alt="건강 점수" class="summary-icon"> <!-- icon_health_report.png 등으로 변경 가능 -->
+                        <span data-summary-type="overall">지난 주 대비 전체 건강 점수 변화를 분석 중입니다...</span>
                     </li>
                 </ul>
             </section>
@@ -84,86 +82,97 @@ document.addEventListener('DOMContentLoaded', function() {
     const loggedInUserEmail = localStorage.getItem('loggedInUserEmail');
     const sidebarProfilePic = document.getElementById('sidebar-profile-pic');
     const sidebarUsername = document.getElementById('sidebar-username');
-    const defaultProfilePicPath = '../image/user_profile_default.png';
     const goalInput = document.getElementById('goal-score-input');
     const pointsRemainingSpan = document.getElementById('points-remaining');
-    const defaultGoalScore = 70; 
+    
+    const defaultProfilePicPath = '../image/user_profile_default.png';
+    const defaultGoalScore = 70; // 기본 목표 점수
 
-    // --- 로그인한 사용자 정보 로드 및 사이드바 UI 업데이트 ---
+    // --- 로그인한 사용자 정보 로드 및 사이드바/목표점수 UI 업데이트 ---
     if (loggedInUserEmail) {
-        // ... (이전과 동일한 로직)
         const nickname = localStorage.getItem('userNickname') || 'User';
         const userSpecificProfileKey = 'userProfileImage_' + loggedInUserEmail;
+        // localStorage의 userProfileImage는 다른 페이지에서 공용으로 쓰는 현재 로그인 유저의 프로필 사진
         const profilePic = localStorage.getItem(userSpecificProfileKey) || localStorage.getItem('userProfileImage') || defaultProfilePicPath;
-        if (sidebarProfilePic) { sidebarProfilePic.src = profilePic; sidebarProfilePic.alt = nickname + " 프로필"; }
-        if (sidebarUsername) { sidebarUsername.textContent = nickname; }
+
+        if (sidebarProfilePic) {
+            sidebarProfilePic.src = profilePic;
+            sidebarProfilePic.alt = nickname + " 프로필";
+        }
+        if (sidebarUsername) {
+            sidebarUsername.textContent = nickname;
+        }
+
         const userGoalScoreKey = 'userGoalScore_' + loggedInUserEmail;
         const storedGoalScore = localStorage.getItem(userGoalScoreKey);
         goalInput.value = storedGoalScore ? parseInt(storedGoalScore) : defaultGoalScore;
     } else {
-        // ... (이전과 동일한 로직)
+        // 로그인하지 않은 사용자 처리
         if (sidebarProfilePic) sidebarProfilePic.src = defaultProfilePicPath;
         if (sidebarUsername) sidebarUsername.textContent = 'User';
         goalInput.value = defaultGoalScore;
+        // 일부 기능 제한 또는 로그인 페이지로 리디렉션 경고 등
+        // 예: document.body.classList.add('機能制限');
     }
 
     // --- 주간 건강 점수 데이터 (실제로는 이 데이터를 동적으로 가져와야 함) ---
-    // 현재는 기록이 없더라도 빈 그래프를 보여주기 위해 레이블은 유지하고 데이터는 비우거나 기본값으로 설정합니다.
     const labels = ['월', '화', '수', '목', '금', '토', '일'];
-    let weeklyScores = []; // 실제 사용자 데이터를 가져오도록 수정해야 함
-    
-    // 예시: localStorage에서 사용자별 주간 점수 데이터 로드 (아직 저장 로직은 없음)
+    let weeklyScores = []; // 실제 사용자 데이터를 저장할 배열
+
+    // TODO: 로그인한 사용자의 실제 주간 점수 데이터를 localStorage 또는 다른 곳에서 가져오는 로직 추가
+    // 예시:
     // if (loggedInUserEmail) {
-    //     const userWeeklyScoresKey = 'userWeeklyScores_' + loggedInUserEmail;
-    //     const storedScores = JSON.parse(localStorage.getItem(userWeeklyScoresKey));
-    //     if (storedScores && storedScores.length === 7) {
-    //         weeklyScores = storedScores;
+    //     const userWeeklyScoresKey = 'userWeeklyScores_' + loggedInUserEmail; // 사용자별 데이터 키
+    //     const storedData = JSON.parse(localStorage.getItem(userWeeklyScoresKey));
+    //     if (storedData && Array.isArray(storedData) && storedData.length === 7) {
+    //         weeklyScores = storedData;
     //     } else {
-    //         // 데이터가 없거나 형식이 맞지 않으면 0으로 채워진 배열 또는 빈 배열 사용
-    //         weeklyScores = [0, 0, 0, 0, 0, 0, 0]; // 또는 []
+    //         weeklyScores = [null, null, null, null, null, null, null]; // 데이터 없을 시
     //     }
     // } else {
-    //     weeklyScores = [0, 0, 0, 0, 0, 0, 0]; // 로그인 안한 경우 기본 빈 데이터
+    //     weeklyScores = [null, null, null, null, null, null, null]; // 비로그인 시
     // }
-    
-    // 기록이 없을 경우 보여줄 기본값 (예: 모든 값을 0으로 또는 null로)
-    if (weeklyScores.length === 0) {
-        weeklyScores = [null, null, null, null, null, null, null]; // 데이터 포인트를 표시하지 않음
-        // 또는 weeklyScores = [0, 0, 0, 0, 0, 0, 0]; // 0점에 라인 표시
-    }
+    // 임시 샘플 데이터 (실제 데이터 로드 로직으로 대체 필요)
+    weeklyScores = [68, 72, 70, 78, 75, 80, 77]; // 차트가 보이도록 임시 데이터 유지
 
-    const averageWeeklyScore = weeklyScores.filter(score => score !== null).length > 0
-        ? weeklyScores.reduce((sum, score) => sum + (score || 0), 0) / weeklyScores.filter(score => score !== null).length
-        : 0; // 데이터가 없으면 평균 0
 
+    const validScores = weeklyScores.filter(score => typeof score === 'number');
+    const averageWeeklyScore = validScores.length > 0
+        ? validScores.reduce((sum, score) => sum + score, 0) / validScores.length
+        : 0;
 
     function updatePointsRemaining() {
-        // ... (이전과 동일한 로직)
         const currentGoalScore = parseInt(goalInput.value) || defaultGoalScore;
-        if (currentGoalScore < 1) goalInput.value = 1;
-        if (currentGoalScore > 100) goalInput.value = 100;
-        const remaining = Math.max(0, (parseInt(goalInput.value) || defaultGoalScore) - Math.round(averageWeeklyScore));
+        // 입력값이 범위 벗어나면 조정
+        goalInput.value = Math.max(1, Math.min(100, currentGoalScore)); 
+        
+        const remaining = Math.max(0, (parseInt(goalInput.value)) - Math.round(averageWeeklyScore));
         pointsRemainingSpan.textContent = remaining;
     }
 
     goalInput.addEventListener('input', updatePointsRemaining);
-    goalInput.addEventListener('change', function() { 
+    goalInput.addEventListener('change', function() {
         updatePointsRemaining();
-        if (loggedInUserEmail) { /* ... (저장 로직 동일) ... */ }
+        if (loggedInUserEmail) {
+            const userGoalScoreKey = 'userGoalScore_' + loggedInUserEmail;
+            localStorage.setItem(userGoalScoreKey, goalInput.value);
+        }
     });
 
     updatePointsRemaining(); // 초기 계산
 
     // --- Chart.js 설정 ---
     const ctx = document.getElementById('weeklyHealthChart');
-    if (ctx) { // canvas 요소가 존재하는지 확인
-        const weeklyHealthChart = new Chart(ctx.getContext('2d'), {
+    let weeklyHealthChartInstance = null; // 차트 인스턴스 저장 변수
+
+    if (ctx) {
+        weeklyHealthChartInstance = new Chart(ctx.getContext('2d'), { // 인스턴스 할당
             type: 'line',
             data: {
                 labels: labels,
                 datasets: [{
                     label: '주간 건강 점수',
-                    data: weeklyScores, // 실제 데이터 또는 빈 데이터를 사용
+                    data: weeklyScores,
                     borderColor: '#3377DD',
                     backgroundColor: 'rgba(51, 119, 221, 0.1)',
                     tension: 0.1,
@@ -175,56 +184,78 @@ document.addEventListener('DOMContentLoaded', function() {
                     pointRadius: 5,
                     pointHoverRadius: 7,
                     borderWidth: 2,
-                    // 데이터가 모두 null일 때 라인이 그려지지 않도록 spanGaps 옵션 고려 가능
-                    // spanGaps: false, // true로 하면 null 값 사이를 이어줌
                 }]
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false, // .chart-container 크기에 맞추도록 false로 설정
+                maintainAspectRatio: false,
                 scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 100,
-                        min: 0, // Y축 최소값 명시
-                        ticks: {
-                            stepSize: 10,
-                            color: '#555',
-                            font: { family: "'Noto Sans KR', sans-serif" }
-                        },
-                        grid: { color: '#E0E0E0', drawBorder: false, }
-                    },
-                    x: {
-                        ticks: { color: '#555', font: { family: "'Noto Sans KR', sans-serif" } },
-                        grid: { display: true, drawBorder: false, } // X축 그리드 표시
-                    }
+                    y: { beginAtZero: true, max: 100, min: 0, ticks: { stepSize: 10, color: '#555', font: { family: "'Noto Sans KR', sans-serif" } }, grid: { color: '#E0E0E0', drawBorder: false, } },
+                    x: { ticks: { color: '#555', font: { family: "'Noto Sans KR', sans-serif" } }, grid: { display: true, drawBorder: false } }
                 },
                 plugins: {
-                    legend: { display: false }, // 범례 숨김 (요청 이미지에 없음)
+                    legend: { display: false },
                     tooltip: {
-                        backgroundColor: 'rgba(0,0,0,0.7)',
-                        titleFont: { family: "'Noto Sans KR', sans-serif", size: 14 },
-                        bodyFont: { family: "'Noto Sans KR', sans-serif", size: 12 },
-                        padding: 10,
-                        cornerRadius: 6,
-                        displayColors: false,
+                        backgroundColor: 'rgba(0,0,0,0.7)', titleFont: { family: "'Noto Sans KR', sans-serif", size: 14 },
+                        bodyFont: { family: "'Noto Sans KR', sans-serif", size: 12 }, padding: 10, cornerRadius: 6, displayColors: false,
                         callbacks: {
                             label: function(context) {
-                                return context.parsed.y !== null ? `점수: ${context.parsed.y}` : '데이터 없음';
+                                return context.parsed.y !== null ? `점수: ${context.parsed.y}` : '기록 없음';
                             }
                         }
                     }
-                },
-                // 데이터가 없을 때도 차트 영역은 보이도록, 하지만 "데이터 없음" 메시지 등은 Chart.js 플러그인 등으로 추가 구현 가능
-                // 간단하게는, 데이터가 없을 때 빈 배열이나 null로 채워진 배열을 전달하면 축과 그리드는 그려짐
+                }
             }
         });
     } else {
-        console.error("Failed to find the canvas element for the chart.");
+        console.error("Error: Canvas element #weeklyHealthChart not found.");
     }
 
-    // --- 사이드바 활성 메뉴 설정 (이전과 동일) ---
-    // ... (활성 메뉴 로직은 이전 답변과 동일하게 유지)
+    // --- 주간 요약 업데이트 (샘플 로직, 실제 데이터 기반으로 수정 필요) ---
+    function updateWeeklySummary() {
+        const summaryList = document.getElementById('weekly-summary-list');
+        if (!summaryList) return;
+
+        // TODO: 실제 지난 주 데이터와 이번 주 평균 데이터를 비교하는 로직 필요
+        // 아래는 하드코딩된 예시입니다.
+        const summaryData = {
+            sleep: { current: 7.2, change: -5, unit: "시간" }, // 5% 감소
+            meal: { current: 1850, change: 3, unit: "kcal" },  // 3% 증가
+            exercise: { current: 1.5, change: 10, unit: "시간" },// 10% 증가
+            stress: { current: 65, change: -8, unit: "점" },   // 8% 감소 (긍정적)
+            overall: { current: 78, change: 4, unit: "점" }    // 4% 증가
+        };
+
+        summaryList.querySelectorAll('li span[data-summary-type]').forEach(span => {
+            const type = span.dataset.summaryType;
+            const data = summaryData[type];
+            if (data) {
+                let changeText = "";
+                if (data.change > 0) {
+                    changeText = `<strong class="highlight-green">${Math.abs(data.change)}% 증가</strong>`;
+                } else if (data.change < 0) {
+                    changeText = `<strong class="highlight-red">${Math.abs(data.change)}% 감소</strong>`;
+                } else {
+                    changeText = "변동 없음";
+                }
+                let baseText = `이번 주 평균 ${
+                    type === 'sleep' ? '수면 시간은' :
+                    type === 'meal' ? '식사량은' :
+                    type === 'exercise' ? '운동 시간은' :
+                    type === 'stress' ? '스트레스 지수는' :
+                    '건강 점수는'
+                } <strong class="highlight-blue">${data.current}${data.unit}</strong>으로 지난 주 대비 ${changeText}했습니다.`;
+                if (type === 'stress') baseText += " (점수가 낮을수록 긍정적입니다.)";
+                if (type === 'overall' && data.change > 0) baseText += "!";
+                
+                span.innerHTML = baseText;
+            }
+        });
+    }
+    updateWeeklySummary();
+
+
+    // --- 사이드바 활성 메뉴 설정 ---
     const currentReportPath = "health_report.html";
     const sidebarLinks = document.querySelectorAll('#sidebar-menu li a');
     sidebarLinks.forEach(link => { link.parentElement.classList.remove('active'); });
@@ -232,11 +263,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const linkHref = a.getAttribute('href');
         const iconSrc = a.parentElement.querySelector('.menu-icon') ? a.parentElement.querySelector('.menu-icon').src : '';
         return (linkHref && linkHref.includes(currentReportPath)) ||
-                (linkHref === "../Health_Report/health_report.html") ||
-                (linkHref === "#" && iconSrc.includes('icon_health_report'));
+               (linkHref === "../Health_Report/health_report.html") ||
+               (linkHref === "#" && iconSrc.includes('icon_health_report'));
     });
     if (healthReportLinkFromList) { healthReportLinkFromList.parentElement.classList.add('active');
     } else { document.querySelector('#sidebar-menu li a[href*="health_report.html"]')?.parentElement.classList.add('active'); }
+
 });
 </script>
 </body>
