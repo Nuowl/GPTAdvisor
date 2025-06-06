@@ -1,60 +1,50 @@
-/* GPT_Chatbot/style_chatbot.css */
+/* GPT_Chatbot/style_chatbot_fix.css */
 
-/* 챗봇 페이지의 .main-content 에만 적용될 스타일 */
+/* 챗봇 페이지의 메인 콘텐츠 영역 (.main-content 클래스도 가짐) */
 /* 이 선택자는 Main_Page/style.css의 .main-content 보다 구체적이므로 우선 적용됩니다. */
-/* body > div.main-dashboard-container > main.main-content.chatbot-page-container */
-/* 위 선택자는 너무 길고 복잡해질 수 있으므로, HTML에서 <main> 태그에 고유 ID를 부여하고 사용하는 것이 더 좋습니다. */
-/* 예: <main id="chatbot-main-content" class="main-content chatbot-page-container"> */
-/* 여기서는 일단 클래스 기반으로 최대한 구체화합니다. */
-
 div.main-dashboard-container > main.main-content.chatbot-page-container {
-    flex-grow: 1;
-    /* !!!! min-width: 0; !!!! */
-    /* 이 속성은 flex 아이템이 내부 콘텐츠(아무리 길어도) 때문에
-       자신의 flex-basis를 초과하여 늘어나 다른 flex 아이템의 공간을 침범하는 것을 방지합니다.
-       이것이 왼쪽 사이드바가 줄어드는 것을 막는 가장 핵심적인 부분일 가능성이 높습니다. */
-    min-width: 0; /* 이 줄이 핵심입니다! */
-
-    display: flex; /* 이미 설정되어 있을 수 있음 */
-    flex-direction: column; /* 이미 설정되어 있을 수 있음 */
-    overflow: hidden; /* 이 컨테이너 자체 스크롤 방지 (자식이 스크롤) */
-    padding: 15px;
+    flex-grow: 1; /* 부모(.main-dashboard-container)의 남은 공간을 차지 */
+    min-width: 0; /* !!!! 매우 중요: 내부 콘텐츠가 부모를 초과하여 늘어나는 것을 방지 !!!! */
+                   /* 이 규칙이 챗봇 페이지의 .main-content 에만 적용되도록 선택자를 구체화 */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* 이 컨테이너 자체는 스크롤되지 않도록 함 */
+    padding: 15px; /* 챗봇 페이지 내부 패딩 */
     box-sizing: border-box;
-    /* height: calc(100vh - 40px); /* 전체 페이지 레이아웃에 따라 필요할 수 있으나,
-                                     flex-grow:1 로 부모 높이를 따라가는 것이 일반적입니다.
-                                     이것이 오히려 문제를 일으킬 수도 있으니 주의. */
+    /* height: calc(100vh - 40px); /* 이 부분은 전체 html, body, dashboard-container 높이 설정에 따라
+                                        문제를 일으킬 수 있으므로, flex-grow로 자동 높이를 우선시합니다.
+                                     문제가 지속되면 이 부분을 다시 고려합니다. */
 }
 
 .chatbot-interface {
     background-color: #FFFFFF;
     border: 2.5px solid #3377DD;
     border-radius: 15px;
-    width: 100%; /* 부모(.chatbot-page-container)의 너비를 따름 */
-    flex-grow: 1; /* 부모의 사용 가능한 높이를 모두 차지 */
+    width: 100%; /* 부모의 너비를 따름 */
+    flex-grow: 1; /* 부모(.chatbot-page-container)의 사용 가능한 높이를 모두 차지 */
     display: flex;
     flex-direction: column;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    overflow: hidden; /* 내부 요소가 이 컨테이너를 넘치지 않도록 */
+    overflow: hidden; /* 내부 요소가 이 컨테이너를 넘치지 않도록 (스크롤은 자식에서) */
     box-sizing: border-box;
 }
 
 .chat-display-area {
     flex-grow: 1;
     overflow-y: auto; /* 채팅 메시지 스크롤 */
-    padding: 15px 20px; /* 상하좌우 패딩 (상단 패딩을 15px로 수정) */
+    padding: 15px 20px; /* 상하 패딩 일관성 */
     display: flex;
     flex-direction: column;
     gap: 18px;
-    /* overflow-x: hidden; /* 만약을 위해 가로 스크롤도 숨김 */
 }
 
 .chat-initial-logo-container {
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    padding-top: 15px; /* 로고와 채팅창 상단 테두리 사이 여백 */
-    padding-bottom: 15px; /* 로고와 첫 메시지 사이 여백 */
-    flex-shrink: 0;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    flex-shrink: 0; /* 로고 컨테이너는 줄어들지 않음 */
 }
 
 .chat-initial-logo {
@@ -66,9 +56,10 @@ div.main-dashboard-container > main.main-content.chatbot-page-container {
 /* Message styles */
 .chat-message {
     display: flex;
-    width: fit-content; /* 내용에 맞게. 단, max-width로 제한됨 */
+    width: fit-content; /* 내용에 맞게 너비 조절 */
+    /* !!!! 각 메시지 타입별로 최대 너비를 좀 더 명확히/작게 설정 !!!! */
+    /* 이 max-width는 .chat-display-area 내부에서의 비율 또는 고정값이어야 함 */
     align-items: flex-end;
-    /* max-width는 각 user/gpt 메시지에서 구체적으로 설정 */
 }
 
 .chat-message.user {
@@ -80,31 +71,37 @@ div.main-dashboard-container > main.main-content.chatbot-page-container {
 .chat-message.gpt {
     align-self: flex-start;
     margin-right: auto;
-    max-width: 70%; /* .chat-display-area 너비의 70% (아바타 포함) */
+    max-width: 70%; /* .chat-display-area 너비의 70% (아바타 포함 전체) */
 }
 
 .chat-message.gpt .chat-avatar {
-    /* ... (이전 스타일 유지) ... */
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2.0px solid #3377DD;
+    margin-right: 10px;
+    object-fit: contain;
+    padding: 3px;
+    background-color: #fff;
     flex-shrink: 0;
+    box-sizing: border-box;
 }
 
 .message-bubble {
     padding: 10px 15px;
     border-radius: 18px;
     line-height: 1.5;
-    max-width: 100%; /* 부모(.chat-message)의 max-width를 넘지 않도록 */
+    max-width: 100%; /* 부모(.chat-message)의 max-width를 넘지 않도록 함 */
     box-sizing: border-box;
-    /* !!!! 중요: 긴 문자열이 부모의 너비를 깨고 나가는 것을 방지 !!!! */
-    overflow: hidden; /* 버블 자체가 넘치는 것을 막고, 내부 p에서 줄바꿈 처리 */
+    /* overflow-wrap 과 white-space 는 p 태그에서 처리 */
 }
 
 .message-bubble p {
     margin: 0;
     font-size: 15px;
-    word-wrap: break-word; /* 구형 브라우저 호환 */
-    overflow-wrap: break-word; /* 표준: 단어 단위 줄바꿈, 긴 영어단어 등 강제 줄바꿈 */
-    white-space: pre-wrap;    /* 입력된 공백 및 엔터 줄바꿈 유지 */
-    /* min-width: 0; /* p 태그가 flex 아이템은 아니지만, 만약을 위해 추가해볼 수 있음 */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
 }
 
 /* User message bubble style */
@@ -122,14 +119,17 @@ div.main-dashboard-container > main.main-content.chatbot-page-container {
     border-radius: 18px 18px 18px 5px;
 }
 .chat-message.gpt.error .message-bubble {
-    /* ... (이전 스타일 유지) ... */
+    border-color: #D32F2F;
+    background-color: #FFEBEE;
+    color: #C62828;
 }
 
-/* Chat input area (이전 스타일 유지) */
+/* Chat input area */
 .chat-input-wrapper {
     padding: 10px 15px;
-    flex-shrink: 0;
+    flex-shrink: 0; /* 입력 영역은 줄어들지 않음 */
 }
+
 .chat-input-area {
     background-color: #FFFFFF;
     border: 2.5px solid #3377DD;
@@ -138,15 +138,51 @@ div.main-dashboard-container > main.main-content.chatbot-page-container {
     display: flex;
     align-items: center;
 }
-#chat-message-input {
-    flex-grow: 1; background-color: transparent; color: #333333; border: none;
-    padding: 8px 0; font-size: 15px; line-height: 1.4; resize: none; overflow-y: hidden;
-    min-height: calc(1.4em + 16px); max-height: calc(2.8em + 16px);
-    font-family: 'Noto Sans KR', 'Mulish', sans-serif; outline: none; box-sizing: content-box;
-}
-.send-button { /* ... (이전 스타일 유지) ... */ }
-.send-button img { /* ... (이전 스타일 유지) ... */ }
-.typing-indicator .message-bubble p span { /* ... (이전 스타일 유지) ... */ }
-@keyframes typing-dots { /* ... (이전 스타일 유지) ... */ }
 
-/* 이 파일은 챗봇 페이지 전용이므로, 사이드바 활성 상태는 Main_Page/style.css 또는 HTML의 JS에서 처리 */
+#chat-message-input {
+    flex-grow: 1;
+    background-color: transparent;
+    color: #333333;
+    border: none;
+    padding: 8px 0;
+    font-size: 15px;
+    line-height: 1.4;
+    resize: none;
+    overflow-y: hidden;
+    min-height: calc(1.4em + 16px);
+    max-height: calc(2.8em + 16px);
+    font-family: 'Noto Sans KR', 'Mulish', sans-serif;
+    outline: none;
+    box-sizing: content-box;
+}
+
+.send-button {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    margin-left: 8px;
+    cursor: pointer;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.send-button img {
+    width: 30px;
+    height: 30px;
+    filter: brightness(0.7);
+}
+.send-button:hover img {
+    filter: brightness(0.5);
+}
+
+/* Typing indicator (유지) */
+.typing-indicator .message-bubble p span { display: inline-block; width: 5px; height: 5px; background-color: #3377DD; border-radius: 50%; margin: 0 1.5px; animation: typing-dots 1.3s infinite ease-in-out; }
+.typing-indicator .message-bubble p span:nth-child(1) { animation-delay: 0s; }
+.typing-indicator .message-bubble p span:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator .message-bubble p span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typing-dots { 0%, 60%, 100% { transform: translateY(0); opacity: 0.4; } 30% { transform: translateY(-4px); opacity: 1; } }
+
+/* 사이드바 활성 상태는 Main_Page/style.css 의 규칙을 따름 */
