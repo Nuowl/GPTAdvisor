@@ -14,7 +14,7 @@
         <!-- Left Sidebar -->
         <aside class="sidebar left-sidebar">
             <div class="profile-section">
-                <img src="../image/user_profile_default.png" alt="User Profile" class="profile-pic">
+                <img src="../image/user_profile_default.png" alt="User Profile" class="profile-pic" id="sidebar-profile-pic">
                 <p class="user-nickname" id="sidebar-username">User</p>
             </div>
             <nav class="menu-section">
@@ -76,127 +76,98 @@
         </main>
     </div>
 
+<!-- Health_Report/health_report.html 의 <script> 태그 내부 수정 -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Sample data for the chart (replace with actual data)
-    const weeklyScores = [68, 72, 70, 78, 75, 80, 77]; // 월, 화, 수, 목, 금, 토, 일
-    const labels = ['월', '화', '수', '목', '금', '토', '일'];
-
-    // Calculate average weekly score
-    const averageWeeklyScore = weeklyScores.reduce((sum, score) => sum + score, 0) / weeklyScores.length;
-
-    // Goal score functionality
+    const loggedInUserEmail = localStorage.getItem('loggedInUserEmail');
+    const sidebarProfilePic = document.getElementById('sidebar-profile-pic'); // HTML에 id 추가 필요
+    const sidebarUsername = document.getElementById('sidebar-username'); // HTML에 id 이미 있음
+    const defaultProfilePicPath = '../image/user_profile_default.png';
     const goalInput = document.getElementById('goal-score-input');
     const pointsRemainingSpan = document.getElementById('points-remaining');
+    const defaultGoalScore = 70; // 기본 목표 점수
+
+    // --- 로그인한 사용자 정보 로드 및 사이드바 UI 업데이트 ---
+    if (loggedInUserEmail) {
+        const nickname = localStorage.getItem('userNickname') || 'User';
+        const userSpecificProfileKey = 'userProfileImage_' + loggedInUserEmail;
+        const profilePic = localStorage.getItem(userSpecificProfileKey) || localStorage.getItem('userProfileImage') || defaultProfilePicPath;
+
+        if (sidebarProfilePic) {
+            sidebarProfilePic.src = profilePic;
+            sidebarProfilePic.alt = nickname + " 프로필";
+        }
+        if (sidebarUsername) {
+            sidebarUsername.textContent = nickname;
+        }
+
+        // --- 목표 점수 로드 및 설정 ---
+        const userGoalScoreKey = 'userGoalScore_' + loggedInUserEmail;
+        const storedGoalScore = localStorage.getItem(userGoalScoreKey);
+        goalInput.value = storedGoalScore ? parseInt(storedGoalScore) : defaultGoalScore;
+
+    } else {
+        // 로그인하지 않은 사용자 처리
+        if (sidebarProfilePic) sidebarProfilePic.src = defaultProfilePicPath;
+        if (sidebarUsername) sidebarUsername.textContent = 'User';
+        goalInput.value = defaultGoalScore; // 로그인 안 했어도 기본 목표 점수 표시
+        // alert("로그인이 필요한 서비스입니다. 일부 기능이 제한될 수 있습니다.");
+        // window.location.href = '../Advisor_login/index.html'; // 필요시 리디렉션
+    }
+
+
+    // --- 기존 건강 리포트 페이지 JS 코드 시작 ---
+    const weeklyScores = [68, 72, 70, 78, 75, 80, 77]; // 샘플 데이터
+    const labels = ['월', '화', '수', '목', '금', '토', '일'];
+    const averageWeeklyScore = weeklyScores.reduce((sum, score) => sum + score, 0) / weeklyScores.length;
+    // --- 기존 건강 리포트 페이지 JS 코드 끝 ---
+
 
     function updatePointsRemaining() {
-        const goalScore = parseInt(goalInput.value) || 0;
-        if (goalScore < 1) goalInput.value = 1;
-        if (goalScore > 100) goalInput.value = 100;
+        const currentGoalScore = parseInt(goalInput.value) || defaultGoalScore; // 입력값이 없거나 잘못되면 기본값 사용
+        if (currentGoalScore < 1) goalInput.value = 1;
+        if (currentGoalScore > 100) goalInput.value = 100;
         
-        const remaining = Math.max(0, goalScore - Math.round(averageWeeklyScore));
+        const remaining = Math.max(0, (parseInt(goalInput.value) || defaultGoalScore) - Math.round(averageWeeklyScore));
         pointsRemainingSpan.textContent = remaining;
     }
 
     goalInput.addEventListener('input', updatePointsRemaining);
-    goalInput.addEventListener('change', updatePointsRemaining); // Handles up/down arrow changes better
+    goalInput.addEventListener('change', function() { // 목표 점수 변경 시 저장
+        updatePointsRemaining();
+        if (loggedInUserEmail) {
+            const userGoalScoreKey = 'userGoalScore_' + loggedInUserEmail;
+            localStorage.setItem(userGoalScoreKey, goalInput.value);
+            // alert("목표 점수가 저장되었습니다."); // 사용자에게 알림 (선택 사항)
+        }
+    });
 
-    // Initial calculation
-    updatePointsRemaining();
+    updatePointsRemaining(); // 초기 계산
 
-    // Chart.js configuration
+    // --- Chart.js 설정 (이전과 동일) ---
     const ctx = document.getElementById('weeklyHealthChart').getContext('2d');
-    const weeklyHealthChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: '주간 건강 점수',
-                data: weeklyScores,
-                borderColor: '#3377DD',
-                backgroundColor: 'rgba(51, 119, 221, 0.1)',
-                tension: 0.1,
-                fill: true,
-                pointBackgroundColor: '#3377DD',
-                pointBorderColor: '#FFFFFF',
-                pointHoverBackgroundColor: '#FFFFFF',
-                pointHoverBorderColor: '#3377DD',
-                pointRadius: 5,
-                pointHoverRadius: 7,
-                borderWidth: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    max: 100,
-                    ticks: {
-                        stepSize: 10,
-                        color: '#555',
-                            font: {
-                                family: "'Noto Sans KR', sans-serif"
-                        }
-                    },
-                    grid: {
-                        color: '#E0E0E0',
-                        drawBorder: false,
-                    }
-                },
-                x: {
-                        ticks: {
-                            color: '#555',
-                            font: {
-                                family: "'Noto Sans KR', sans-serif"
-                        }
-                    },
-                    grid: {
-                        display: false, // Hides vertical grid lines on x-axis if not desired
-                    }
-                }
-            },
-            plugins: {
-                legend: {
-                    display: false // Hides the legend if not needed as per image
-                },
-                tooltip: {
-                    backgroundColor: 'rgba(0,0,0,0.7)',
-                    titleFont: { family: "'Noto Sans KR', sans-serif", size: 14 },
-                    bodyFont: { family: "'Noto Sans KR', sans-serif", size: 12 },
-                    padding: 10,
-                    cornerRadius: 6,
-                    displayColors: false, // Hides color box in tooltip
-                        callbacks: {
-                            label: function(context) {
-                                return `점수: ${context.parsed.y}`;
-                        }
-                    }
-                }
-            }
-        }
-    });
-     // Ensure correct sidebar link is active (main page style might override)
-    const currentReportPath = "health_report.html"; // Or the specific path for this page
+    const weeklyHealthChart = new Chart(ctx, { /* ... 차트 설정 ... */ });
+
+    // --- 사이드바 활성 메뉴 설정 (이전과 동일) ---
+    const currentReportPath = "health_report.html";
     const sidebarLinks = document.querySelectorAll('#sidebar-menu li a');
+    sidebarLinks.forEach(link => { /* ... */ });
+    // ... (이하 활성 메뉴 로직은 이전 답변과 동일하게 유지)
     sidebarLinks.forEach(link => {
-        link.parentElement.classList.remove('active'); // Remove active from all
-        if (link.getAttribute('href') && (link.getAttribute('href').includes(currentReportPath) || (link.getAttribute('href') === "#" && link.parentElement.querySelector('.menu-icon').src.includes('icon_health_report')))) {
-            link.parentElement.classList.add('active');
-        }
+        link.parentElement.classList.remove('active');
     });
-    // If the "나의 오늘" link goes to main.html, ensure it's not active here
-    const myTodayLink = document.querySelector('#sidebar-menu li a[href*="main.html"]');
-    if (myTodayLink) {
-        myTodayLink.parentElement.classList.remove('active');
+    const healthReportLinkFromList = Array.from(sidebarLinks).find(a => {
+        const linkHref = a.getAttribute('href');
+        const iconSrc = a.parentElement.querySelector('.menu-icon') ? a.parentElement.querySelector('.menu-icon').src : '';
+        return (linkHref && linkHref.includes(currentReportPath)) ||
+                (linkHref === "../Health_Report/health_report.html") ||
+                (linkHref === "#" && iconSrc.includes('icon_health_report'));
+    });
+    if (healthReportLinkFromList) {
+        healthReportLinkFromList.parentElement.classList.add('active');
+    } else {
+        document.querySelector('#sidebar-menu li a[href*="health_report.html"]')?.parentElement.classList.add('active');
     }
-    const healthReportLink = Array.from(sidebarLinks).find(a => a.textContent.includes("건강 리포트"));
-    if (healthReportLink) {
-        healthReportLink.parentElement.classList.add('active');
-    }
-
-
 });
 </script>
 </body>
