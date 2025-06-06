@@ -137,7 +137,11 @@ document.addEventListener('DOMContentLoaded', function() {
         yPosition = addText("AdvisorGPT 사용자 데이터 요약", indent, yPosition, { fontSize: 16 }); yPosition += lineHeight;
         yPosition = addText(`사용자 별명: ${userForPdfData.nickname || 'User'}`, indent, yPosition); yPosition = addText(`이메일: ${userForPdfData.email}`, indent, yPosition);
         yPosition = addText(`키: ${userForPdfData.height || '-'} cm`, indent, yPosition); yPosition = addText(`몸무게: ${userForPdfData.weight || '-'} kg`, indent, yPosition);
-        yPosition = addText(`성별: ${userForPdfData.gender || '-'}`, indent, yPosition); yPosition += lineHeight;
+        yPosition = addText(`성별: ${userForPdfData.gender || '-'}`, indent, yPosition);
+        const userGoalScoreKey = 'userGoalScore_' + loggedInUserEmail;
+        const goalScoreForPdf = localStorage.getItem(userGoalScoreKey) || defaultGoalScore; // 건강 리포트의 기본값과 동일하게
+        yPosition = addText(`나의 목표 평균 점수: ${goalScoreForPdf} 점`, indent, yPosition);
+        yPosition += lineHeight;
         yPosition = addText("일일 기록 데이터:", indent, yPosition, { fontSize: 12 }); yPosition = addText("(현재 기록된 일일 데이터 없음 - 추후 연동 예정)", indent, yPosition); yPosition += lineHeight;
         yPosition = addText("주간 평균 데이터:", indent, yPosition, { fontSize: 12 }); yPosition = addText("(현재 기록된 주간 평균 데이터 없음 - 추후 연동 예정)", indent, yPosition); yPosition += lineHeight;
         yPosition = addText("챗봇 대화 내역:", indent, yPosition, { fontSize: 12 }); yPosition = addText("(현재 기록된 챗봇 대화 내역 없음 - 추후 연동 예정)", indent, yPosition);
