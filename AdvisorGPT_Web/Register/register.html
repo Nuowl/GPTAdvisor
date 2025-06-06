@@ -11,17 +11,17 @@
         <div class="login-box">
             <h2>회원가입</h2>
             <form id="register-form">
-            <input type="email" placeholder="E - 메일" required />
-            <input type="text" placeholder="사용자 별명" required />
+            <input type="email" id="email" placeholder="E - 메일" required />
+            <input type="text" id="nickname" placeholder="사용자 별명" required />
             <input type="password" id="password" placeholder="비밀번호" required />
             <input type="password" id="confirm-password" placeholder="비밀번호 확인" required />
             <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                <input type="number" placeholder="키 (cm)" required />
-                <input type="number" placeholder="몸무게 (kg)" required />
+                <input type="number" id="height" placeholder="키 (cm)" required />
+                <input type="number" id="weight" placeholder="몸무게 (kg)" required />
             </div>
             <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                <button type="button" class="gender-button selected" id="male">남자</button>
-                <button type="button" class="gender-button" id="female">여자</button>
+                <button type="button" class="gender-button selected" id="male" data-gender="male">남자</button>
+                <button type="button" class="gender-button" id="female" data-gender="female">여자</button>
             </div>
             <button type="submit" class="signup-button">계정 생성</button>
         </form>
@@ -29,34 +29,68 @@
     </div>
 
     <script>
-    // 성별 선택
         const maleBtn = document.getElementById('male');
         const femaleBtn = document.getElementById('female');
+        let selectedGender = 'male'; // 기본값, data-gender 속성 추가 필요
+
+        // 성별 버튼에 data-gender 속성 추가 필요 (HTML에서)
+        // <button type="button" class="gender-button selected" id="male" data-gender="male">남자</button>
+        // <button type="button" class="gender-button" id="female" data-gender="female">여자</button>
 
         maleBtn.onclick = () => {
             maleBtn.classList.add('selected');
             femaleBtn.classList.remove('selected');
+            selectedGender = maleBtn.dataset.gender; // data-gender 값 사용
         };
 
         femaleBtn.onclick = () => {
             femaleBtn.classList.add('selected');
             maleBtn.classList.remove('selected');
+            selectedGender = femaleBtn.dataset.gender; // data-gender 값 사용
         };
 
-    // 회원가입 처리
-    document.getElementById('register-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const pwd = document.getElementById('password').value;
-        const confirm = document.getElementById('confirm-password').value;
-        if (pwd !== confirm) {
-            alert('비밀번호가 일치하지 않습니다.');
-            return;
-        }
+        document.getElementById('register-form').addEventListener('submit', function(e) {
+            e.preventDefault();
 
-        // 계정 생성 로직 생략 (예: 서버 전송 등)
-        alert('계정이 성공적으로 생성되었습니다.');
-        window.location.href = '../Advisor_login/index.html';
-    });
+            // 입력 필드에 id 추가 필요 (HTML에서)
+            // <input type="email" id="email" ... />
+            // <input type="text" id="nickname" ... />
+            // <input type="number" id="height" ... />
+            // <input type="number" id="weight" ... />
+            const email = document.getElementById('email').value;
+            const nickname = document.getElementById('nickname').value;
+            const password = document.getElementById('password').value; // id="password"는 이미 존재
+            const confirmPassword = document.getElementById('confirm-password').value; // id="confirm-password"는 이미 존재
+            const height = document.getElementById('height').value;
+            const weight = document.getElementById('weight').value;
+
+            if (password !== confirmPassword) {
+                alert('비밀번호가 일치하지 않습니다.');
+                return;
+            }
+
+            let users = JSON.parse(localStorage.getItem('advisorGptUsers')) || [];
+
+            if (users.find(user => user.email === email)) {
+                alert('이미 사용 중인 이메일입니다.');
+                return;
+            }
+
+            const newUser = {
+                email: email,
+                nickname: nickname,
+                password: password, // 실제 환경에서는 해싱 필요!
+                height: height,
+                weight: weight,
+                gender: selectedGender
+            };
+
+            users.push(newUser);
+            localStorage.setItem('advisorGptUsers', JSON.stringify(users));
+
+            alert('계정이 성공적으로 생성되었습니다. 로그인 페이지로 이동합니다.');
+            window.location.href = '../Advisor_login/index.html';
+        });
     </script>
 </body>
 </html>
