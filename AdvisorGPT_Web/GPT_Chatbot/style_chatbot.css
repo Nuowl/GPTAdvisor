@@ -1,25 +1,32 @@
 /* GPT_Chatbot/style_chatbot.css */
 
-/* 챗봇 페이지의 .main-content 에 적용될 추가/덮어쓰기 스타일 */
-.main-content.chatbot-page-container {
-    flex-grow: 1;
+/*
+    이 CSS 파일은 Main_Page/style.css가 이미 로드된 후에 적용되어야 합니다.
+    Main_Page/style.css에 정의된 .left-sidebar의 width와 flex-shrink:0이
+    제대로 설정되어 있다는 가정 하에 진행합니다.
+*/
+
+/* 챗봇 페이지의 .main-content 에만 적용될 스타일 */
+/* HTML에서 <main class="main-content chatbot-page-container"> 와 같이 사용 */
+.chatbot-page-container.main-content {
+    flex-grow: 1; /* Main_Page/style.css 에서 상속받을 것으로 예상 */
     /* !!!! 챗봇 페이지에서만 .main-content가 늘어나는 것을 방지 !!!! */
-    min-width: 0; /* 이 규칙이 Main_Page/style.css 에 없다면 여기서라도 적용 시도 */
-                   /* 하지만 Main_Page/style.css 에 있는 것이 더 근본적인 해결책입니다. */
+    min-width: 0; /* 이 규칙이 이 페이지의 .main-content에만 적용되도록 함 */
     
-    display: flex; /* 내부 .chatbot-interface가 높이를 100% 사용할 수 있도록 */
-    flex-direction: column;
-    padding: 15px; /* 챗봇 페이지용 패딩 */
-    overflow: hidden; /* 이 컨테이너 자체는 스크롤되지 않도록 */
-    box-sizing: border-box;
+    display: flex; /* Main_Page/style.css 에서 상속받거나 여기서 명시 */
+    flex-direction: column; /* Main_Page/style.css 에서 상속받거나 여기서 명시 */
+    overflow: hidden; /* Main_Page/style.css 에서 상속받거나 여기서 명시 */
+    padding: 15px; /* 챗봇 페이지용 특정 패딩 */
+    box-sizing: border-box; /* Main_Page/style.css 에서 상속받을 것으로 예상 */
+    /* height 관련 설정은 Main_Page/style.css 의 전체 레이아웃 구성에 따름 */
 }
 
 .chatbot-interface {
     background-color: #FFFFFF;
     border: 2.5px solid #3377DD;
     border-radius: 15px;
-    width: 100%;
-    height: 100%; /* 부모(.chatbot-page-container)가 flex column이므로 높이 100% 사용 */
+    width: 100%; /* 부모(.chatbot-page-container)의 너비를 따름 */
+    height: 100%; /* 부모(.chatbot-page-container)의 높이를 따름 */
     display: flex;
     flex-direction: column;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
@@ -29,11 +36,11 @@
 
 .chat-display-area {
     flex-grow: 1; /* 사용 가능한 수직 공간을 모두 차지 */
-    overflow-y: auto; /* 내용이 넘치면 스크롤 */
-    padding: 15px 20px; /* 내부 패딩 (상단 0px에서 15px로 변경) */
+    overflow-y: auto; /* 채팅 메시지 스크롤 */
+    padding: 15px 20px; /* 상하 패딩 일관성 및 좌우 패딩 */
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 18px; /* 메시지 사이 간격 */
 }
 
 .chat-initial-logo-container {
@@ -54,22 +61,21 @@
 /* Message styles */
 .chat-message {
     display: flex;
-    width: fit-content; /* 내용에 맞게 너비 조절 */
-    /* !!!! 각 메시지 타입별로 최대 너비를 좀 더 명확히/작게 설정 !!!! */
-    /* 이 max-width는 .chat-display-area 내부에서의 비율 또는 고정값이어야 함 */
+    width: fit-content; /* 내용에 맞게 너비 조절, 단 max-width로 제한 */
     align-items: flex-end;
+    /* 각 user/gpt 메시지에서 max-width 설정 */
 }
 
 .chat-message.user {
-    align-self: flex-end;
-    margin-left: auto;
-    max-width: 55%; /* .chat-display-area 너비의 70% */
+    align-self: flex-end; /* 오른쪽 정렬 */
+    margin-left: auto;   /* 오른쪽으로 밀어냄 */
+    max-width: 65%;     /* 채팅 표시 영역 너비의 65% (더 줄여도 됨) */
 }
 
 .chat-message.gpt {
-    align-self: flex-start;
-    margin-right: auto;
-    max-width: 55%; /* .chat-display-area 너비의 70% (아바타 포함 전체) */
+    align-self: flex-start; /* 왼쪽 정렬 */
+    margin-right: auto;    /* 왼쪽으로 밀어냄 */
+    max-width: 65%;      /* 채팅 표시 영역 너비의 65% (아바타 포함, 더 줄여도 됨) */
 }
 
 .chat-message.gpt .chat-avatar {
@@ -81,7 +87,7 @@
     object-fit: contain;
     padding: 3px;
     background-color: #fff;
-    flex-shrink: 0;
+    flex-shrink: 0; /* 아바타 크기 고정 */
     box-sizing: border-box;
 }
 
@@ -91,23 +97,22 @@
     line-height: 1.5;
     max-width: 100%; /* 부모(.chat-message)의 max-width를 넘지 않도록 함 */
     box-sizing: border-box;
-    overflow: hidden; /* 내부 p 태그가 넘치는 것을 방지 (텍스트는 p에서 줄바꿈) */
-    /* overflow-wrap 과 white-space 는 p 태그에서 처리 */
+    overflow: hidden; /* 내부 p 태그가 버블을 넘어서는 것을 방지 (안전장치) */
 }
 
 .message-bubble p {
     margin: 0;
     font-size: 15px;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    white-space: pre-wrap;
+    word-wrap: break-word;     /* 구형 브라우저 호환 */
+    overflow-wrap: break-word; /* 표준: 긴 단어/URL 강제 줄바꿈 */
+    white-space: pre-wrap;       /* HTML 소스의 공백/줄바꿈 유지 */
 }
 
 /* User message bubble style */
 .chat-message.user .message-bubble {
     background-color: #3377DD;
     color: #FFFFFF;
-    border-radius: 18px 18px 5px 18px;
+    border-radius: 18px 18px 5px 18px; /* 꼬리 효과 */
 }
 
 /* GPT message bubble style */
@@ -115,7 +120,7 @@
     background-color: #FFFFFF;
     color: #000000;
     border: 2.5px solid #3377DD;
-    border-radius: 18px 18px 18px 5px;
+    border-radius: 18px 18px 18px 5px; /* 꼬리 효과 */
 }
 .chat-message.gpt.error .message-bubble {
     border-color: #D32F2F;
@@ -126,7 +131,7 @@
 /* Chat input area */
 .chat-input-wrapper {
     padding: 10px 15px;
-    flex-shrink: 0; /* 입력 영역은 줄어들지 않음 */
+    flex-shrink: 0; /* 입력 영역은 줄어들지 않도록 고정 */
 }
 
 .chat-input-area {
@@ -147,12 +152,12 @@
     font-size: 15px;
     line-height: 1.4;
     resize: none;
-    overflow-y: hidden;
-    min-height: calc(1.4em + 16px);
-    max-height: calc(2.8em + 16px);
+    overflow-y: hidden; /* 내용 많아지면 JS로 스크롤 제어 */
+    min-height: calc(1.4em + 16px);   /* 약 1줄 높이 + 패딩 */
+    max-height: calc(2.8em + 16px);  /* 약 2줄 높이 + 패딩 */
     font-family: 'Noto Sans KR', 'Mulish', sans-serif;
     outline: none;
-    box-sizing: content-box;
+    box-sizing: content-box; /* min/max-height가 content 영역 기준이 되도록 */
 }
 
 .send-button {
@@ -166,22 +171,37 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
+    flex-shrink: 0; /* 버튼 크기 고정 */
 }
 .send-button img {
     width: 30px;
     height: 30px;
-    filter: brightness(0.7);
+    filter: brightness(0.7); /* 아이콘 색상 조정 */
 }
 .send-button:hover img {
     filter: brightness(0.5);
 }
 
-/* Typing indicator (유지) */
-.typing-indicator .message-bubble p span { display: inline-block; width: 5px; height: 5px; background-color: #3377DD; border-radius: 50%; margin: 0 1.5px; animation: typing-dots 1.3s infinite ease-in-out; }
+/* Typing indicator */
+.typing-indicator .message-bubble p span {
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    background-color: #3377DD;
+    border-radius: 50%;
+    margin: 0 1.5px;
+    animation: typing-dots 1.3s infinite ease-in-out;
+}
 .typing-indicator .message-bubble p span:nth-child(1) { animation-delay: 0s; }
 .typing-indicator .message-bubble p span:nth-child(2) { animation-delay: 0.2s; }
 .typing-indicator .message-bubble p span:nth-child(3) { animation-delay: 0.4s; }
-@keyframes typing-dots { 0%, 60%, 100% { transform: translateY(0); opacity: 0.4; } 30% { transform: translateY(-4px); opacity: 1; } }
 
-/* 사이드바 활성 상태는 Main_Page/style.css 의 규칙을 따름 */
+@keyframes typing-dots {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+    30% { transform: translateY(-4px); opacity: 1; }
+}
+
+/* 
+   사이드바 활성 상태 등은 Main_Page/style.css 또는 각 페이지의 JS에서 처리합니다.
+   이 파일은 챗봇 페이지의 레이아웃과 컴포넌트 스타일링에 집중합니다.
+*/
