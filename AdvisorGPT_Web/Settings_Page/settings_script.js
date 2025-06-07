@@ -1,20 +1,20 @@
 // Settings_Page/settings_script.js
 
 document.addEventListener('DOMContentLoaded', function() {
-    // ... (이전 DOM 요소 및 변수 선언은 동일) ...
-    const deleteAccountButton = document.getElementById('delete-account-button');
     const sidebarProfilePic = document.getElementById('sidebar-profile-pic');
     const sidebarUsername = document.getElementById('sidebar-username');
     const settingsProfileImgDisplay = document.getElementById('settings-profile-img-display');
     const settingsUsernameDisplay = document.getElementById('settings-username-display');
     const profileImageUpload = document.getElementById('profile-image-upload');
     const nicknameInput = document.getElementById('nickname');
+    const ageDisplayInput = document.getElementById('age_display'); // !!!! 나이 표시 필드 ID !!!!
     const heightInput = document.getElementById('height');
     const weightInput = document.getElementById('weight');
     const genderButtons = document.querySelectorAll('.gender-button');
     const saveInfoButton = document.getElementById('save-info-button');
     const downloadDataButton = document.getElementById('download-data-button');
     const logoutButton = document.getElementById('logout-button');
+    const deleteAccountButton = document.getElementById('delete-account-button');
     const accountInfoForm = document.getElementById('account-info-form');
 
     let loggedInUserEmail = localStorage.getItem('loggedInUserEmail');
@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let profileImageChanged = false;
     let newProfileImageBase64 = null;
     const defaultProfilePic = '../image/user_profile_default.png'; 
+    const defaultGoalScore = 70; // PDF 다운로드 시 사용될 기본 목표 점수 (건강 리포트 페이지와 일관성)
 
     function loadUserData() {
         if (!loggedInUserEmail) {
@@ -36,27 +37,50 @@ document.addEventListener('DOMContentLoaded', function() {
         if (currentUserData) {
             const userProfileImageKey = 'userProfileImage_' + loggedInUserEmail;
             const storedUserPic = localStorage.getItem(userProfileImageKey) || currentUserData.profileImage || defaultProfilePic;
+            
             settingsProfileImgDisplay.src = storedUserPic;
             if (sidebarProfilePic) sidebarProfilePic.src = storedUserPic;
+            
             const nickname = currentUserData.nickname || 'User';
             settingsUsernameDisplay.textContent = nickname;
             if (sidebarUsername) sidebarUsername.textContent = nickname;
             nicknameInput.value = nickname === 'User' ? '' : nickname;
+
+            // !!!! 나이 정보 표시 !!!!
+            if (ageDisplayInput) {
+                ageDisplayInput.value = currentUserData.age ? `${currentUserData.age}세` : '정보 없음';
+            }
+            
             heightInput.value = currentUserData.height || '';
             weightInput.value = currentUserData.weight || '';
+            
             if (currentUserData.gender) {
                 genderButtons.forEach(btn => {
                     btn.classList.toggle('selected', btn.dataset.gender === currentUserData.gender);
                 });
-            } else { genderButtons.forEach(btn => btn.classList.remove('selected')); }
-            originalValues = { nickname: nicknameInput.value, height: heightInput.value, weight: weightInput.value, gender: currentUserData.gender, profilePic: storedUserPic };
-            profileImageChanged = false; newProfileImageBase64 = null; updateSaveButtonState();
+            } else { 
+                genderButtons.forEach(btn => btn.classList.remove('selected')); 
+            }
+            
+            originalValues = { 
+                nickname: nicknameInput.value, 
+                age: currentUserData.age, // 원본값에 나이도 저장 (나중에 수정 기능 추가 시 대비)
+                height: heightInput.value, 
+                weight: weightInput.value, 
+                gender: currentUserData.gender, 
+                profilePic: storedUserPic 
+            };
+            profileImageChanged = false; 
+            newProfileImageBase64 = null; 
+            updateSaveButtonState();
         } else {
             alert("사용자 정보를 불러올 수 없습니다. 다시 로그인해주세요.");
-            localStorage.removeItem('loggedInUserEmail'); window.location.href = '../Advisor_login/index.html';
+            localStorage.removeItem('loggedInUserEmail'); 
+            window.location.href = '../Advisor_login/index.html';
         }
     }
-    function checkForChanges() {
+
+    function checkForChanges() { // (나이 필드는 readonly이므로 변경 감지 대상에서 제외)
         if (!currentUserData) return false;
         if (profileImageChanged) return true;
         if (nicknameInput.value !== originalValues.nickname) return true;
@@ -96,9 +120,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const userIndex = users.findIndex(user => user.email === loggedInUserEmail);
         if (userIndex !== -1) {
             const updatedNickname = nicknameInput.value.trim() || 'User';
-            users[userIndex].nickname = updatedNickname; users[userIndex].height = heightInput.value; users[userIndex].weight = weightInput.value;
+            users[userIndex].nickname = updatedNickname; 
+            users[userIndex].height = heightInput.value; 
+            users[userIndex].weight = weightInput.value;
             const currentSelectedGenderButton = document.querySelector('.gender-button.selected');
             users[userIndex].gender = currentSelectedGenderButton ? currentSelectedGenderButton.dataset.gender : null;
+            // users[userIndex].age 는 회원가입 시 저장된 값 유지 (현재 수정 UI 없음)
+
             if (profileImageChanged && newProfileImageBase64) {
                 const userProfileImageKey = 'userProfileImage_' + loggedInUserEmail;
                 localStorage.setItem(userProfileImageKey, newProfileImageBase64);
@@ -106,21 +134,31 @@ document.addEventListener('DOMContentLoaded', function() {
                 settingsProfileImgDisplay.src = newProfileImageBase64;
             }
             localStorage.setItem('advisorGptUsers', JSON.stringify(users));
-            if (sidebarUsername) sidebarUsername.textContent = updatedNickname; settingsUsernameDisplay.textContent = updatedNickname;
+            if (sidebarUsername) sidebarUsername.textContent = updatedNickname; 
+            settingsUsernameDisplay.textContent = updatedNickname;
             localStorage.setItem('userNickname', updatedNickname);
             if (profileImageChanged && newProfileImageBase64) { localStorage.setItem('userProfileImage', newProfileImageBase64); }
             alert('정보가 성공적으로 변경되었습니다.');
-            currentUserData = users[userIndex]; // 중요: 현재 스크립트 내 변수 업데이트
-            originalValues = { nickname: nicknameInput.value, height: heightInput.value, weight: weightInput.value, gender: users[userIndex].gender, profilePic: settingsProfileImgDisplay.src };
-            profileImageChanged = false; newProfileImageBase64 = null; updateSaveButtonState();
+            currentUserData = users[userIndex]; 
+            originalValues = { 
+                nickname: nicknameInput.value, 
+                age: currentUserData.age, // 원본값 업데이트
+                height: heightInput.value, 
+                weight: weightInput.value, 
+                gender: users[userIndex].gender, 
+                profilePic: settingsProfileImgDisplay.src 
+            };
+            profileImageChanged = false; 
+            newProfileImageBase64 = null; 
+            updateSaveButtonState();
         } else { alert("오류: 현재 로그인된 사용자 정보를 찾을 수 없습니다."); }
     });
 
     downloadDataButton.addEventListener('click', async function() {
         const usersForPdf = JSON.parse(localStorage.getItem('advisorGptUsers')) || [];
         const userForPdfData = usersForPdf.find(user => user.email === loggedInUserEmail);
-        // const profilePicForPdf = localStorage.getItem('userProfileImage_' + loggedInUserEmail) || defaultProfilePic; // PDF에 프로필 이미지 추가 시 사용 가능
         if (!userForPdfData) { alert("PDF를 생성할 사용자 정보가 없습니다."); return; }
+        
         const { jsPDF } = window.jspdf; const pdf = new jsPDF();
         const base64FontData = typeof nanumGothicBase64Data !== 'undefined' ? nanumGothicBase64Data : '';
         if (base64FontData.trim().length < 10000 && navigator.language.startsWith('ko')) { alert("PDF 생성 경고: 한글 폰트 데이터가 로드되지 않아 한글이 깨질 수 있습니다.");}
@@ -128,23 +166,65 @@ document.addEventListener('DOMContentLoaded', function() {
             if (base64FontData.trim().length >= 10000) { pdf.addFileToVFS('NanumGothic-Regular.ttf', base64FontData); pdf.addFont('NanumGothic-Regular.ttf', 'NanumGothic', 'normal'); pdf.setFont('NanumGothic', 'normal');
             } else { pdf.setFont("helvetica", "normal"); }
         } catch (error) { console.error("Error applying Korean font to PDF:", error); pdf.setFont("helvetica", "normal"); }
+
         let yPosition = 15; const lineHeight = 7; const indent = 10; const pageHeight = pdf.internal.pageSize.height; const margin = 15;
         function addText(text, x, y, options = {}) { 
             if (y > pageHeight - margin - lineHeight) { pdf.addPage(); yPosition = margin; y = yPosition; }
             const fontSize = options.fontSize || 10; pdf.setFontSize(fontSize); pdf.text(text, x, y);
             yPosition = y + lineHeight * (fontSize / 10); return yPosition;
         }
+
         yPosition = addText("AdvisorGPT 사용자 데이터 요약", indent, yPosition, { fontSize: 16 }); yPosition += lineHeight;
-        yPosition = addText(`사용자 별명: ${userForPdfData.nickname || 'User'}`, indent, yPosition); yPosition = addText(`이메일: ${userForPdfData.email}`, indent, yPosition);
-        yPosition = addText(`키: ${userForPdfData.height || '-'} cm`, indent, yPosition); yPosition = addText(`몸무게: ${userForPdfData.weight || '-'} kg`, indent, yPosition);
+        yPosition = addText(`사용자 별명: ${userForPdfData.nickname || 'User'}`, indent, yPosition); 
+        yPosition = addText(`이메일: ${userForPdfData.email}`, indent, yPosition);
+        // !!!! PDF에 나이 정보 추가 !!!!
+        yPosition = addText(`나이: ${userForPdfData.age || '-'} 세`, indent, yPosition); 
+        yPosition = addText(`키: ${userForPdfData.height || '-'} cm`, indent, yPosition); 
+        yPosition = addText(`몸무게: ${userForPdfData.weight || '-'} kg`, indent, yPosition);
         yPosition = addText(`성별: ${userForPdfData.gender || '-'}`, indent, yPosition);
+        
+        // !!!! PDF에 목표 점수 추가 !!!!
         const userGoalScoreKey = 'userGoalScore_' + loggedInUserEmail;
-        const goalScoreForPdf = localStorage.getItem(userGoalScoreKey) || defaultGoalScore; // 건강 리포트의 기본값과 동일하게
+        const goalScoreForPdf = localStorage.getItem(userGoalScoreKey) || defaultGoalScore;
         yPosition = addText(`나의 목표 평균 점수: ${goalScoreForPdf} 점`, indent, yPosition);
         yPosition += lineHeight;
-        yPosition = addText("일일 기록 데이터:", indent, yPosition, { fontSize: 12 }); yPosition = addText("(현재 기록된 일일 데이터 없음 - 추후 연동 예정)", indent, yPosition); yPosition += lineHeight;
-        yPosition = addText("주간 평균 데이터:", indent, yPosition, { fontSize: 12 }); yPosition = addText("(현재 기록된 주간 평균 데이터 없음 - 추후 연동 예정)", indent, yPosition); yPosition += lineHeight;
-        yPosition = addText("챗봇 대화 내역:", indent, yPosition, { fontSize: 12 }); yPosition = addText("(현재 기록된 챗봇 대화 내역 없음 - 추후 연동 예정)", indent, yPosition);
+
+        yPosition = addText("일일 기록 데이터:", indent, yPosition, { fontSize: 12 }); 
+        // TODO: 실제 일일 기록 데이터 로드하여 추가
+        const dailyRecordsKey = `dailyRecords_${loggedInUserEmail}`;
+        const userDailyRecords = JSON.parse(localStorage.getItem(dailyRecordsKey)) || {};
+        const recordDates = Object.keys(userDailyRecords).sort(); // 날짜순 정렬
+        if (recordDates.length > 0) {
+            recordDates.forEach(date => {
+                const record = userDailyRecords[date];
+                yPosition = addText(`  [${date}]`, indent, yPosition, {fontSize: 10});
+                if(record.log) {
+                    yPosition = addText(`    수면: ${record.log.sleep_hours}시간, 식사: ${record.log.calories}kcal, 운동: ${record.log.strength_minutes + record.log.cardio_minutes}분`, indent + 5, yPosition, {fontSize: 9});
+                }
+                if(record.analysis){
+                    yPosition = addText(`    건강점수: ${record.analysis.todayHealthScore}, 스트레스: ${record.analysis.aiMentalAnalysis.stress_score}`, indent + 5, yPosition, {fontSize: 9});
+                }
+            });
+        } else {
+            yPosition = addText("(기록된 일일 데이터 없음)", indent, yPosition);
+        }
+        yPosition += lineHeight;
+
+        yPosition = addText("주간 평균 데이터:", indent, yPosition, { fontSize: 12 }); 
+        // TODO: 실제 주간 평균 데이터 로드 (lastWeekSummary_ 키 등)
+        const lastWeekSummaryKey = `lastWeekSummary_${loggedInUserEmail}`;
+        const lastWeekData = JSON.parse(localStorage.getItem(lastWeekSummaryKey));
+        if (lastWeekData && lastWeekData.daysRecorded > 0) {
+            yPosition = addText(`  [지난 주 (${lastWeekData.weekStartDate} 시작)]`, indent, yPosition, {fontSize: 10});
+            yPosition = addText(`    평균 건강점수: ${lastWeekData.overall.toFixed(1)}, 평균 수면: ${lastWeekData.sleep.toFixed(1)}시간 등`, indent + 5, yPosition, {fontSize: 9});
+        } else {
+            yPosition = addText("(기록된 주간 평균 데이터 없음)", indent, yPosition);
+        }
+        yPosition += lineHeight;
+        
+        yPosition = addText("챗봇 대화 내역:", indent, yPosition, { fontSize: 12 }); 
+        yPosition = addText("(현재 기록된 챗봇 대화 내역 없음 - 추후 연동 예정)", indent, yPosition);
+        
         pdf.save(`AdvisorGPT_데이터_${userForPdfData.nickname || 'User'}.pdf`);
     });
 
