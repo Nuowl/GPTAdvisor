@@ -214,7 +214,7 @@ def get_encouragement_comment():
         return jsonify({"comment": comment_text})
     except Exception as e:
         print(f"Gemini 격려 코멘트 생성 오류: {e}")
-        return jsonify({"comment": "목표를 향해 꾸준히 나아가세요! 작은 변화가 큰 결과를 만듭니다. (기본 메시지)"})
+        return jsonify({"comment": "목표를 향해 꾸준히 나아가세요! 작은 변화가 큰 결과를 만듭니다."})
 
 
 if __name__ == '__main__':
