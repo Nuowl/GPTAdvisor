@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AdvisorGPT 건강 리포트</title>
+    <title>AdvisorGPT</title>
     <link rel="stylesheet" href="../Main_Page/style.css"> <!-- 기본 스타일 상속 -->
     <link rel="stylesheet" href="style_report.css"> <!-- 리포트 페이지 전용 스타일 -->
     <link href="https://fonts.googleapis.com/css2?family=Mulish&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
@@ -302,9 +302,9 @@ document.addEventListener('DOMContentLoaded', function() {
             let percentageChange = 0; // 비교를 위해 초기화
 
             if (daysRecordedThisWeek === 0) {
-                changeText = `<strong class="highlight-purple">비교 불가(이번주 기록 X)</strong>`;
+                changeText = `<strong class="highlight-#7d04e0">비교 불가(이번주 기록 X)</strong>`;
             } else if (daysRecordedLastWeek === 0) {
-                changeText = `<strong class="highlight-purple">비교 불가(지난주 기록 X)</strong>`;
+                changeText = `<strong class="highlight-#7d04e0">비교 불가(지난주 기록 X)</strong>`;
             } else {
                 if (lastAvg === currentAvg) {
                     changeText = `<strong class="highlight-blue">동일</strong>`;
@@ -318,7 +318,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else if (currentAvg > 0) { 
                     changeText = `<strong class="highlight-green">이번주 기록 시작</strong>`;
                 } else { 
-                     changeText = `<strong class="highlight-purple">비교 불가(기록 X)</strong>`; // 둘 다 0이거나 lastAvg만 0이고 currentAvg도 0일 때
+                     changeText = `<strong class="highlight-#7d04e0">비교 불가(기록 X)</strong>`; // 둘 다 0이거나 lastAvg만 0이고 currentAvg도 0일 때
                 }
             }
             
