@@ -2,14 +2,14 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8" />
-    <title>AdvisorGPT</title> <!-- 타이틀 변경 -->
+    <title>AdvisorGPT 회원가입</title>
     <link rel="stylesheet" href="style.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Mulish&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet"> <!-- Noto Sans KR 추가 (다른 페이지와 일관성) -->
+    <link href="https://fonts.googleapis.com/css2?family=Mulish&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
         <img src="../image/AdvisorGPT_Logo_big.png" class="logo" alt="Logo" />
-        <div class="login-box"> <!-- register-box 클래스명도 고려 가능 -->
+        <div class="login-box">
             <h2>회원가입</h2>
             <form id="register-form">
                 <input type="email" id="email" placeholder="E - 메일" required />
@@ -17,14 +17,13 @@
                 <input type="password" id="password" placeholder="비밀번호" required />
                 <input type="password" id="confirm-password" placeholder="비밀번호 확인" required />
                 
-                <!-- 나이, 키, 몸무게 입력 칸을 한 줄에 배치 -->
-                <div class="form-row-triple" style="display: flex; gap: 10px; margin-bottom: 15px;">
-                    <input type="number" id="age" placeholder="나이 (세)" required style="flex: 1;" />
-                    <input type="number" id="height" placeholder="키 (cm)" required style="flex: 1;" />
-                    <input type="number" id="weight" placeholder="몸무게 (kg)" required style="flex: 1;" />
+                <div class="form-row-triple">
+                    <input type="number" id="age" placeholder="나이 (세)" required />
+                    <input type="number" id="height" placeholder="키 (cm)" required />
+                    <input type="number" id="weight" placeholder="몸무게 (kg)" required />
                 </div>
 
-                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <div class="gender-buttons-container">
                     <button type="button" class="gender-button selected" id="male" data-gender="male">남자</button>
                     <button type="button" class="gender-button" id="female" data-gender="female">여자</button>
                 </div>
