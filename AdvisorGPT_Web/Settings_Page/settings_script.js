@@ -1,13 +1,14 @@
 // Settings_Page/settings_script.js
 
 document.addEventListener('DOMContentLoaded', function() {
+    // DOM Elements
     const sidebarProfilePic = document.getElementById('sidebar-profile-pic');
     const sidebarUsername = document.getElementById('sidebar-username');
     const settingsProfileImgDisplay = document.getElementById('settings-profile-img-display');
     const settingsUsernameDisplay = document.getElementById('settings-username-display');
     const profileImageUpload = document.getElementById('profile-image-upload');
     const nicknameInput = document.getElementById('nickname');
-    const ageDisplayInput = document.getElementById('age_display'); // !!!! 나이 표시 필드 ID !!!!
+    const ageDisplayInput = document.getElementById('age_display');
     const heightInput = document.getElementById('height');
     const weightInput = document.getElementById('weight');
     const genderButtons = document.querySelectorAll('.gender-button');
@@ -17,19 +18,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const deleteAccountButton = document.getElementById('delete-account-button');
     const accountInfoForm = document.getElementById('account-info-form');
 
-    const loggedInUserEmail = localStorage.getItem('loggedInUserEmail');
+    let loggedInUserEmail = localStorage.getItem('loggedInUserEmail');
     let currentUserData = null; 
     let originalValues = {};    
     let profileImageChanged = false;
     let newProfileImageBase64 = null;
     const defaultProfilePic = '../image/user_profile_default.png'; 
-    const defaultGoalScore = 70; // PDF 다운로드 시 사용될 기본 목표 점수 (건강 리포트 페이지와 일관성)
+    const defaultGoalScore = 70;
 
+    // --- 데이터 로드 및 UI 초기화 함수 ---
     function loadUserData() {
+        loggedInUserEmail = localStorage.getItem('loggedInUserEmail'); // 함수 호출 시점에 다시 한번 가져오기
         if (!loggedInUserEmail) {
             alert("로그인 정보가 없습니다. 로그인 페이지로 이동합니다.");
             window.location.href = '../Advisor_login/index.html';
-            return;
+            return false; // 로드 실패 의미
         }
         const users = JSON.parse(localStorage.getItem('advisorGptUsers')) || [];
         currentUserData = users.find(user => user.email === loggedInUserEmail);
@@ -46,11 +49,9 @@ document.addEventListener('DOMContentLoaded', function() {
             if (sidebarUsername) sidebarUsername.textContent = nickname;
             nicknameInput.value = nickname === 'User' ? '' : nickname;
 
-            // !!!! 나이 정보 표시 !!!!
             if (ageDisplayInput) {
                 ageDisplayInput.value = currentUserData.age ? `${currentUserData.age}세` : '정보 없음';
             }
-            
             heightInput.value = currentUserData.height || '';
             weightInput.value = currentUserData.weight || '';
             
@@ -63,23 +64,24 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             originalValues = { 
-                nickname: nicknameInput.value, 
-                age: currentUserData.age, // 원본값에 나이도 저장 (나중에 수정 기능 추가 시 대비)
-                height: heightInput.value, 
-                weight: weightInput.value, 
-                gender: currentUserData.gender, 
-                profilePic: storedUserPic 
+                nickname: nicknameInput.value, age: currentUserData.age, height: heightInput.value, 
+                weight: weightInput.value, gender: currentUserData.gender, profilePic: storedUserPic 
             };
-            profileImageChanged = false; 
-            newProfileImageBase64 = null; 
+            profileImageChanged = false; newProfileImageBase64 = null; 
             updateSaveButtonState();
+            return true; // 로드 성공
         } else {
             alert("사용자 정보를 불러올 수 없습니다. 다시 로그인해주세요.");
+            // 로그인 관련 정보만 제거, 전체 사용자 목록은 유지할 수 있음
             localStorage.removeItem('loggedInUserEmail'); 
+            localStorage.removeItem('userNickname');
+            localStorage.removeItem('userProfileImage');
             window.location.href = '../Advisor_login/index.html';
+            return false; // 로드 실패
         }
     }
 
+    // --- 변경 감지 및 저장 버튼 활성화 함수 ---
     function checkForChanges() { // (나이 필드는 readonly이므로 변경 감지 대상에서 제외)
         if (!currentUserData) return false;
         if (profileImageChanged) return true;
@@ -154,6 +156,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } else { alert("오류: 현재 로그인된 사용자 정보를 찾을 수 없습니다."); }
     });
 
+if (downloadDataButton) {
     downloadDataButton.addEventListener('click', async function() {
         const usersForPdf = JSON.parse(localStorage.getItem('advisorGptUsers')) || [];
         const userForPdfData = usersForPdf.find(user => user.email === loggedInUserEmail);
@@ -169,6 +172,7 @@ document.addEventListener('DOMContentLoaded', function() {
             unit: 'mm',       // millimeters
             format: 'a4'      // A4 format
         });
+    }
         const base64FontData = typeof nanumGothicBase64Data !== 'undefined' ? nanumGothicBase64Data : '';
         
         try {
@@ -298,17 +302,83 @@ document.addEventListener('DOMContentLoaded', function() {
         
         pdf.save(`AdvisorGPT_데이터_${userForPdfData.nickname || 'User'}.pdf`);
     });
+        // !!!! 로그아웃 버튼 이벤트 리스너 !!!!
+    if (logoutButton) {
+        logoutButton.addEventListener('click', function() {
+            console.log("Logout button clicked"); // 디버깅용 로그
+            localStorage.removeItem('loggedInUserEmail');
+            localStorage.removeItem('userNickname');
+            localStorage.removeItem('userProfileImage');
+            // 필요에 따라 다른 세션 관련 정보도 삭제
+            alert('로그아웃 되었습니다.');
+            window.location.href = '../Advisor_login/index.html';
+        });
+    } else {
+        console.error("Logout button not found!");
+    }
 
-    loadUserData(); // 페이지 로드 시 사용자 데이터 로드
+    // !!!! 계정 탈퇴 버튼 이벤트 리스너 !!!!
+    if (deleteAccountButton) {
+        deleteAccountButton.addEventListener('click', function() {
+            console.log("Delete account button clicked"); // 디버깅용 로그
+            if (!loggedInUserEmail) { // 함수 시작 시점에 loggedInUserEmail 다시 확인
+                alert("로그인 정보가 없어 계정을 탈퇴할 수 없습니다.");
+                return;
+            }
 
-    // 사이드바 활성화 로직 (이전과 동일)
-    const currentSettingsPath = "settings.html"; 
-    const sidebarMenuLinks = document.querySelectorAll('#sidebar-menu li a');
-    sidebarMenuLinks.forEach(link => { link.parentElement.classList.remove('active'); });
-    const settingsLink = Array.from(sidebarMenuLinks).find(a => {
-        const linkHref = a.getAttribute('href'); const iconSrc = a.parentElement.querySelector('.menu-icon') ? a.parentElement.querySelector('.menu-icon').src : '';
-        return (linkHref && linkHref.includes(currentSettingsPath)) || (linkHref === "../Settings_Page/settings.html") || (linkHref === "#" && iconSrc.includes('icon_settings'));
-    });
-    if (settingsLink) { settingsLink.parentElement.classList.add('active');
-    } else { document.querySelector('#sidebar-menu li a[href*="settings.html"]')?.parentElement.classList.add('active'); }
+            const confirmation = confirm("정말로 계정을 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없으며, 모든 사용자 데이터가 삭제됩니다.");
+
+            if (confirmation) {
+                console.log("User confirmed account deletion for:", loggedInUserEmail);
+                let users = JSON.parse(localStorage.getItem('advisorGptUsers')) || [];
+                const remainingUsers = users.filter(user => user.email !== loggedInUserEmail);
+                localStorage.setItem('advisorGptUsers', JSON.stringify(remainingUsers));
+                console.log("User removed from advisorGptUsers array.");
+
+                // 해당 사용자와 관련된 모든 개별 localStorage 항목 삭제
+                localStorage.removeItem('userProfileImage_' + loggedInUserEmail);
+                localStorage.removeItem('userGoalScore_' + loggedInUserEmail);
+                localStorage.removeItem(`dailyRecords_${loggedInUserEmail}`); 
+                localStorage.removeItem(`lastRecordDate_${loggedInUserEmail}`); 
+                localStorage.removeItem(`lastWeekSummaryProcessedForWeekStart_${loggedInUserEmail}`); 
+                localStorage.removeItem(`lastWeekSummary_${loggedInUserEmail}`); 
+                // TODO: 챗봇 대화 내역 등 다른 사용자별 데이터 키가 있다면 여기에 삭제 로직 추가
+                // 예: localStorage.removeItem(`userChatHistory_${loggedInUserEmail}`);
+                console.log("User-specific data removed from localStorage.");
+
+                // 현재 로그인 상태 정보도 삭제
+                localStorage.removeItem('loggedInUserEmail');
+                localStorage.removeItem('userNickname');
+                localStorage.removeItem('userProfileImage'); 
+                console.log("Current login session data removed.");
+                
+                alert("계정이 성공적으로 탈퇴되었습니다. 로그인 화면으로 이동합니다.");
+                window.location.href = '../Advisor_login/index.html';
+            } else {
+                console.log("User cancelled account deletion.");
+            }
+        });
+    } else {
+        console.error("Delete account button not found!");
+    }
+
+    // --- 초기 실행 ---
+    if (loadUserData()) { // 사용자 데이터 로드가 성공했을 때만 다음 초기화 진행
+        // 사이드바 활성화 로직
+        const currentSettingsPath = "settings.html"; 
+        const sidebarMenuLinks = document.querySelectorAll('#sidebar-menu li a');
+        sidebarMenuLinks.forEach(link => { link.parentElement.classList.remove('active'); });
+        const settingsLink = Array.from(sidebarMenuLinks).find(a => {
+            const linkHref = a.getAttribute('href'); 
+            const iconSrc = a.parentElement.querySelector('.menu-icon') ? a.parentElement.querySelector('.menu-icon').src : '';
+            return (linkHref && linkHref.includes(currentSettingsPath)) || 
+                   (linkHref === "../Settings_Page/settings.html") || 
+                   (linkHref === "#" && iconSrc.includes('icon_settings'));
+        });
+        if (settingsLink) { 
+            settingsLink.parentElement.classList.add('active');
+        } else { 
+            document.querySelector('#sidebar-menu li a[href*="settings.html"]')?.parentElement.classList.add('active'); 
+        }
+    }
 });
