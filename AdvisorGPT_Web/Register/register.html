@@ -74,6 +74,13 @@
                 alert('비밀번호가 일치하지 않습니다.');
                 return;
             }
+            
+            // !!!! 나이 변경 불가 경고 및 확인 !!!!
+            const ageConfirmation = confirm("사용자 나이는 한번 설정 시 변경이 불가능합니다. 정말 이대로 진행하시겠습니까?");
+            if (!ageConfirmation) {
+                // 사용자가 "취소"를 누르면 여기서 중단
+                return; 
+            }
 
             let users = JSON.parse(localStorage.getItem('advisorGptUsers')) || [];
 
