@@ -32,22 +32,6 @@
     gap: 15px; /* 메시지 간 간격 */
 }
 
-.chat-initial-logo-container {
-    display: flex;
-    justify-content: center;
-    align-items: flex-end   ; /* Align logo to the top */
-    padding-top: 0px;      /* 3. Small top padding */
-    padding-bottom: 0px;
-    /* margin-bottom will be handled by gap in .chat-display-area */
-}
-
-.chat-initial-logo {
-    width: 300px; /* 3. Increased size for initial top logo */
-    height: auto;  
-    opacity: 0.9;
-    margin-top: -70px;
-}
-
 /* Message styles (remain mostly the same) */
 .chat-message {
     display: flex;
