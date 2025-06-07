@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
@@ -160,6 +160,9 @@ document.addEventListener('DOMContentLoaded', function() {
             };
 
             const API_CHATBOT_URL = 'https://gptadvisor.onrender.com/api/chatbot'; // 실제 배포된 API 주소
+
+            console.log("Sending to chatbot API:", JSON.stringify(requestBody, null, 2)); // 요청 데이터 로깅
+
             const response = await fetch(API_CHATBOT_URL, { 
                 method: 'POST', 
                 headers: { 'Content-Type': 'application/json' }, 
@@ -167,90 +170,64 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             if (!response.ok) {
-                const errorData = await response.json().catch(() => ({ reply: `챗봇 서버 오류: ${response.status}`}));
-                throw new Error(errorData.reply || `챗봇 서버 오류: ${response.status}`);
+                let errorDetail = `챗봇 서버 오류: ${response.status}`;
+                try {
+                    const errorData = await response.json();
+                    errorDetail = errorData.reply || errorData.error || errorDetail;
+                } catch (e) { /* JSON 파싱 실패 시 기존 오류 메시지 사용 */ }
+                throw new Error(errorDetail);
             }
             
             const data = await response.json();
-            appendMessage(data.reply, 'gpt'); // AI 응답 표시 및 저장
+            console.log("Received from chatbot API:", data); // 응답 데이터 로깅
+            appendMessageToScreenAndSave(data.reply, 'gpt'); // AI 응답 표시 및 저장
         } catch (error) {
             console.error("Chatbot API Error:", error);
-            appendMessage(error.message || "죄송합니다, 답변 생성 중 오류가 발생했습니다.", 'gpt', true);
+            appendMessageToScreenAndSave(error.message || "죄송합니다, 답변 생성 중 오류가 발생했습니다.", 'gpt', true); // 오류 메시지도 저장
         } finally {
-            if(loaderChat) loaderChat.style.display = 'none'; // 로딩 종료
+            if(loaderChat) loaderChat.style.display = 'none';
         }
     }
 
-    // 채팅 화면에 메시지 추가 함수
-    function appendMessage(text, sender, isError = false, saveToHistory = true) { // saveToHistory 파라미터 추가
+    // 화면에만 메시지 추가 (채팅 내역 로드용)
+    function appendMessageToScreen(text, sender, isError = false) {
         const messageDiv = document.createElement('div');
-        // ... (messageDiv 생성 및 스타일링은 이전과 동일) ...
         messageDiv.classList.add('chat-message', sender);
         if (isError) messageDiv.classList.add('error');
         if (sender === 'gpt') {
             const avatarImg = document.createElement('img');
-            avatarImg.src = '../image/chatbot_avatar.png'; // GPT 아바타 이미지 경로
-            avatarImg.alt = 'GPT Avatar';
-            avatarImg.classList.add('chat-avatar');
+            avatarImg.src = '../image/chatbot_avatar.png'; 
+            avatarImg.alt = 'GPT Avatar'; avatarImg.classList.add('chat-avatar');
             messageDiv.appendChild(avatarImg);
         }
-
         const bubbleDiv = document.createElement('div');
         bubbleDiv.classList.add('message-bubble');
         const p = document.createElement('p');
-        p.textContent = text; // XSS 방지를 위해 innerHTML 대신 textContent 사용 권장
-        bubbleDiv.appendChild(p);
-        messageDiv.appendChild(bubbleDiv);
+        p.textContent = text;
+        bubbleDiv.appendChild(p); messageDiv.appendChild(bubbleDiv);
         chatDisplay.appendChild(messageDiv);
-        chatDisplay.scrollTop = chatDisplay.scrollHeight; // 새 메시지 추가 시 스크롤 맨 아래로
-        // 채팅 내역 저장 (새 메시지일 경우에만)
-        if (saveToHistory && loggedInUserEmail) {
+        chatDisplay.scrollTop = chatDisplay.scrollHeight;
+    }
+
+    // 화면에 메시지 추가 및 localStorage에 저장
+    function appendMessageToScreenAndSave(text, sender, isError = false) {
+        appendMessageToScreen(text, sender, isError); // 먼저 화면에 표시
+
+        if (loggedInUserEmail) {
             const chatHistoryKey = `userChatHistory_${loggedInUserEmail}`;
             let history = JSON.parse(localStorage.getItem(chatHistoryKey)) || [];
             const now = new Date();
             history.push({
-                timestamp: now.toISOString(), // ISO 문자열로 저장 (날짜+시간)
-                date: formatDate(now), // YYYY-MM-DD
-                time: now.toLocaleTimeString('ko-KR'), // HH:MM:SS
+                timestamp: now.toISOString(), 
+                date: formatDateForChat(now), 
+                time: now.toLocaleTimeString('ko-KR'), 
                 sender: sender,
                 message: text
             });
-            // 최근 N개만 저장하도록 제한 가능 (예: history = history.slice(-100);)
             localStorage.setItem(chatHistoryKey, JSON.stringify(history));
         }
     }
-
-    // "입력 중..." 표시기 추가 함수
-    function appendTypingIndicator() {
-        const typingDiv = document.createElement('div');
-        typingDiv.classList.add('chat-message', 'gpt', 'typing-indicator');
-        typingDiv.id = 'typing-indicator'; // 제거를 위한 ID
-        
-        const avatarImg = document.createElement('img');
-        avatarImg.src = '../image/chatbot_avatar.png';
-        avatarImg.alt = 'GPT Avatar';
-        avatarImg.classList.add('chat-avatar');
-        typingDiv.appendChild(avatarImg);
-
-        const bubbleDiv = document.createElement('div');
-        bubbleDiv.classList.add('message-bubble');
-        const p = document.createElement('p');
-        p.innerHTML = '<span>.</span><span>.</span><span>.</span>'; // 간단한 점 애니메이션
-        bubbleDiv.appendChild(p);
-        typingDiv.appendChild(bubbleDiv);
-        
-        chatDisplay.appendChild(typingDiv);
-        chatDisplay.scrollTop = chatDisplay.scrollHeight;
-    }
-
-    // "입력 중..." 표시기 제거 함수
-    function removeTypingIndicator() {
-        const typingIndicator = document.getElementById('typing-indicator');
-        if (typingIndicator) {
-            typingIndicator.remove();
-        }
-    }
-
+    
     if(sendButton) sendButton.addEventListener('click', sendMessage);
     if(messageInput) {
         messageInput.addEventListener('keydown', function(event) {
@@ -261,8 +238,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // --- 초기화 ---
-    loadChatHistory(); // 페이지 로드 시 채팅 내역 불러오기
+    loadChatHistory();
     if(chatDisplay) chatDisplay.scrollTop = chatDisplay.scrollHeight; 
 });
 </script>
