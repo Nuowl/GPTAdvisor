@@ -192,19 +192,23 @@ document.addEventListener('DOMContentLoaded', function() {
     // 화면에만 메시지 추가 (채팅 내역 로드용)
     function appendMessageToScreen(text, sender, isError = false) {
         const messageDiv = document.createElement('div');
-        messageDiv.classList.add('chat-message', sender);
+        messageDiv.classList.add('chat-message', sender); // 'user' 또는 'gpt' 클래스 추가
         if (isError) messageDiv.classList.add('error');
-        if (sender === 'gpt') {
+
+        if (sender === 'gpt') { // GPT 메시지일 경우 아바타 추가
             const avatarImg = document.createElement('img');
             avatarImg.src = '../image/chatbot_avatar.png'; 
-            avatarImg.alt = 'GPT Avatar'; avatarImg.classList.add('chat-avatar');
+            avatarImg.alt = 'GPT Avatar'; 
+            avatarImg.classList.add('chat-avatar');
             messageDiv.appendChild(avatarImg);
         }
         const bubbleDiv = document.createElement('div');
         bubbleDiv.classList.add('message-bubble');
         const p = document.createElement('p');
         p.textContent = text;
-        bubbleDiv.appendChild(p); messageDiv.appendChild(bubbleDiv);
+        bubbleDiv.appendChild(p); 
+        messageDiv.appendChild(bubbleDiv);
+        
         chatDisplay.appendChild(messageDiv);
         chatDisplay.scrollTop = chatDisplay.scrollHeight;
     }
