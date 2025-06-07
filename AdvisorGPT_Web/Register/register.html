@@ -2,51 +2,52 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8" />
-    <title>AdvisorGPT</title>
+    <title>AdvisorGPT 회원가입</title> <!-- 타이틀 변경 -->
     <link rel="stylesheet" href="style.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Mulish&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet"> <!-- Noto Sans KR 추가 (다른 페이지와 일관성) -->
 </head>
 <body>
     <div class="container">
         <img src="../image/AdvisorGPT_Logo_big.png" class="logo" alt="Logo" />
-        <div class="login-box">
+        <div class="login-box"> <!-- register-box 클래스명도 고려 가능 -->
             <h2>회원가입</h2>
             <form id="register-form">
-            <input type="email" id="email" placeholder="E - 메일" required />
-            <input type="text" id="nickname" placeholder="사용자 별명" required />
-            <input type="password" id="password" placeholder="비밀번호" required />
-            <input type="password" id="confirm-password" placeholder="비밀번호 확인" required />
-            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                <input type="number" id="height" placeholder="키 (cm)" required />
-                <input type="number" id="weight" placeholder="몸무게 (kg)" required />
-            </div>
-            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                <button type="button" class="gender-button selected" id="male" data-gender="male">남자</button>
-                <button type="button" class="gender-button" id="female" data-gender="female">여자</button>
-            </div>
-            <button type="submit" class="signup-button">계정 생성</button>
-        </form>
-    </div>
+                <input type="email" id="email" placeholder="E - 메일" required />
+                <input type="text" id="nickname" placeholder="사용자 별명" required />
+                <input type="password" id="password" placeholder="비밀번호" required />
+                <input type="password" id="confirm-password" placeholder="비밀번호 확인" required />
+                
+                <!-- 나이, 키, 몸무게 입력 칸을 한 줄에 배치 -->
+                <div class="form-row-triple" style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <input type="number" id="age" placeholder="나이 (세)" required style="flex: 1;" />
+                    <input type="number" id="height" placeholder="키 (cm)" required style="flex: 1;" />
+                    <input type="number" id="weight" placeholder="몸무게 (kg)" required style="flex: 1;" />
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <button type="button" class="gender-button selected" id="male" data-gender="male">남자</button>
+                    <button type="button" class="gender-button" id="female" data-gender="female">여자</button>
+                </div>
+                <button type="submit" class="signup-button">계정 생성</button>
+            </form>
+        </div>
     </div>
 
     <script>
         const maleBtn = document.getElementById('male');
         const femaleBtn = document.getElementById('female');
-        let selectedGender = 'male'; // 기본값, data-gender 속성 추가 필요
-
-        // 성별 버튼에 data-gender 속성 추가 필요 (HTML에서)
-        // <button type="button" class="gender-button selected" id="male" data-gender="male">남자</button>
-        // <button type="button" class="gender-button" id="female" data-gender="female">여자</button>
+        let selectedGender = 'male'; 
 
         maleBtn.onclick = () => {
             maleBtn.classList.add('selected');
             femaleBtn.classList.remove('selected');
-            selectedGender = maleBtn.dataset.gender; // data-gender 값 사용
+            selectedGender = maleBtn.dataset.gender; 
         };
 
         femaleBtn.onclick = () => {
             femaleBtn.classList.add('selected');
             maleBtn.classList.remove('selected');
-            selectedGender = femaleBtn.dataset.gender; // data-gender 값 사용
+            selectedGender = femaleBtn.dataset.gender; 
         };
 
         document.getElementById('register-form').addEventListener('submit', function(e) {
