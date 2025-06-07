@@ -55,6 +55,17 @@ body {
     outline: none;
 }
 
+.form-row-triple {
+    display: flex;
+    gap: 10px; /* 입력 칸 사이의 간격 */
+    margin-bottom: 15px;
+}
+
+.form-row-triple input[type="number"] {
+    flex: 1; /* 사용 가능한 공간을 1:1:1 비율로 나눠 가짐 */
+    width: auto;
+}
+
 .forgot-password {
     font-size: 13px;
     color: #909498;
