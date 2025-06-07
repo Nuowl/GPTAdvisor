@@ -246,21 +246,25 @@ document.addEventListener('DOMContentLoaded', function() {
         const confirmation = confirm("정말로 계정을 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없으며, 모든 사용자 데이터가 삭제됩니다.");
 
         if (confirmation) {
+            // 1. advisorGptUsers 배열에서 해당 사용자 제거
             let users = JSON.parse(localStorage.getItem('advisorGptUsers')) || [];
-            // 현재 로그인된 사용자를 제외한 새로운 사용자 배열 생성
             const remainingUsers = users.filter(user => user.email !== loggedInUserEmail);
             localStorage.setItem('advisorGptUsers', JSON.stringify(remainingUsers));
 
-            // 현재 로그인된 사용자와 관련된 모든 개별 localStorage 항목 삭제
+            // 2. 해당 사용자와 관련된 모든 개별 localStorage 항목 삭제
             localStorage.removeItem('userProfileImage_' + loggedInUserEmail);
-            // 만약 일일 기록, 챗봇 내역 등이 이메일 기반 키로 저장되었다면 함께 삭제
-            // 예: localStorage.removeItem('userDailyRecords_' + loggedInUserEmail);
-            //     localStorage.removeItem('userChatHistory_' + loggedInUserEmail);
+            localStorage.removeItem('userGoalScore_' + loggedInUserEmail);
+            localStorage.removeItem(`dailyRecords_${loggedInUserEmail}`); // !!!! 일일 기록 데이터 삭제 추가 !!!!
+            localStorage.removeItem(`lastRecordDate_${loggedInUserEmail}`); 
+            localStorage.removeItem(`lastWeekSummaryProcessedForWeekStart_${loggedInUserEmail}`); 
+            localStorage.removeItem(`lastWeekSummary_${loggedInUserEmail}`); 
+            // TODO: 만약 챗봇 대화 내역 등 다른 사용자별 데이터가 있다면 함께 삭제
+            // localStorage.removeItem('userChatHistory_' + loggedInUserEmail); 
 
-            // 로그인 상태 정보도 삭제
+            // 3. 현재 로그인 상태 정보도 삭제
             localStorage.removeItem('loggedInUserEmail');
             localStorage.removeItem('userNickname');
-            localStorage.removeItem('userProfileImage');
+            localStorage.removeItem('userProfileImage'); 
             
             alert("계정이 성공적으로 탈퇴되었습니다. 로그인 화면으로 이동합니다.");
             window.location.href = '../Advisor_login/index.html';
