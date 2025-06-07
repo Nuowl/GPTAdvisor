@@ -329,6 +329,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 localStorage.removeItem(`lastWeekSummaryProcessedForWeekStart_${currentLoggedInUserEmail}`); 
                 localStorage.removeItem(`lastWeekSummary_${currentLoggedInUserEmail}`);
                 localStorage.removeItem(`userChatHistory_${loggedInUserEmail}`);
+                localStorage.removeItem(`userChatHistory_${currentLoggedInUserEmail}`);
                 // TODO: 챗봇 대화 내역 등 다른 사용자별 데이터 키가 있다면 여기에 삭제 로직 추가
                 console.log("User-specific data removed from localStorage for:", currentLoggedInUserEmail);
 
