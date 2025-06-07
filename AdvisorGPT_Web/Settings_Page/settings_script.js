@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const deleteAccountButton = document.getElementById('delete-account-button');
     const accountInfoForm = document.getElementById('account-info-form');
 
-    let loggedInUserEmail = localStorage.getItem('loggedInUserEmail');
+    const loggedInUserEmail = localStorage.getItem('loggedInUserEmail');
     let currentUserData = null; 
     let originalValues = {};    
     let profileImageChanged = false;
@@ -157,118 +157,146 @@ document.addEventListener('DOMContentLoaded', function() {
     downloadDataButton.addEventListener('click', async function() {
         const usersForPdf = JSON.parse(localStorage.getItem('advisorGptUsers')) || [];
         const userForPdfData = usersForPdf.find(user => user.email === loggedInUserEmail);
-        if (!userForPdfData) { alert("PDF를 생성할 사용자 정보가 없습니다."); return; }
         
-        const { jsPDF } = window.jspdf; const pdf = new jsPDF();
+        if (!userForPdfData) { 
+            alert("PDF를 생성할 사용자 정보가 없습니다. 먼저 로그인하거나 정보를 저장해주세요."); 
+            return; 
+        }
+        
+        const { jsPDF } = window.jspdf; 
+        const pdf = new jsPDF({
+            orientation: 'p', // portrait
+            unit: 'mm',       // millimeters
+            format: 'a4'      // A4 format
+        });
         const base64FontData = typeof nanumGothicBase64Data !== 'undefined' ? nanumGothicBase64Data : '';
-        if (base64FontData.trim().length < 10000 && navigator.language.startsWith('ko')) { alert("PDF 생성 경고: 한글 폰트 데이터가 로드되지 않아 한글이 깨질 수 있습니다.");}
+        
         try {
-            if (base64FontData.trim().length >= 10000) { pdf.addFileToVFS('NanumGothic-Regular.ttf', base64FontData); pdf.addFont('NanumGothic-Regular.ttf', 'NanumGothic', 'normal'); pdf.setFont('NanumGothic', 'normal');
-            } else { pdf.setFont("helvetica", "normal"); }
-        } catch (error) { console.error("Error applying Korean font to PDF:", error); pdf.setFont("helvetica", "normal"); }
-
-        let yPosition = 15; const lineHeight = 7; const indent = 10; const pageHeight = pdf.internal.pageSize.height; const margin = 15;
-        function addText(text, x, y, options = {}) { 
-            if (y > pageHeight - margin - lineHeight) { pdf.addPage(); yPosition = margin; y = yPosition; }
-            const fontSize = options.fontSize || 10; pdf.setFontSize(fontSize); pdf.text(text, x, y);
-            yPosition = y + lineHeight * (fontSize / 10); return yPosition;
+            if (base64FontData.trim().length >= 10000) { 
+                pdf.addFileToVFS('NanumGothic-Regular.ttf', base64FontData); 
+                pdf.addFont('NanumGothic-Regular.ttf', 'NanumGothic', 'normal'); 
+                pdf.setFont('NanumGothic', 'normal');
+            } else { 
+                pdf.setFont("helvetica", "normal"); 
+                if (navigator.language.startsWith('ko')) {
+                    console.warn("PDF 생성 경고: 한글 폰트 데이터가 로드되지 않아 한글이 깨질 수 있습니다.");
+                }
+            }
+        } catch (error) { 
+            console.error("Error applying Korean font to PDF:", error); 
+            pdf.setFont("helvetica", "normal"); 
         }
 
-        yPosition = addText("AdvisorGPT 사용자 데이터 요약", indent, yPosition, { fontSize: 16 }); yPosition += lineHeight;
-        yPosition = addText(`사용자 별명: ${userForPdfData.nickname || 'User'}`, indent, yPosition); 
-        yPosition = addText(`이메일: ${userForPdfData.email}`, indent, yPosition);
-        // !!!! PDF에 나이 정보 추가 !!!!
-        yPosition = addText(`나이: ${userForPdfData.age || '-'} 세`, indent, yPosition); 
-        yPosition = addText(`키: ${userForPdfData.height || '-'} cm`, indent, yPosition); 
-        yPosition = addText(`몸무게: ${userForPdfData.weight || '-'} kg`, indent, yPosition);
-        yPosition = addText(`성별: ${userForPdfData.gender || '-'}`, indent, yPosition);
+        let yPosition = 15; 
+        const lineHeight = 7;  // 기본 줄 간격
+        const sectionSpacing = 10; // 섹션 간 간격
+        const indent = 10; 
+        const contentIndent = 15; // 내용 들여쓰기
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        const margin = 15;
+        const usableWidth = pageWidth - indent - margin; // 실제 사용 가능한 텍스트 너비
+
+        function addWrappedText(text, x, y, maxWidth, options = {}) {
+            const fontSize = options.fontSize || 10;
+            pdf.setFontSize(fontSize);
+            const lines = pdf.splitTextToSize(text || "정보 없음", maxWidth);
+            lines.forEach(line => {
+                if (y > pageHeight - margin - lineHeight) { // 페이지 넘김 확인
+                    pdf.addPage();
+                    yPosition = margin;
+                    y = yPosition;
+                }
+                pdf.text(line, x, y);
+                y += lineHeight * (fontSize / 10); // 다음 줄 위치
+            });
+            yPosition = y; // 전역 yPosition 업데이트
+            return yPosition;
+        }
         
-        // !!!! PDF에 목표 점수 추가 !!!!
+        yPosition = addWrappedText("AdvisorGPT 사용자 데이터 요약", indent, yPosition, usableWidth, { fontSize: 16 });
+        yPosition += sectionSpacing / 2; 
+
+        yPosition = addWrappedText(`사용자 별명: ${userForPdfData.nickname || 'User'}`, indent, yPosition, usableWidth); 
+        yPosition = addWrappedText(`이메일: ${userForPdfData.email}`, indent, yPosition, usableWidth);
+        yPosition = addWrappedText(`나이: ${userForPdfData.age || '-'} 세`, indent, yPosition, usableWidth); 
+        yPosition = addWrappedText(`키: ${userForPdfData.height || '-'} cm`, indent, yPosition, usableWidth); 
+        yPosition = addWrappedText(`몸무게: ${userForPdfData.weight || '-'} kg`, indent, yPosition, usableWidth);
+        yPosition = addWrappedText(`성별: ${userForPdfData.gender || '-'}`, indent, yPosition, usableWidth);
+        
         const userGoalScoreKey = 'userGoalScore_' + loggedInUserEmail;
         const goalScoreForPdf = localStorage.getItem(userGoalScoreKey) || defaultGoalScore;
-        yPosition = addText(`나의 목표 평균 점수: ${goalScoreForPdf} 점`, indent, yPosition);
-        yPosition += lineHeight;
+        yPosition = addWrappedText(`나의 목표 평균 점수: ${goalScoreForPdf} 점`, indent, yPosition, usableWidth);
+        yPosition += sectionSpacing;
 
-        yPosition = addText("일일 기록 데이터:", indent, yPosition, { fontSize: 12 }); 
-        // TODO: 실제 일일 기록 데이터 로드하여 추가
+        yPosition = addWrappedText("일일 기록 데이터:", indent, yPosition, usableWidth, { fontSize: 12 });
+        yPosition += lineHeight / 2;
+
         const dailyRecordsKey = `dailyRecords_${loggedInUserEmail}`;
         const userDailyRecords = JSON.parse(localStorage.getItem(dailyRecordsKey)) || {};
-        const recordDates = Object.keys(userDailyRecords).sort(); // 날짜순 정렬
+        const recordDates = Object.keys(userDailyRecords).sort((a,b) => new Date(b) - new Date(a)); // 최신순 정렬
+
         if (recordDates.length > 0) {
             recordDates.forEach(date => {
+                if (yPosition > pageHeight - margin - (lineHeight * 10) ) { // 새 기록 시작 전 페이지 넘김 여유 공간 확인
+                     pdf.addPage(); yPosition = margin;
+                }
                 const record = userDailyRecords[date];
-                yPosition = addText(`  [${date}]`, indent, yPosition, {fontSize: 10});
+                yPosition = addWrappedText(`[${date}]`, indent, yPosition, usableWidth, { fontSize: 11 });
+                
                 if(record.log) {
-                    yPosition = addText(`    수면: ${record.log.sleep_hours}시간, 식사: ${record.log.calories}kcal, 운동: ${record.log.strength_minutes + record.log.cardio_minutes}분`, indent + 5, yPosition, {fontSize: 9});
+                    yPosition = addWrappedText(`  수면: ${record.log.sleep_hours || 0}시간, 식사: ${record.log.calories || 0}kcal, 운동: ${(record.log.strength_minutes || 0) + (record.log.cardio_minutes || 0)}분`, contentIndent, yPosition, usableWidth - (contentIndent-indent), {fontSize: 9});
+                    yPosition = addWrappedText(`  감정/스트레스: ${record.log.mood_text || "기록 없음"}`, contentIndent, yPosition, usableWidth - (contentIndent-indent), {fontSize: 9});
                 }
                 if(record.analysis){
-                    yPosition = addText(`    건강점수: ${record.analysis.todayHealthScore}, 스트레스: ${record.analysis.aiMentalAnalysis.stress_score}`, indent + 5, yPosition, {fontSize: 9});
+                    yPosition = addWrappedText(`  건강점수: ${record.analysis.todayHealthScore || '--'}, 스트레스 지수: ${record.analysis.aiMentalAnalysis ? record.analysis.aiMentalAnalysis.stress_score : '--'}`, contentIndent, yPosition, usableWidth - (contentIndent-indent), {fontSize: 9});
+                    yPosition = addWrappedText(`  점수 산출 이유: ${record.analysis.scoreReason || "내용 없음"}`, contentIndent, yPosition, usableWidth - (contentIndent-indent), {fontSize: 9});
+                    if(record.analysis.aiPhysicalAnalysis) {
+                        yPosition = addWrappedText(`  신체적 분석: ${record.analysis.aiPhysicalAnalysis.summary || "내용 없음"}`, contentIndent, yPosition, usableWidth - (contentIndent-indent), {fontSize: 9});
+                        yPosition = addWrappedText(`  신체적 피드백: ${record.analysis.aiPhysicalAnalysis.feedback || "내용 없음"}`, contentIndent, yPosition, usableWidth - (contentIndent-indent), {fontSize: 9});
+                    }
+                    if(record.analysis.aiMentalAnalysis) {
+                        yPosition = addWrappedText(`  정신적 분석: ${record.analysis.aiMentalAnalysis.summary || "내용 없음"}`, contentIndent, yPosition, usableWidth - (contentIndent-indent), {fontSize: 9});
+                        yPosition = addWrappedText(`  정신적 피드백: ${record.analysis.aiMentalAnalysis.feedback || "내용 없음"}`, contentIndent, yPosition, usableWidth - (contentIndent-indent), {fontSize: 9});
+                    }
                 }
+                yPosition += lineHeight / 2; // 각 날짜 기록 후 간격
             });
         } else {
-            yPosition = addText("(기록된 일일 데이터 없음)", indent, yPosition);
+            yPosition = addWrappedText("(기록된 일일 데이터 없음)", contentIndent, yPosition, usableWidth - (contentIndent-indent));
         }
-        yPosition += lineHeight;
+        yPosition += sectionSpacing;
 
-        yPosition = addText("주간 평균 데이터:", indent, yPosition, { fontSize: 12 }); 
-        // TODO: 실제 주간 평균 데이터 로드 (lastWeekSummary_ 키 등)
+        yPosition = addWrappedText("주간 평균 데이터:", indent, yPosition, usableWidth, { fontSize: 12 });
+        yPosition += lineHeight / 2;
         const lastWeekSummaryKey = `lastWeekSummary_${loggedInUserEmail}`;
         const lastWeekData = JSON.parse(localStorage.getItem(lastWeekSummaryKey));
         if (lastWeekData && lastWeekData.daysRecorded > 0) {
-            yPosition = addText(`  [지난 주 (${lastWeekData.weekStartDate} 시작)]`, indent, yPosition, {fontSize: 10});
-            yPosition = addText(`    평균 건강점수: ${lastWeekData.overall.toFixed(1)}, 평균 수면: ${lastWeekData.sleep.toFixed(1)}시간 등`, indent + 5, yPosition, {fontSize: 9});
+            yPosition = addWrappedText(`  [지난 주 요약 (${lastWeekData.weekStartDate} 시작, ${lastWeekData.daysRecorded}일 기록)]`, indent, yPosition, usableWidth, {fontSize: 10});
+            yPosition = addWrappedText(`    평균 건강점수: ${lastWeekData.overall ? lastWeekData.overall.toFixed(1) : '-'}점`, contentIndent, yPosition, usableWidth - (contentIndent-indent), {fontSize: 9});
+            yPosition = addWrappedText(`    평균 수면: ${lastWeekData.sleep ? lastWeekData.sleep.toFixed(1) : '-'}시간`, contentIndent, yPosition, usableWidth - (contentIndent-indent), {fontSize: 9});
+            yPosition = addWrappedText(`    평균 식사량: ${lastWeekData.meal ? lastWeekData.meal.toFixed(0) : '-'}kcal`, contentIndent, yPosition, usableWidth - (contentIndent-indent), {fontSize: 9});
+            yPosition = addWrappedText(`    평균 운동시간: ${lastWeekData.exercise ? lastWeekData.exercise.toFixed(1) : '-'}시간`, contentIndent, yPosition, usableWidth - (contentIndent-indent), {fontSize: 9});
+            yPosition = addWrappedText(`    평균 스트레스 지수: ${lastWeekData.stress ? lastWeekData.stress.toFixed(0) : '-'}점`, contentIndent, yPosition, usableWidth - (contentIndent-indent), {fontSize: 9});
         } else {
-            yPosition = addText("(기록된 주간 평균 데이터 없음)", indent, yPosition);
+            yPosition = addWrappedText("(기록된 주간 평균 데이터 없음)", contentIndent, yPosition, usableWidth - (contentIndent-indent));
         }
-        yPosition += lineHeight;
+        yPosition += sectionSpacing;
         
-        yPosition = addText("챗봇 대화 내역:", indent, yPosition, { fontSize: 12 }); 
-        yPosition = addText("(현재 기록된 챗봇 대화 내역 없음 - 추후 연동 예정)", indent, yPosition);
+        yPosition = addWrappedText("챗봇 대화 내역:", indent, yPosition, usableWidth, { fontSize: 12 }); 
+        yPosition += lineHeight / 2;
+        // TODO: 실제 챗봇 대화 내역 로드 로직 (현재는 플레이스홀더)
+        // const chatHistoryKey = `userChatHistory_${loggedInUserEmail}`;
+        // const chatHistory = JSON.parse(localStorage.getItem(chatHistoryKey)) || [];
+        // if (chatHistory.length > 0) {
+        //     chatHistory.forEach(chat => {
+        //         yPosition = addWrappedText(`  ${chat.timestamp || ''} ${chat.sender}: ${chat.message}`, contentIndent, yPosition, usableWidth - (contentIndent-indent), {fontSize: 9});
+        //     });
+        // } else {
+            yPosition = addWrappedText("(기록된 챗봇 대화 내역 없음 - 추후 연동 예정)", contentIndent, yPosition, usableWidth - (contentIndent-indent));
+        // }
         
         pdf.save(`AdvisorGPT_데이터_${userForPdfData.nickname || 'User'}.pdf`);
-    });
-
-    logoutButton.addEventListener('click', function() {
-        localStorage.removeItem('loggedInUserEmail');
-        localStorage.removeItem('userNickname');
-        localStorage.removeItem('userProfileImage');
-        alert('로그아웃 되었습니다.');
-        window.location.href = '../Advisor_login/index.html';
-    });
-
-    // 계정 탈퇴 버튼 이벤트 리스너 추가
-    deleteAccountButton.addEventListener('click', function() {
-        if (!loggedInUserEmail) {
-            alert("로그인 정보가 없어 계정을 탈퇴할 수 없습니다.");
-            return;
-        }
-
-        const confirmation = confirm("정말로 계정을 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없으며, 모든 사용자 데이터가 삭제됩니다.");
-
-        if (confirmation) {
-            // 1. advisorGptUsers 배열에서 해당 사용자 제거
-            let users = JSON.parse(localStorage.getItem('advisorGptUsers')) || [];
-            const remainingUsers = users.filter(user => user.email !== loggedInUserEmail);
-            localStorage.setItem('advisorGptUsers', JSON.stringify(remainingUsers));
-
-            // 2. 해당 사용자와 관련된 모든 개별 localStorage 항목 삭제
-            localStorage.removeItem('userProfileImage_' + loggedInUserEmail);
-            localStorage.removeItem('userGoalScore_' + loggedInUserEmail);
-            localStorage.removeItem(`dailyRecords_${loggedInUserEmail}`); // !!!! 일일 기록 데이터 삭제 추가 !!!!
-            localStorage.removeItem(`lastRecordDate_${loggedInUserEmail}`); 
-            localStorage.removeItem(`lastWeekSummaryProcessedForWeekStart_${loggedInUserEmail}`); 
-            localStorage.removeItem(`lastWeekSummary_${loggedInUserEmail}`); 
-            // TODO: 만약 챗봇 대화 내역 등 다른 사용자별 데이터가 있다면 함께 삭제
-            // localStorage.removeItem('userChatHistory_' + loggedInUserEmail); 
-
-            // 3. 현재 로그인 상태 정보도 삭제
-            localStorage.removeItem('loggedInUserEmail');
-            localStorage.removeItem('userNickname');
-            localStorage.removeItem('userProfileImage'); 
-            
-            alert("계정이 성공적으로 탈퇴되었습니다. 로그인 화면으로 이동합니다.");
-            window.location.href = '../Advisor_login/index.html';
-        }
     });
 
     loadUserData(); // 페이지 로드 시 사용자 데이터 로드
