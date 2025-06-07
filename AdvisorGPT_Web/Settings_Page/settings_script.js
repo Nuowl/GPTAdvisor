@@ -259,8 +259,35 @@ document.addEventListener('DOMContentLoaded', function() {
             } else { yPosition = addWrappedText("(기록된 주간 평균 데이터 없음)", contentIndent, yPosition, usableWidth - (contentIndent-indent)); }
             yPosition += sectionSpacing;
             
-            yPosition = addWrappedText("챗봇 대화 내역:", indent, yPosition, usableWidth, { fontSize: 12 }); yPosition += lineHeight / 2;
-            yPosition = addWrappedText("(현재 기록된 챗봇 대화 내역 없음 - 추후 연동 예정)", contentIndent, yPosition, usableWidth - (contentIndent-indent));
+            yPosition = addWrappedText("챗봇 대화 내역:", indent, yPosition, usableWidth, { fontSize: 12 }); 
+            yPosition += lineHeight / 2;
+            
+            if (loggedInUserEmail) {
+                const chatHistoryKey = `userChatHistory_${loggedInUserEmail}`;
+                const chatHistory = JSON.parse(localStorage.getItem(chatHistoryKey)) || [];
+                if (chatHistory.length > 0) {
+                    let currentDateForChat = '';
+                    chatHistory.forEach(chat => {
+                        const messageDate = chat.date || new Date(chat.timestamp).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\. /g, '-').slice(0, -1); // YYYY-MM-DD 형식으로
+                        if (messageDate !== currentDateForChat) {
+                            if (yPosition > pageHeight - margin - (lineHeight * 3) ) { pdf.addPage(); yPosition = margin; } // 새 날짜 전에 페이지 넘김 확인
+                            yPosition = addWrappedText(`\n[${messageDate} 대화]`, indent, yPosition, usableWidth, {fontSize: 10});
+                            currentDateForChat = messageDate;
+                        }
+                        const messagePrefix = chat.sender === 'user' ? "나:" : "AdvisorGPT:";
+                        const messageLine = `${chat.time || new Date(chat.timestamp).toLocaleTimeString('ko-KR')} ${messagePrefix} ${chat.message}`;
+                        
+                        const lines = pdf.splitTextToSize(messageLine, usableWidth - (contentIndent-indent));
+                        lines.forEach(line => {
+                            yPosition = addWrappedText(line, contentIndent, yPosition, usableWidth - (contentIndent-indent), {fontSize: 9});
+                        });
+                    });
+                } else {
+                    yPosition = addWrappedText("(기록된 챗봇 대화 내역 없음)", contentIndent, yPosition, usableWidth - (contentIndent-indent));
+                }
+            } else {
+                yPosition = addWrappedText("(로그인 정보 없어 챗봇 대화 내역 로드 불가)", contentIndent, yPosition, usableWidth - (contentIndent-indent));
+            }
             
             pdf.save(`AdvisorGPT_데이터_${userForPdfData.nickname || 'User'}.pdf`);
         });
@@ -300,7 +327,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 localStorage.removeItem(`dailyRecords_${currentLoggedInUserEmail}`); 
                 localStorage.removeItem(`lastRecordDate_${currentLoggedInUserEmail}`); 
                 localStorage.removeItem(`lastWeekSummaryProcessedForWeekStart_${currentLoggedInUserEmail}`); 
-                localStorage.removeItem(`lastWeekSummary_${currentLoggedInUserEmail}`); 
+                localStorage.removeItem(`lastWeekSummary_${currentLoggedInUserEmail}`);
+                localStorage.removeItem(`userChatHistory_${loggedInUserEmail}`);
                 // TODO: 챗봇 대화 내역 등 다른 사용자별 데이터 키가 있다면 여기에 삭제 로직 추가
                 console.log("User-specific data removed from localStorage for:", currentLoggedInUserEmail);
 
@@ -326,8 +354,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const linkHref = a.getAttribute('href'); 
             const iconSrc = a.parentElement.querySelector('.menu-icon') ? a.parentElement.querySelector('.menu-icon').src : '';
             return (linkHref && linkHref.includes(currentSettingsPath)) || 
-                   (linkHref === "../Settings_Page/settings.html") || 
-                   (linkHref === "#" && iconSrc.includes('icon_settings'));
+                    (linkHref === "../Settings_Page/settings.html") || 
+                    (linkHref === "#" && iconSrc.includes('icon_settings'));
         });
         if (settingsLink) { 
             settingsLink.parentElement.classList.add('active');
