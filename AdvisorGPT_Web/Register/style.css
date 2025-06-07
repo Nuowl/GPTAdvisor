@@ -1,6 +1,6 @@
 body {
     margin: 0;
-    font-family: 'Mulish', sans-serif; /* Noto Sans KR도 고려 가능 */
+    font-family: 'Mulish', sans-serif;
     background-color: #F5FAFF;
     display: flex;
     justify-content: center;
@@ -21,16 +21,15 @@ body {
     margin-top: -100px;
 }
 
-.login-box { /* 회원가입 페이지에서도 .login-box 클래스 사용 중 */
+.login-box {
     background-color: #FFFFFF;
     border: 3px solid #3377DD;
     border-radius: 15px;
     padding: 40px 30px;
-    width: 360px; /* 이 너비를 기준으로 내부 요소들이 정렬됨 */
+    width: 360px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.05);
     text-align: center;
     margin-top: -110px;
-    box-sizing: border-box; /* 패딩과 보더가 width에 포함되도록 */
 }
 
 .login-box h2 {
@@ -44,106 +43,29 @@ body {
     flex-direction: column;
 }
 
-/* 기본 input 스타일: 이메일, 별명, 비밀번호 등에 적용 */
-.login-box input[type="email"],
-.login-box input[type="text"],
-.login-box input[type="password"] {
-    width: 100%; /* 부모 form의 너비를 기준으로 함 (패딩 제외) */
+.login-box input {
+    width: 91%;
     padding: 12px 15px;
     margin-bottom: 15px;
     border: none;
     border-radius: 10px;
     background-color: #EFEFEF;
     font-size: 14px;
-    /* color: #909498; /* 플레이스홀더 색상은 아래 따로 지정 */
-    outline: none;
-    box-sizing: border-box; /* 패딩과 보더가 width에 포함되도록 */
-}
-.login-box input::placeholder { /* 플레이스홀더 텍스트 색상 */
     color: #909498;
-}
-.login-box input { /* 입력된 텍스트 색상 */
-    color: #333;
+    outline: none;
 }
 
-
-/* 나이, 키, 몸무게 입력 필드를 담는 컨테이너 */
 .form-row-triple {
     display: flex;
     gap: 10px; /* 입력 칸 사이의 간격 */
     margin-bottom: 15px;
-    width: 100%; /* 부모 form의 너비를 기준으로 함 */
 }
 
-/* form-row-triple 내부의 number input 필드 스타일 */
 .form-row-triple input[type="number"] {
     flex: 1; /* 사용 가능한 공간을 1:1:1 비율로 나눠 가짐 */
-    /* width: auto; /* flex:1 사용 시 width는 자동으로 조절됨. 
-                      하지만 명시적으로 계산해서 넣을 수도 있음: calc((100% - 20px) / 3) (gap이 10px 두 개일 때) */
-    padding: 12px 10px; /* 좌우 패딩을 약간 줄여서 공간 확보 (필요시) */
-    margin-bottom: 0;   /* .form-row-triple에서 margin-bottom을 관리하므로 개별 input은 0 */
-    border: none;
-    border-radius: 10px;
-    background-color: #EFEFEF;
-    font-size: 14px;
-    outline: none;
-    box-sizing: border-box;
-    text-align: center; /* 숫자 입력 시 중앙 정렬 (선택 사항) */
-}
-.form-row-triple input[type="number"]::placeholder {
-    color: #909498;
-}
-.form-row-triple input[type="number"] {
-    color: #333;
+    width: auto;
 }
 
-
-/* 성별 버튼 컨테이너는 기존 HTML의 인라인 스타일 사용 또는 클래스 부여 가능 */
-/* div[style*="display: flex"][style*="gap: 10px"][style*="margin-bottom: 20px"] { ... } */
-.gender-buttons-container { /* HTML에 이 클래스 추가 시 사용: <div class="gender-buttons-container" style="..."> */
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-    width: 100%; /* 부모 form의 너비를 기준으로 함 */
-}
-
-.gender-button {
-    flex: 1;
-    padding: 12px;
-    border: 2px solid #3377DD;
-    border-radius: 10px;
-    background-color: #FFFFFF;
-    color: #333; /* 기본 글자색 변경 */
-    cursor: pointer;
-    font-size: 15px;
-    font-weight: 600; /* 글꼴 두께 추가 */
-    transition: background-color 0.2s, color 0.2s; /* 부드러운 전환 효과 */
-}
-
-.gender-button.selected {
-    background-color: #3377DD;
-    color: #FFFFFF;
-}
-
-.signup-button { /* 계정 생성 버튼 */
-    background-color: #FFFFFF;
-    color: #3377DD; /* 글자색을 파란색으로 (선택 사항) */
-    font-size: 16px;
-    font-weight: bold; /* 글꼴 두께 추가 */
-    border: 2px solid #3377DD;
-    border-radius: 10px;
-    padding: 12px;
-    cursor: pointer;
-    width: 100%;
-    margin-top: 5px; /* 성별 버튼과의 간격 */
-    transition: background-color 0.2s, color 0.2s;
-}
-.signup-button:hover {
-    background-color: #3377DD;
-    color: #FFFFFF;
-}
-
-/* 로그인 페이지에서 가져온 스타일 (필요하다면) */
 .forgot-password {
     font-size: 13px;
     color: #909498;
@@ -155,4 +77,42 @@ body {
     color: #3377DD;
     text-decoration: none;
     font-weight: bold;
+}
+
+.login-button,
+.signup-button {
+    font-size: 16px;
+    border-radius: 10px;
+    padding: 12px;
+    cursor: pointer;
+    width: 100%;
+}
+
+.login-button {
+    background-color: #3377DD;
+    color: #FFFFFF;
+    border: none;
+    margin-bottom: 10px;
+}
+
+.signup-button {
+    background-color: #FFFFFF;
+    color: #000000;
+    border: 2px solid #3377DD;
+}
+
+.gender-button {
+    flex: 1;
+    padding: 12px;
+    border: 2px solid #3377DD;
+    border-radius: 10px;
+    background-color: #FFFFFF;
+    color: #000;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.gender-button.selected {
+    background-color: #3377DD;
+    color: #FFFFFF;
 }
