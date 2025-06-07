@@ -36,85 +36,102 @@
         const maleBtn = document.getElementById('male');
         const femaleBtn = document.getElementById('female');
         let selectedGender = 'male'; 
+        const defaultProfilePicPath = '../image/user_profile_default.png';
 
         maleBtn.onclick = () => {
             maleBtn.classList.add('selected');
             femaleBtn.classList.remove('selected');
             selectedGender = maleBtn.dataset.gender; 
+            console.log("Selected gender:", selectedGender); // 성별 선택 확인
         };
 
         femaleBtn.onclick = () => {
             femaleBtn.classList.add('selected');
             maleBtn.classList.remove('selected');
             selectedGender = femaleBtn.dataset.gender; 
+            console.log("Selected gender:", selectedGender); // 성별 선택 확인
         };
 
         document.getElementById('register-form').addEventListener('submit', function(e) {
-            e.preventDefault();
+            e.preventDefault(); 
+            console.log("Register form submitted."); // 폼 제출 시작 확인
 
             const email = document.getElementById('email').value;
             const nickname = document.getElementById('nickname').value;
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirm-password').value;
-            const age = document.getElementById('age').value; // 나이 값 가져오기
+            const age = document.getElementById('age').value;
             const height = document.getElementById('height').value;
             const weight = document.getElementById('weight').value;
 
-            // 간단한 유효성 검사 추가
+            console.log("Form data:", { email, nickname, age, height, weight, selectedGender }); // 입력값 확인
+
             if (!email || !nickname || !password || !confirmPassword || !age || !height || !weight) {
                 alert('모든 필수 정보를 입력해주세요.');
+                console.log("Validation failed: Missing required fields.");
                 return;
             }
             if (parseInt(age) <= 0 || parseInt(height) <= 0 || parseInt(weight) <= 0) {
                 alert('나이, 키, 몸무게는 0보다 큰 값을 입력해야 합니다.');
+                console.log("Validation failed: Invalid age, height, or weight.");
+                return;
+            }
+            if (password !== confirmPassword) {
+                alert('비밀번호가 일치하지 않습니다.');
+                console.log("Validation failed: Passwords do not match.");
                 return;
             }
 
-            if (password !== confirmPassword) {
-                alert('비밀번호가 일치하지 않습니다.');
-                return;
-            }
-            
-            // !!!! 나이 변경 불가 경고 및 확인 !!!!
+            console.log("Basic validation passed.");
+
             const ageConfirmation = confirm("사용자 나이는 한번 설정 시 변경이 불가능합니다. 정말 이대로 진행하시겠습니까?");
+            console.log("Age confirmation result:", ageConfirmation); // confirm 결과 확인
+
             if (!ageConfirmation) {
-                // 사용자가 "취소"를 누르면 여기서 중단
+                console.log("User cancelled age confirmation.");
                 return; 
             }
 
+            console.log("Age confirmed. Proceeding with registration.");
+
             let users = JSON.parse(localStorage.getItem('advisorGptUsers')) || [];
+            console.log("Current users from localStorage:", users);
 
             if (users.find(user => user.email === email)) {
                 alert('이미 사용 중인 이메일입니다.');
+                console.log("Registration failed: Email already exists.");
                 return;
             }
+
+            console.log("Email is unique. Creating new user.");
 
             const newUser = {
                 email: email,
                 nickname: nickname,
-                password: password, // 보안 경고: 실제 서비스에서는 해싱 필수!
-                age: age,           // !!!! 나이 정보 추가 !!!!
+                password: password, 
+                age: age,          
                 height: height,
                 weight: weight,
                 gender: selectedGender,
-                profileImage: defaultProfilePicPath // 가입 시 기본 프로필 이미지 경로 저장
+                profileImage: defaultProfilePicPath 
             };
 
             users.push(newUser);
             localStorage.setItem('advisorGptUsers', JSON.stringify(users));
-
-            // 사용자별 목표 점수 기본값 설정 (선택 사항)
+            console.log("New user added to localStorage. Users:", users);
+            
             if (email) {
                 const userGoalScoreKey = 'userGoalScore_' + email;
-                localStorage.setItem(userGoalScoreKey, '70'); // 기본 목표 점수
+                localStorage.setItem(userGoalScoreKey, '70'); 
+                console.log("Default goal score set for user:", email);
             }
-            // 사용자별 프로필 이미지 기본값 설정 (개별 키로, 로그인 시 사용 위함)
             if (email) {
                 localStorage.setItem('userProfileImage_' + email, defaultProfilePicPath);
+                console.log("Default profile image set for user:", email);
             }
 
-
             alert('계정이 성공적으로 생성되었습니다. 로그인 페이지로 이동합니다.');
+            console.log("Registration successful. Redirecting to login page.");
             window.location.href = '../Advisor_login/index.html';
         });
     </script>
