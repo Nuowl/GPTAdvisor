@@ -4,65 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AdvisorGPT</title>
-    <link rel="stylesheet" href="../Main_Page/style.css"> <!-- 기본 스타일 상속 -->
-    <link rel="stylesheet" href="style_report.css"> <!-- 리포트 페이지 전용 스타일 -->
+    <link rel="stylesheet" href="../Main_Page/style.css">
+    <link rel="stylesheet" href="style_report.css">
     <link href="https://fonts.googleapis.com/css2?family=Mulish&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- 로딩 스피너 CSS 추가 -->
+    <style>
+        .loader-overlay-report { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(255, 255, 255, 0.7); display: flex; justify-content: center; align-items: center; z-index: 10000; }
+        .loader-report { border: 8px solid #f3f3f3; border-radius: 50%; border-top: 8px solid #3498db; width: 60px; height: 60px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
 </head>
 <body>
+    <div id="loader-overlay-report" class="loader-overlay-report" style="display: none;"><div class="loader-report"></div></div>
     <div class="main-dashboard-container">
-        <!-- Left Sidebar -->
-        <aside class="sidebar left-sidebar">
-            <div class="profile-section">
-                <img src="../image/user_profile_default.png" alt="User Profile" class="profile-pic" id="sidebar-profile-pic">
-                <p class="user-nickname" id="sidebar-username">User</p>
-            </div>
-            <nav class="menu-section">
-                <ul id="sidebar-menu">
-                    <li><a href="../Main_Page/main.html"><img src="../image/icon_my_today.png" alt="" class="menu-icon"> 나의 오늘</a></li>
-                    <li class="active"><a href="../Health_Report/health_report.html"><img src="../image/icon_health_report.png" alt="" class="menu-icon"> 건강 리포트</a></li>
-                    <li><a href="../GPT_Chatbot/gpt_chatbot.html"><img src="../image/icon_gpt_chatbot.png" alt="" class="menu-icon"> GPT Chatbot</a></li>
-                    <li><a href="../Settings_Page/settings.html"><img src="../image/icon_settings.png" alt="" class="menu-icon"> 설정</a></li>
-                </ul>
-            </nav>
-            <div class="logo-section">  
-                <img src="../image/AdvisorGPT_Logo_big.png" alt="AdvisorGPT Logo" class="advisor-logo">
-            </div>
-        </aside>
-
-        <!-- Main Content for Health Report -->
+        <!-- Left Sidebar (이전과 동일) -->
+        <aside class="sidebar left-sidebar"> <div class="profile-section"> <img src="../image/user_profile_default.png" alt="User Profile" class="profile-pic" id="sidebar-profile-pic"> <p class="user-nickname" id="sidebar-username">User</p> </div> <nav class="menu-section"> <ul id="sidebar-menu"> <li><a href="../Main_Page/main.html"><img src="../image/icon_my_today.png" alt="" class="menu-icon"> 나의 오늘</a></li> <li class="active"><a href="../Health_Report/health_report.html"><img src="../image/icon_health_report.png" alt="" class="menu-icon"> 건강 리포트</a></li> <li><a href="../GPT_Chatbot/gpt_chatbot.html"><img src="../image/icon_gpt_chatbot.png" alt="" class="menu-icon"> GPT Chatbot</a></li> <li><a href="../Settings_Page/settings.html"><img src="../image/icon_settings.png" alt="" class="menu-icon"> 설정</a></li> </ul> </nav> <div class="logo-section"> <img src="../image/AdvisorGPT_Logo_big.png" alt="AdvisorGPT Logo" class="advisor-logo"> </div> </aside>
         <main class="main-content report-content">
             <section class="goal-status-section">
-                <p class="goal-text">
-                    나의 목표 점수 
-                    <input type="number" id="goal-score-input" min="1" max="100">점까지 
-                    <span id="points-remaining">XX</span>점 남았습니다.
-                </p>
-                <p class="gpt-comment">GPT 격려 코멘트: 목표를 향해 꾸준히 나아가세요! 작은 변화가 큰 결과를 만듭니다.</p>
+                <p class="goal-text"> 나의 목표 점수 <input type="number" id="goal-score-input" min="1" max="100">점까지 <span id="points-remaining">XX</span>점 남았습니다. </p>
+                <p class="gpt-comment" id="gpt-encouragement-comment">GPT 격려 코멘트: 목표를 향해 꾸준히 나아가세요! 작은 변화가 큰 결과를 만듭니다.</p> <!-- ID 추가 -->
             </section>
-
-            <section class="weekly-chart-section">
-                <h2>주간 건강 점수</h2>
-                <div class="chart-container">
-                    <canvas id="weeklyHealthChart"></canvas>
-                </div>
-            </section>
-
-            <section class="weekly-summary-section">
-                <h2>주간 요약</h2>
-                <ul class="summary-list" id="weekly-summary-list">
-                    <!-- JavaScript가 이 목록을 동적으로 채웁니다. -->
-                    <!-- 예시 li 구조 (JS에서 생성)
-                    <li>
-                        <img src="../image/icon_sleep_moon_right.png" alt="수면" class="summary-icon">
-                        <span data-summary-type="sleep">분석 중...</span>
-                    </li>
-                    -->
-                </ul>
-            </section>
+            <section class="weekly-chart-section"> <h2>주간 건강 점수</h2> <div class="chart-container"> <canvas id="weeklyHealthChart"></canvas> </div> </section>
+            <section class="weekly-summary-section"> <h2>주간 요약</h2> <ul class="summary-list" id="weekly-summary-list"></ul> </section>
         </main>
     </div>
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const loggedInUserEmail = localStorage.getItem('loggedInUserEmail');
@@ -71,14 +37,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const goalInput = document.getElementById('goal-score-input');
     const pointsRemainingSpan = document.getElementById('points-remaining');
     const summaryList = document.getElementById('weekly-summary-list');
+    const gptEncouragementCommentEl = document.getElementById('gpt-encouragement-comment'); // 코멘트 요소
+    const loaderReport = document.getElementById('loader-overlay-report');
     
     const defaultProfilePicPath = '../image/user_profile_default.png';
     const defaultGoalScore = 70;
 
-    // --- 유틸리티 함수: YYYY-MM-DD 형식으로 날짜 반환 ---
     const formatDate = (dt) => `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
-
-    // --- 유틸리티 함수: 특정 날짜가 속한 주의 시작일(월요일)과 모든 날짜 정보 반환 ---
     function getWeekInfo(date = new Date()) {
         const d = new Date(date);
         const dayOfWeek = d.getDay(); 
@@ -167,6 +132,54 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // --- GPT 격려 코멘트 요청 함수 ---
+    async function fetchEncouragementComment(currentGoalScore, currentAvgScore, pointsRemaining) {
+        if (!loggedInUserEmail || !gptEncouragementCommentEl) return;
+        if(loaderReport) loaderReport.style.display = 'flex';
+
+        // 최근 기록에서 취약점 찾기 (간단 예시 - 실제로는 더 정교하게)
+        const dailyRecordsKey = `dailyRecords_${loggedInUserEmail}`;
+        const userDailyRecords = JSON.parse(localStorage.getItem(dailyRecordsKey)) || {};
+        const recordDates = Object.keys(userDailyRecords).sort((a,b) => new Date(b) - new Date(a));
+        let recentLogForPrompt = {};
+        if (recordDates.length > 0) {
+            recentLogForPrompt = userDailyRecords[recordDates[0]].log || {};
+        }
+        
+        // 사용자 기본 정보도 가져오기 (API가 userInfo를 받을 수 있도록)
+        const users = JSON.parse(localStorage.getItem('advisorGptUsers')) || [];
+        const foundUser = users.find(user => user.email === loggedInUserEmail);
+        const userInfoForPrompt = foundUser ? {
+            age: parseInt(foundUser.age) || 30,
+            gender: foundUser.gender || 'female',
+            // 필요시 키, 몸무게도 추가
+        } : {age: 30, gender: 'female'};
+
+
+        try {
+            const API_ENCOURAGEMENT_URL = 'https://gptadvisor.onrender.com/api/encouragement';
+            const response = await fetch(API_ENCOURAGEMENT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    userInfo: userInfoForPrompt, // 사용자 기본 정보
+                    goalScore: currentGoalScore, 
+                    currentAvgScore: currentAvgScore,
+                    pointsRemaining: pointsRemaining,
+                    recentLog: recentLogForPrompt // 최근 기록 전달
+                })
+            });
+            if (!response.ok) throw new Error(`격려 메시지 서버 오류: ${response.status}`);
+            const data = await response.json();
+            gptEncouragementCommentEl.textContent = data.comment || "목표를 향해 화이팅! (AI 코멘트 로드 실패)";
+        } catch (error) {
+            console.error("Error fetching encouragement comment:", error);
+            gptEncouragementCommentEl.textContent = "목표를 향해 꾸준히 나아가세요! 오늘도 좋은 하루 보내세요. (기본 메시지)";
+        } finally {
+            if(loaderReport) loaderReport.style.display = 'none';
+        }
+    }
+    
     // --- 로그인 정보 및 사용자 UI 업데이트 ---
     if (loggedInUserEmail) {
         const nickname = localStorage.getItem('userNickname') || 'User';
@@ -207,15 +220,19 @@ document.addEventListener('DOMContentLoaded', function() {
         ? 이번주기록된점수들.reduce((sum, score) => sum + score, 0) / 이번주기록된점수들.length
         : 0;
 
-    function updatePointsRemaining() {
-        const currentGoalScore = parseInt(goalInput.value) || defaultGoalScore;
-        goalInput.value = Math.max(1, Math.min(100, currentGoalScore)); 
-        const remaining = Math.max(0, (parseInt(goalInput.value)) - Math.round(averageThisWeekScore));
+    function updatePointsAndComment() {
+        const currentGoalScoreVal = parseInt(goalInput.value) || defaultGoalScore;
+        goalInput.value = Math.max(1, Math.min(100, currentGoalScoreVal));
+        const currentAvg = averageThisWeekScore; // 이미 계산된 값 사용
+        const remaining = Math.max(0, parseInt(goalInput.value) - Math.round(currentAvg));
         pointsRemainingSpan.textContent = remaining;
+        
+        fetchEncouragementComment(parseInt(goalInput.value), currentAvg, remaining); // 격려 코멘트 요청
     }
-    goalInput.addEventListener('input', updatePointsRemaining);
+    
+    goalInput.addEventListener('input', updatePointsAndComment); // input 이벤트에도 격려 코멘트 요청
     goalInput.addEventListener('change', function() { 
-        updatePointsRemaining();
+        updatePointsAndComment(); // 여기서도 격려 코멘트 요청
         if (loggedInUserEmail) {
             const userGoalScoreKey = 'userGoalScore_' + loggedInUserEmail;
             localStorage.setItem(userGoalScoreKey, goalInput.value);
@@ -359,6 +376,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+    updatePointsAndComment();
     const calculateAverageForSummary = (arr) => arr.length > 0 ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
     const avgThisWeekForSummaryDisplay = {
         sleep: calculateAverageForSummary(thisWeekAggregatedData.sleep),
