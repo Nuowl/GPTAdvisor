@@ -7,7 +7,7 @@ body {
     align-items: center;
     min-height: 100vh;
     flex-direction: column;
-    padding: 20px; /* body에도 약간의 패딩을 주어 화면 가장자리에 붙는 것 방지 */
+    padding: 0px; /* body에도 약간의 패딩을 주어 화면 가장자리에 붙는 것 방지 */
     box-sizing: border-box;
 }
 
@@ -19,9 +19,10 @@ body {
 }
 
 .logo {
-    width: 300px; /* 로고 크기 약간 줄임 (선택 사항) */
+    width: 360px; /* 로고 크기 약간 줄임 (선택 사항) */
     max-width: 90%; /* 화면 작은 경우 대비 */
-    margin-bottom: 20px; /* 간격 조정 */
+    margin-bottom: -80px;
+    margin-top: -100px; /* 간격 조정 */
     /* margin-top: -100px; /* 이 값은 화면 크기에 따라 조정 필요, 또는 제거 후 align-items:center 활용 */
 }
 
@@ -31,7 +32,7 @@ body {
     border-radius: 15px;
     padding: 30px 25px; /* 패딩 약간 줄임 */
     width: 100%; /* 부모 .container 너비에 맞춤 */
-    max-width: 400px; /* 회원가입 폼의 최대 너비 설정 */
+    max-width: 420px; /* 회원가입 폼의 최대 너비 설정 */
     box-shadow: 0 4px 8px rgba(0,0,0,0.05);
     text-align: center;
     /* margin-top: -110px; /* 로고와 겹치는 효과, 로고 마진으로 조절 */
