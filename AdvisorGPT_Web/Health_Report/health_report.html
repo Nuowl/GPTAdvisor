@@ -302,9 +302,9 @@ document.addEventListener('DOMContentLoaded', function() {
             let percentageChange = 0; // 비교를 위해 초기화
 
             if (daysRecordedThisWeek === 0) {
-                changeText = "이번 주 기록 없음";
+                changeText = `<strong class="highlight-purple">비교 불가(이번주 기록 X)</strong>`;
             } else if (daysRecordedLastWeek === 0) {
-                changeText = "지난 주 기록 없음";
+                changeText = `<strong class="highlight-purple">비교 불가(지난주 기록 X)</strong>`;
             } else {
                 if (lastAvg === currentAvg) {
                     changeText = `<strong class="highlight-blue">동일</strong>`;
@@ -316,9 +316,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         changeText = `<strong class="highlight-red">${Math.abs(percentageChange).toFixed(0)}% 감소</strong>`;
                     }
                 } else if (currentAvg > 0) { 
-                    changeText = `<strong class="highlight-green">새롭게 기록 시작!</strong>`;
+                    changeText = `<strong class="highlight-green">이번주 기록 시작</strong>`;
                 } else { 
-                     changeText = `변동 없음`; // 둘 다 0이거나 lastAvg만 0이고 currentAvg도 0일 때
+                     changeText = `<strong class="highlight-purple">비교 불가(기록 X)</strong>`; // 둘 다 0이거나 lastAvg만 0이고 currentAvg도 0일 때
                 }
             }
             
