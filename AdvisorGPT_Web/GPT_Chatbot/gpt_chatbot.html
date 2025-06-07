@@ -4,51 +4,66 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AdvisorGPT 챗봇</title>
-    <link rel="stylesheet" href="../Main_Page/style.css">
-    <link rel="stylesheet" href="style_chatbot.css">
+    <link rel="stylesheet" href="../Main_Page/style.css"> <!-- 기본 스타일 상속 -->
+    <link rel="stylesheet" href="style_chatbot.css"> <!-- 챗봇 페이지 전용 스타일 -->
     <link href="https://fonts.googleapis.com/css2?family=Mulish&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        .loader-overlay-chat { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(255, 255, 255, 0.7); display: flex; justify-content: center; align-items: center; z-index: 10000; }
-        .loader-chat { border: 8px solid #f3f3f3; border-radius: 50%; border-top: 8px solid #3498db; width: 60px; height: 60px; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    </style>
+    <!-- 로딩 스피너 CSS는 제거됨 -->
 </head>
 <body>
-    <div id="loader-overlay-chat" class="loader-overlay-chat" style="display: none;"><div class="loader-chat"></div></div>
+    <!-- 로딩 오버레이 div 제거됨 -->
     <div class="main-dashboard-container">
         <aside class="sidebar left-sidebar">
-            <div class="profile-section"> <img src="../image/user_profile_default.png" alt="User Profile" class="profile-pic" id="sidebar-profile-pic"> <p class="user-nickname" id="sidebar-username">User</p> </div>
-            <nav class="menu-section"> <ul id="sidebar-menu"> <li><a href="../Main_Page/main.html"><img src="../image/icon_my_today.png" alt="" class="menu-icon"> 나의 오늘</a></li> <li><a href="../Health_Report/health_report.html"><img src="../image/icon_health_report.png" alt="" class="menu-icon"> 건강 리포트</a></li> <li class="active"><a href="../GPT_Chatbot/gpt_chatbot.html"><img src="../image/icon_gpt_chatbot.png" alt="" class="menu-icon"> GPT Chatbot</a></li> <li><a href="../Settings_Page/settings.html"><img src="../image/icon_settings.png" alt="" class="menu-icon"> 설정</a></li> </ul> </nav>
-            <div class="logo-section"> <img src="../image/AdvisorGPT_Logo_big.png" alt="AdvisorGPT Logo" class="advisor-logo"> </div>
+            <div class="profile-section"> 
+                <img src="../image/user_profile_default.png" alt="User Profile" class="profile-pic" id="sidebar-profile-pic"> 
+                <p class="user-nickname" id="sidebar-username">User</p> 
+            </div>
+            <nav class="menu-section"> 
+                <ul id="sidebar-menu"> 
+                    <li><a href="../Main_Page/main.html"><img src="../image/icon_my_today.png" alt="" class="menu-icon"> 나의 오늘</a></li> 
+                    <li><a href="../Health_Report/health_report.html"><img src="../image/icon_health_report.png" alt="" class="menu-icon"> 건강 리포트</a></li> 
+                    <li class="active"><a href="../GPT_Chatbot/gpt_chatbot.html"><img src="../image/icon_gpt_chatbot.png" alt="" class="menu-icon"> GPT Chatbot</a></li> 
+                    <li><a href="../Settings_Page/settings.html"><img src="../image/icon_settings.png" alt="" class="menu-icon"> 설정</a></li> 
+                </ul> 
+            </nav>
+            <div class="logo-section"> 
+                <img src="../image/AdvisorGPT_Logo_big.png" alt="AdvisorGPT Logo" class="advisor-logo"> 
+            </div>
         </aside>
         <main class="main-content chatbot-page-container">
             <div class="chatbot-interface">
                 <div class="chat-display-area" id="chat-display">
-                    <div class="chat-initial-logo-container"> <img src="../image/AdvisorGPT_Logo_big.png" alt="AdvisorGPT Initial Logo" class="chat-initial-logo"> </div>
-                    <div class="chat-message gpt"> <img src="../image/chatbot_avatar.png" alt="GPT Avatar" class="chat-avatar"> <div class="message-bubble"> <p>안녕하세요! AdvisorGPT입니다. 무엇을 도와드릴까요? 건강 관련 질문이나 고민을 말씀해주세요.</p> </div> </div>
+                    <!-- 초기 로고 컨테이너 제거됨 -->
+                    <div class="chat-message gpt"> 
+                        <img src="../image/chatbot_avatar.png" alt="GPT Avatar" class="chat-avatar"> 
+                        <div class="message-bubble"> <p>안녕하세요! AdvisorGPT입니다. 무엇을 도와드릴까요? 건강 관련 질문이나 고민을 말씀해주세요.</p> </div> 
+                    </div>
                 </div>
-                <div class="chat-input-wrapper"> <div class="chat-input-area"> <textarea id="chat-message-input" placeholder="메시지를 입력하세요..." rows="1"></textarea> <button id="send-message-button" class="send-button"> <img src="../image/icon_send_message.png" alt="Send"> </button> </div> </div>
+                <div class="chat-input-wrapper"> 
+                    <div class="chat-input-area"> 
+                        <textarea id="chat-message-input" placeholder="메시지를 입력하세요..." rows="1"></textarea> 
+                        <button id="send-message-button" class="send-button"> <img src="../image/icon_send_message.png" alt="Send"> </button> 
+                    </div> 
+                </div>
             </div>
         </main>
     </div>
 <script>
+// GPT_Chatbot/gpt_chatbot.html 스크립트
 document.addEventListener('DOMContentLoaded', function() {
     const chatDisplay = document.getElementById('chat-display');
     const messageInput = document.getElementById('chat-message-input');
     const sendButton = document.getElementById('send-message-button');
-    const initialLogoContainer = document.querySelector('.chat-initial-logo-container');
-    const loaderChat = document.getElementById('loader-overlay-chat');
-    let chatHistoryLoaded = false; // 채팅 내역 로드 여부 플래그
+    // const initialLogoContainer = document.querySelector('.chat-initial-logo-container'); // 제거됨
+    // const loaderChat = document.getElementById('loader-overlay-chat'); // 제거됨
+    let chatHistoryLoaded = false; 
 
     const loggedInUserEmail = localStorage.getItem('loggedInUserEmail');
     const sidebarProfilePic = document.getElementById('sidebar-profile-pic');
     const sidebarUsername = document.getElementById('sidebar-username');
     const defaultProfilePicPath = '../image/user_profile_default.png';
 
-    // 유틸리티 함수: YYYY-MM-DD 형식으로 날짜 반환
     const formatDateForChat = (dt) => `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
 
-    // 사용자 정보 및 최신 건강 컨텍스트 로드 함수
     function getCurrentHealthContext() {
         if (!loggedInUserEmail) return {};
         const users = JSON.parse(localStorage.getItem('advisorGptUsers')) || [];
@@ -74,7 +89,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return { userInfo: userInfo, dailyLog: latestRecord ? latestRecord.log : {}, analysis: latestRecord ? latestRecord.analysis : {} };
     }
 
-    // 로그인 정보 로드 (사이드바용)
     if (loggedInUserEmail) {
         const nickname = localStorage.getItem('userNickname') || 'User';
         const userSpecificProfileKey = 'userProfileImage_' + loggedInUserEmail;
@@ -84,9 +98,10 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
         if (sidebarProfilePic) sidebarProfilePic.src = defaultProfilePicPath;
         if (sidebarUsername) sidebarUsername.textContent = 'User';
+        if (messageInput) messageInput.disabled = true; // 로그인 안 했으면 입력창 비활성화
+        if (sendButton) sendButton.disabled = true;
     }
 
-    // 사이드바 활성 메뉴 설정
     const currentChatbotPath = "gpt_chatbot.html";
     const sidebarLinks = document.querySelectorAll('#sidebar-menu li a');
     sidebarLinks.forEach(link => { link.parentElement.classList.remove('active'); });
@@ -97,34 +112,26 @@ document.addEventListener('DOMContentLoaded', function() {
                (linkHref === "../GPT_Chatbot/gpt_chatbot.html") ||
                (linkHref === "#" && iconSrc.includes('icon_gpt_chatbot'));
     });
-    if (chatbotLink) { chatbotLink.parentElement.classList.add('active'); }
-    else { document.querySelector('#sidebar-menu li a[href*="gpt_chatbot.html"]')?.parentElement.classList.add('active'); }
+    if (chatbotLink) { chatbotLink.parentElement.classList.add('active');
+    } else { document.querySelector('#sidebar-menu li a[href*="gpt_chatbot.html"]')?.parentElement.classList.add('active'); }
 
-    // 채팅 내역 로드 및 표시
     function loadChatHistory() {
         if (!loggedInUserEmail) return;
         const chatHistoryKey = `userChatHistory_${loggedInUserEmail}`;
         const history = JSON.parse(localStorage.getItem(chatHistoryKey)) || [];
         
-        // 초기 로고 및 기본 GPT 메시지를 먼저 지우고 시작 (채팅 내역이 하나라도 있으면)
-        if (history.length > 0 && initialLogoContainer) {
-            const defaultGptMessage = chatDisplay.querySelector('.chat-message.gpt:first-child'); // 기본 GPT 메시지
-            if(defaultGptMessage && defaultGptMessage.textContent.includes("안녕하세요! AdvisorGPT입니다.")){ // 더 정확한 식별 필요
-                 // 초기 로고와 기본 GPT 메시지 모두 지우기
-                while (chatDisplay.firstChild) {
-                    chatDisplay.removeChild(chatDisplay.firstChild);
-                }
+        const defaultGptMessage = chatDisplay.querySelector('.chat-message.gpt:first-child');
+        if (history.length > 0) { 
+            if(defaultGptMessage && defaultGptMessage.textContent.includes("안녕하세요! AdvisorGPT입니다.")){
+                defaultGptMessage.remove();
             }
-            initialLogoContainer.style.display = 'none';
         }
 
-
-        history.forEach(chat => appendMessageToScreen(chat.message, chat.sender, false)); // 화면에만 표시
+        history.forEach(chat => appendMessageToScreen(chat.message, chat.sender, false));
         if(chatDisplay) chatDisplay.scrollTop = chatDisplay.scrollHeight;
-        chatHistoryLoaded = true; // 로드 완료 플래그
+        chatHistoryLoaded = true;
     }
 
-    // Textarea 자동 높이 조절
     messageInput.addEventListener('input', function() {
         this.style.height = 'auto';
         let scrollHeight = this.scrollHeight;
@@ -133,21 +140,13 @@ document.addEventListener('DOMContentLoaded', function() {
         else { this.style.height = scrollHeight + 'px'; this.style.overflowY = 'hidden'; }
     });
 
-    // 메시지 전송 함수
     async function sendMessage() {
         const messageText = messageInput.value.trim();
         if (messageText === "") return;
 
-        // 첫 사용자 메시지일 경우 로고와 기본 메시지 처리
-        if (chatHistoryLoaded && initialLogoContainer.style.display !== 'none') {
-            const defaultGptMessage = chatDisplay.querySelector('.chat-message.gpt:first-child');
-             if(defaultGptMessage && defaultGptMessage.textContent.includes("안녕하세요! AdvisorGPT입니다.")){
-                // 초기 로고와 기본 GPT 메시지 모두 지우기
-                while (chatDisplay.firstChild) { // chatDisplay의 모든 자식 제거
-                    chatDisplay.removeChild(chatDisplay.firstChild);
-                }
-            }
-            initialLogoContainer.style.display = 'none';
+        const defaultGptHelloMessage = chatDisplay.querySelector('.chat-message.gpt');
+        if(defaultGptHelloMessage && defaultGptHelloMessage.textContent.includes("안녕하세요! AdvisorGPT입니다.")){
+             defaultGptHelloMessage.remove();
         }
 
         appendMessageToScreenAndSave(messageText, 'user'); 
@@ -155,9 +154,9 @@ document.addEventListener('DOMContentLoaded', function() {
         messageInput.value = ""; 
         messageInput.style.height = 'auto'; 
         messageInput.style.overflowY = 'hidden';
-        // messageInput.focus(); // 모바일에서 키보드 자동 팝업 방지 위해 주석 처리 고려
+        // messageInput.focus(); 
 
-        if(loaderChat) loaderChat.style.display = 'flex';
+        appendTypingIndicator(); 
 
         try {
             const healthContext = getCurrentHealthContext();
@@ -171,6 +170,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify(requestBody) 
             });
 
+            removeTypingIndicator(); 
+
             if (!response.ok) {
                 let errorDetail = `챗봇 서버 오류: ${response.status}`;
                 try { const errorData = await response.json(); errorDetail = errorData.reply || errorData.error || errorDetail;
@@ -183,13 +184,11 @@ document.addEventListener('DOMContentLoaded', function() {
             appendMessageToScreenAndSave(data.reply, 'gpt');
         } catch (error) {
             console.error("Chatbot API Error:", error);
+            removeTypingIndicator(); 
             appendMessageToScreenAndSave(error.message || "죄송합니다, 답변 생성 중 오류가 발생했습니다.", 'gpt', true);
-        } finally {
-            if(loaderChat) loaderChat.style.display = 'none';
         }
     }
 
-    // 화면에만 메시지 추가 (채팅 내역 로드용 또는 내부 호출용)
     function appendMessageToScreen(text, sender, isError = false) {
         const messageDiv = document.createElement('div');
         messageDiv.classList.add('chat-message', sender);
@@ -206,19 +205,15 @@ document.addEventListener('DOMContentLoaded', function() {
         p.textContent = text;
         bubbleDiv.appendChild(p); messageDiv.appendChild(bubbleDiv);
         
-        // chatDisplay에 추가하기 전에 initialLogoContainer가 아직 있다면 제거
-        if (initialLogoContainer && initialLogoContainer.parentNode === chatDisplay) {
-            // chatDisplay.removeChild(initialLogoContainer); // 로고 컨테이너만 제거
-            // 또는, 메시지들을 담을 별도의 div를 chatDisplay 내부에 만들고 거기에 추가하는 방법도 있음
-        }
-
         chatDisplay.appendChild(messageDiv);
-        chatDisplay.scrollTop = chatDisplay.scrollHeight;
+        if (chatDisplay.scrollHeight > chatDisplay.clientHeight) { // 스크롤이 필요할 때만 맨 아래로
+            chatDisplay.scrollTop = chatDisplay.scrollHeight;
+        }
     }
 
-    // 화면에 메시지 추가 및 localStorage에 저장 (실제 메시지 전송 시 사용)
     function appendMessageToScreenAndSave(text, sender, isError = false) {
-        appendMessageToScreen(text, sender, isError); // 화면에 표시
+        removeTypingIndicator(); // 새 메시지 추가 전 타이핑 인디케이터 제거
+        appendMessageToScreen(text, sender, isError);
 
         if (loggedInUserEmail) {
             const chatHistoryKey = `userChatHistory_${loggedInUserEmail}`;
@@ -235,6 +230,30 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    function appendTypingIndicator() {
+        if (document.getElementById('typing-indicator')) return;
+        const typingDiv = document.createElement('div');
+        typingDiv.classList.add('chat-message', 'gpt', 'typing-indicator');
+        typingDiv.id = 'typing-indicator';
+        const avatarImg = document.createElement('img');
+        avatarImg.src = '../image/chatbot_avatar.png';
+        avatarImg.alt = 'GPT Avatar'; avatarImg.classList.add('chat-avatar');
+        typingDiv.appendChild(avatarImg);
+        const bubbleDiv = document.createElement('div');
+        bubbleDiv.classList.add('message-bubble');
+        const p = document.createElement('p');
+        p.innerHTML = '<span>.</span><span>.</span><span>.</span>';
+        bubbleDiv.appendChild(p); typingDiv.appendChild(bubbleDiv);
+        chatDisplay.appendChild(typingDiv);
+        chatDisplay.scrollTop = chatDisplay.scrollHeight;
+    }
+    function removeTypingIndicator() {
+        const typingIndicator = document.getElementById('typing-indicator');
+        if (typingIndicator) {
+            typingIndicator.remove();
+        }
+    }
+
     if(sendButton) sendButton.addEventListener('click', sendMessage);
     if(messageInput) {
         messageInput.addEventListener('keydown', function(event) {
@@ -245,15 +264,15 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // --- 초기화 ---
-    loadChatHistory(); // 페이지 로드 시 채팅 내역 불러오기
-    if(chatDisplay && !chatHistoryLoaded && initialLogoContainer) { 
-        // 채팅 내역이 없고, 로고가 아직 있다면 그대로 둠 (초기 화면 유지)
-    } else if (chatDisplay && chatHistoryLoaded && initialLogoContainer) {
-        // 채팅 내역 로드 후에도 initialLogoContainer가 남아있다면 (예: 히스토리 비어있음)
-        // 이 경우, 첫 메시지 전송 시 sendMessage 함수에서 처리
+    loadChatHistory();
+    if(chatDisplay && !chatHistoryLoaded && document.querySelector('.chat-initial-logo-container')) {
+        // 초기 로고 컨테이너가 있고, 채팅 내역이 로드되지 않았다면 (즉, 첫 방문 또는 내역 없음)
+        // initialLogoContainer.style.display = 'flex'; // 로고 보이도록 (이미 HTML에서 보임)
+    } else if (chatDisplay && document.querySelector('.chat-initial-logo-container')) {
+        // 채팅 내역이 로드되었거나 (비었더라도), 로고 컨테이너가 있다면 숨김
+        // 단, loadChatHistory에서 이미 처리함.
     }
-    if(chatDisplay) chatDisplay.scrollTop = chatDisplay.scrollHeight; // 초기 스크롤
+    if(chatDisplay) chatDisplay.scrollTop = chatDisplay.scrollHeight;
 });
 </script>
 </body>
