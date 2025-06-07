@@ -52,17 +52,23 @@
         document.getElementById('register-form').addEventListener('submit', function(e) {
             e.preventDefault();
 
-            // 입력 필드에 id 추가 필요 (HTML에서)
-            // <input type="email" id="email" ... />
-            // <input type="text" id="nickname" ... />
-            // <input type="number" id="height" ... />
-            // <input type="number" id="weight" ... />
             const email = document.getElementById('email').value;
             const nickname = document.getElementById('nickname').value;
-            const password = document.getElementById('password').value; // id="password"는 이미 존재
-            const confirmPassword = document.getElementById('confirm-password').value; // id="confirm-password"는 이미 존재
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            const age = document.getElementById('age').value; // 나이 값 가져오기
             const height = document.getElementById('height').value;
             const weight = document.getElementById('weight').value;
+
+            // 간단한 유효성 검사 추가
+            if (!email || !nickname || !password || !confirmPassword || !age || !height || !weight) {
+                alert('모든 필수 정보를 입력해주세요.');
+                return;
+            }
+            if (parseInt(age) <= 0 || parseInt(height) <= 0 || parseInt(weight) <= 0) {
+                alert('나이, 키, 몸무게는 0보다 큰 값을 입력해야 합니다.');
+                return;
+            }
 
             if (password !== confirmPassword) {
                 alert('비밀번호가 일치하지 않습니다.');
@@ -79,18 +85,27 @@
             const newUser = {
                 email: email,
                 nickname: nickname,
-                password: password, // 실제 환경에서는 해싱 필요!
+                password: password, // 보안 경고: 실제 서비스에서는 해싱 필수!
+                age: age,           // !!!! 나이 정보 추가 !!!!
                 height: height,
                 weight: weight,
-                gender: selectedGender
+                gender: selectedGender,
+                profileImage: defaultProfilePicPath // 가입 시 기본 프로필 이미지 경로 저장
             };
 
             users.push(newUser);
             localStorage.setItem('advisorGptUsers', JSON.stringify(users));
-            if (email) { // 이메일이 정상적으로 있을 때만
+
+            // 사용자별 목표 점수 기본값 설정 (선택 사항)
+            if (email) {
                 const userGoalScoreKey = 'userGoalScore_' + email;
-                localStorage.setItem(userGoalScoreKey, '70'); // 기본 목표 점수 70으로 설정
+                localStorage.setItem(userGoalScoreKey, '70'); // 기본 목표 점수
             }
+            // 사용자별 프로필 이미지 기본값 설정 (개별 키로, 로그인 시 사용 위함)
+            if (email) {
+                localStorage.setItem('userProfileImage_' + email, defaultProfilePicPath);
+            }
+
 
             alert('계정이 성공적으로 생성되었습니다. 로그인 페이지로 이동합니다.');
             window.location.href = '../Advisor_login/index.html';
