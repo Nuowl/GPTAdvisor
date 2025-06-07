@@ -47,22 +47,10 @@
             <section class="daily-feedback">
                 <h2><img src="../image/icon_daily_feedback.png" alt="" class="score-icon-feedback"> 오늘의 요약 & 피드백</h2>
                 <div class="feedback-grid">
-                    <div class="feedback-box" id="feedback-physical-analysis-box"> <!-- ID 변경 -->
-                        <h3><img src="../image/icon_physical.png" alt="" class="feedback-icon"> 신체적 분석</h3>
-                        <p id="physical-analysis-text">오늘의 기록을 입력하시면 AI가 분석을 제공합니다.</p>
-                    </div>
-                    <div class="feedback-box" id="feedback-physical-tips-box"> <!-- ID 변경 -->
-                        <h3><img src="../image/icon_tip.png" alt="" class="feedback-icon"> 피드백 & 팁 (신체)</h3> <!-- 제목 수정 -->
-                        <p id="physical-tips-text">AI의 피드백과 팁이 여기에 표시됩니다.</p>
-                    </div>
-                    <div class="feedback-box" id="feedback-mental-analysis-box"> <!-- ID 변경 -->
-                        <h3><img src="../image/icon_mental.png" alt="" class="feedback-icon"> 정신적 분석</h3>
-                        <p id="mental-analysis-text">AI의 정신적 분석이 여기에 표시됩니다.</p>
-                    </div>
-                    <div class="feedback-box" id="feedback-mental-tips-box"> <!-- ID 변경 -->
-                        <h3><img src="../image/icon_tip.png" alt="" class="feedback-icon"> 피드백 & 팁 (정신)</h3> <!-- 제목 수정 -->
-                        <p id="mental-tips-text">AI의 추가적인 피드백과 팁이 여기에 표시됩니다.</p>
-                    </div>
+                    <div class="feedback-box" id="feedback-physical-analysis-box"><h3><img src="../image/icon_physical.png" alt="" class="feedback-icon"> 신체적 분석</h3><p id="physical-analysis-text">오늘의 기록을 입력하시면 AI가 분석을 제공합니다.</p></div>
+                    <div class="feedback-box" id="feedback-physical-tips-box"><h3><img src="../image/icon_tip.png" alt="" class="feedback-icon"> 피드백 & 팁 (신체)</h3><p id="physical-tips-text">AI의 피드백과 팁이 여기에 표시됩니다.</p></div>
+                    <div class="feedback-box" id="feedback-mental-analysis-box"><h3><img src="../image/icon_mental.png" alt="" class="feedback-icon"> 정신적 분석</h3><p id="mental-analysis-text">AI의 정신적 분석이 여기에 표시됩니다.</p></div>
+                    <div class="feedback-box" id="feedback-mental-tips-box"><h3><img src="../image/icon_tip.png" alt="" class="feedback-icon"> 피드백 & 팁 (정신)</h3><p id="mental-tips-text">AI의 추가적인 피드백과 팁이 여기에 표시됩니다.</p></div>
                 </div>
             </section>
         </main>
@@ -80,7 +68,6 @@
         </aside>
     </div>
 <script>
-// Main_Page/main.html 스크립트
 document.addEventListener('DOMContentLoaded', function() {
     const loader = document.getElementById('loader-overlay');
     const loggedInUserEmail = localStorage.getItem('loggedInUserEmail');
@@ -95,18 +82,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const year = today.getFullYear();
     const month = String(today.getMonth() + 1).padStart(2, '0');
     const day = String(today.getDate()).padStart(2, '0');
-    const formattedDateKey = `${year}-${month}-${day}`;
+    const formattedDateKey = `${year}-${month}-${day}`; // YYYY-MM-DD
 
     const form = document.getElementById('daily-record-form');
     const submitButton = form ? form.querySelector('.submit-button') : null;
 
+    // --- 로그인 정보 및 사용자 기본 정보 로드 ---
     if (loggedInUserEmail) {
+        // ... (이전과 동일한 닉네임, 프로필 사진, currentUserInfo 로드 로직)
         const nickname = localStorage.getItem('userNickname') || 'User';
         const profilePic = localStorage.getItem('userProfileImage') || defaultProfilePicPath;
         if (sidebarProfilePic) { sidebarProfilePic.src = profilePic; sidebarProfilePic.alt = nickname + " 프로필"; }
         if (sidebarUsername) { sidebarUsername.textContent = nickname; }
         if (mainUsernamePlaceholder) { mainUsernamePlaceholder.textContent = nickname; }
-
         const users = JSON.parse(localStorage.getItem('advisorGptUsers')) || [];
         const foundUser = users.find(user => user.email === loggedInUserEmail);
         if (foundUser) {
@@ -118,26 +106,60 @@ document.addEventListener('DOMContentLoaded', function() {
             };
         }
     } else {
+        // 비로그인 시 UI 처리 및 버튼 비활성화
         if (sidebarProfilePic) sidebarProfilePic.src = defaultProfilePicPath;
         if (sidebarUsername) sidebarUsername.textContent = 'User';
         if (mainUsernamePlaceholder) mainUsernamePlaceholder.textContent = 'User';
-        if (submitButton) { submitButton.disabled = true; submitButton.textContent = "로그인 필요"; }
+        if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.textContent = "로그인 필요";
+        }
     }
 
+    // --- 날짜 표시 및 문자 카운터 ---
     if (dateElement) dateElement.textContent = `${year} / ${month} / ${day}`;
     const moodStressText = document.getElementById('mood-stress-text');
     const charCounter = document.getElementById('char-counter');
-    if (moodStressText && charCounter) {
-        moodStressText.addEventListener('input', () => {
-            charCounter.textContent = `${moodStressText.value.length}/500 자`;
-        });
+    if (moodStressText && charCounter) { /* ... (이전과 동일) ... */ }
+
+    // --- 기록 완료 버튼 상태 관리 함수 ---
+    function setSubmitButtonState(enabled, message = "기록 완료") {
+        if (submitButton) {
+            submitButton.disabled = !enabled;
+            submitButton.textContent = message;
+        }
     }
 
+    // --- 오늘 기록 여부 확인 및 버튼 초기 상태 설정 ---
+    function checkTodaysRecordAndSetButton() {
+        if (!loggedInUserEmail) {
+            setSubmitButtonState(false, "로그인 필요");
+            return;
+        }
+        const dailyRecordsKey = `dailyRecords_${loggedInUserEmail}`;
+        const userDailyRecords = JSON.parse(localStorage.getItem(dailyRecordsKey)) || {};
+        const todaysData = userDailyRecords[formattedDateKey];
+
+        if (todaysData && todaysData.log && todaysData.analysis) {
+            // 오늘 기록이 이미 있으면 UI 업데이트 및 버튼 비활성화
+            updateDashboardUI(todaysData.analysis, todaysData.log);
+            setSubmitButtonState(false, "오늘 기록 완료");
+            console.log("오늘의 저장된 기록을 불러왔습니다.");
+        } else {
+            // 오늘 기록이 없으면 대시보드 리셋 및 버튼 활성화
+            resetDashboardToDefault();
+            setSubmitButtonState(true, "기록 완료");
+        }
+    }
+    
+    // --- "기록 완료" 폼 제출 처리 ---
     if (form && submitButton) {
         form.addEventListener('submit', async function(event) {
             event.preventDefault();
-            if (!loggedInUserEmail) { alert("로그인이 필요합니다."); return; }
-            if (submitButton.disabled) { alert("오늘은 이미 기록을 완료했거나 기록할 수 없는 상태입니다."); return; }
+            if (!loggedInUserEmail || submitButton.disabled) {
+                alert(submitButton.disabled ? "오늘은 이미 기록을 완료했습니다." : "로그인이 필요합니다.");
+                return;
+            }
             if(loader) loader.style.display = 'flex';
 
             const dailyLogData = {
@@ -161,19 +183,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 const dailyRecordsKey = `dailyRecords_${loggedInUserEmail}`;
                 let userDailyRecords = JSON.parse(localStorage.getItem(dailyRecordsKey)) || {};
-                userDailyRecords[formattedDateKey] = { 
-                    log: dailyLogData, 
-                    analysis: { // AI 분석 결과 전체를 저장
-                        todayHealthScore: result.todayHealthScore,
-                        scoreReason: result.scoreReason,
-                        aiMentalAnalysis: result.aiMentalAnalysis,
-                        aiPhysicalAnalysis: result.aiPhysicalAnalysis
-                    }
-                };
+                userDailyRecords[formattedDateKey] = { log: dailyLogData, analysis: result };
                 localStorage.setItem(dailyRecordsKey, JSON.stringify(userDailyRecords));
                 
+                // !!!! 마지막 기록 날짜 저장 !!!!
+                localStorage.setItem(`lastRecordDate_${loggedInUserEmail}`, formattedDateKey);
+                
                 alert('기록이 완료되었고, AI 분석 결과가 반영되었습니다!');
-                disableSubmitButtonForToday();
+                setSubmitButtonState(false, "오늘 기록 완료"); // 버튼 비활성화
 
             } catch (error) { console.error('API 호출 중 오류 발생:', error); alert(`데이터 처리 중 오류가 발생했습니다: ${error.message}\n브라우저 콘솔(F12)을 확인해주세요.`); resetDashboardToDefault();
             } finally { if(loader) loader.style.display = 'none'; }
@@ -203,9 +220,28 @@ document.addEventListener('DOMContentLoaded', function() {
         if(document.getElementById('mental-tips-text')) document.getElementById('mental-tips-text').textContent = apiResult.aiMentalAnalysis.feedback || "팁 없음";
     }
 
-    function resetDashboardToDefault() { /* ... (이전과 동일) ... */ }
-    function disableSubmitButtonForToday() { /* ... (이전과 동일) ... */ }
-    function checkAndSetSubmitButtonState() { /* ... (이전과 동일) ... */ }
+    function resetDashboardToDefault() {
+        if(document.getElementById('health-score-value')) document.getElementById('health-score-value').textContent = '--';
+        if(document.getElementById('display-sleep-hours')) document.getElementById('display-sleep-hours').textContent = '--';
+        if(document.getElementById('display-sleep-mins')) document.getElementById('display-sleep-mins').textContent = '--';
+        if(document.getElementById('display-meal-kcal')) document.getElementById('display-meal-kcal').textContent = '--';
+        if(document.getElementById('display-exercise-hours')) document.getElementById('display-exercise-hours').textContent = '--';
+        if(document.getElementById('display-exercise-mins')) document.getElementById('display-exercise-mins').textContent = '--';
+        if(document.getElementById('stress-score-value')) document.getElementById('stress-score-value').textContent = '--';
+        if(document.getElementById('physical-analysis-text')) document.getElementById('physical-analysis-text').textContent = "오늘의 기록을 입력하시면 AI가 분석을 제공합니다.";
+        if(document.getElementById('physical-tips-text')) document.getElementById('physical-tips-text').textContent = "AI의 피드백과 팁이 여기에 표시됩니다.";
+        if(document.getElementById('mental-analysis-text')) document.getElementById('mental-analysis-text').textContent = "AI의 정신적 분석이 여기에 표시됩니다.";
+        if(document.getElementById('mental-tips-text')) document.getElementById('mental-tips-text').textContent = "AI의 추가적인 피드백과 팁이 여기에 표시됩니다.";
+    }
+    function disableSubmitButtonForToday() {
+        if (submitButton) { // submitButton 변수가 스크립트 상단에 정의되어 있어야 함
+            submitButton.disabled = true;
+            submitButton.textContent = "오늘 기록 완료";
+            if(loggedInUserEmail) { // loggedInUserEmail 변수가 스크립트 상단에 정의되어 있어야 함
+                localStorage.setItem(`lastRecordDate_${loggedInUserEmail}`, formattedDateKey); // formattedDateKey도 접근 가능해야 함
+            }
+        }
+    }
 
     function loadTodaysRecordAndSetButton() {
         if (loggedInUserEmail) {
