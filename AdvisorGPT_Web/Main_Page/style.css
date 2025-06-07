@@ -56,8 +56,7 @@ html, body {
 
 /* Center Content */
 .main-content {
-    flex-grow: 0;
-    flex-shrink: 0;/* !!!! 중요: 사용 가능한 나머지 너비를 모두 차지 !!!! */
+    flex-grow: 1;/* !!!! 중요: 사용 가능한 나머지 너비를 모두 차지 !!!! */
     min-width: 0;   /* !!!! 중요: 내부 콘텐츠가 부모를 초과하여 늘어나는 것을 방지 !!!! */
     /* max-width: 900px; /* !!!! 이 줄을 삭제하거나 주석 처리 !!!! */
     /* margin: 0 auto;   /* !!!! max-width가 없으므로 이 줄도 삭제하거나 주석 처리 !!!! */
