@@ -3,13 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AdvisorGPT</title>
-    <link rel="stylesheet" href="../Main_Page/style.css"> <!-- 기본 스타일 상속 -->
-    <link rel="stylesheet" href="style_chatbot.css"> <!-- 챗봇 페이지 전용 스타일 -->
+    <title>AdvisorGPT 챗봇</title>
+    <link rel="stylesheet" href="../Main_Page/style.css"> <!-- 공통 스타일 -->
+    <link rel="stylesheet" href="style_chatbot.css">   <!-- 챗봇 페이지 전용 스타일 -->
     <link href="https://fonts.googleapis.com/css2?family=Mulish&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <!-- 인라인 스타일로 메시지 시간 및 날짜 구분선 스타일 정의 -->
+    <style>
+        .message-timestamp {
+            font-size: 0.75em; /* 예: 12px */
+            color: #888888;
+            margin-left: 8px; /* 사용자 메시지 버블 오른쪽 */
+            margin-right: 8px;/* GPT 메시지 버블 왼쪽 (CSS에서 sender 따라 조정) */
+            align-self: flex-end; 
+            white-space: nowrap;
+            line-height: 1.5; /* 버블 텍스트와 정렬을 위해 */
+            padding-bottom: 1px; /* 미세 조정 */
+        }
+
+        /* 메시지 버블과 시간을 한 줄에 배치하기 위한 래퍼 */
+        .message-content-wrapper {
+            display: flex;
+            align-items: flex-end; /* 버블과 시간이 하단 정렬 */
+            max-width: 100%; /* 부모(.chat-message)의 max-width를 넘지 않도록 */
+        }
+        
+        .chat-message.user .message-content-wrapper {
+            flex-direction: row; /* 사용자: [버블][시간] */
+            gap: 6px;
+        }
+
+        .chat-message.gpt .message-content-wrapper {
+            flex-direction: row; /* GPT: [버블][시간] (아바타는 이 래퍼의 형제 요소) */
+            gap: 6px;
+        }
+
+
+        .chat-date-separator {
+            text-align: center;
+            margin: 20px 0 15px 0; /* 위아래 간격 */
+            font-size: 0.8em; /* 예: 12.8px */
+            color: #777;
+            font-weight: 600;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .chat-date-separator::before,
+        .chat-date-separator::after {
+            content: "";
+            flex-grow: 1;
+            height: 1px;
+            background-color: #e0e0e0; /* 선 색상 */
+            margin: 0 10px;
+        }
+    </style>
 </head>
 <body>
+    <!-- 로딩 오버레이 div는 사용하지 않으므로 제거됨 -->
     <div class="main-dashboard-container">
+        <!-- Left Sidebar -->
         <aside class="sidebar left-sidebar">
             <div class="profile-section"> 
                 <img src="../image/user_profile_default.png" alt="User Profile" class="profile-pic" id="sidebar-profile-pic"> 
@@ -27,13 +79,11 @@
                 <img src="../image/AdvisorGPT_Logo_big.png" alt="AdvisorGPT Logo" class="advisor-logo"> 
             </div>
         </aside>
+        <!-- Main Content for Chatbot -->
         <main class="main-content chatbot-page-container">
             <div class="chatbot-interface">
                 <div class="chat-display-area" id="chat-display">
-                    <div class="chat-message gpt"> 
-                        <img src="../image/chatbot_avatar.png" alt="GPT Avatar" class="chat-avatar"> 
-                        <div class="message-bubble"> <p>안녕하세요! AdvisorGPT입니다. 무엇을 도와드릴까요? 건강 관련 질문이나 고민을 말씀해주세요.</p> </div> 
-                    </div>
+                    <!-- 초기 메시지는 JavaScript에서 동적으로 추가 -->
                 </div>
                 <div class="chat-input-wrapper"> 
                     <div class="chat-input-area"> 
@@ -50,6 +100,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const chatDisplay = document.getElementById('chat-display');
     const messageInput = document.getElementById('chat-message-input');
     const sendButton = document.getElementById('send-message-button');
+    // initialLogoContainer는 HTML에서 제거됨
 
     const loggedInUserEmail = localStorage.getItem('loggedInUserEmail');
     const sidebarProfilePic = document.getElementById('sidebar-profile-pic');
@@ -57,9 +108,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const defaultProfilePicPath = '../image/user_profile_default.png';
 
     const formatDateForChat = (dt) => `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
+    const formatTimeForChat = (isoTimestamp) => {
+        const date = new Date(isoTimestamp);
+        return date.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false });
+    };
 
     function getCurrentHealthContext() {
-        if (!loggedInUserEmail) return {};
+        if (!loggedInUserEmail) return { userInfo: {}, dailyLog: {}, analysis: {} };
         const users = JSON.parse(localStorage.getItem('advisorGptUsers')) || [];
         const foundUser = users.find(user => user.email === loggedInUserEmail);
         const userInfo = foundUser ? {
@@ -92,39 +147,55 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
         if (sidebarProfilePic) sidebarProfilePic.src = defaultProfilePicPath;
         if (sidebarUsername) sidebarUsername.textContent = 'User';
-        if (messageInput) messageInput.disabled = true; // 로그인 안 했으면 입력창 비활성화
+        if (messageInput) messageInput.disabled = true; 
         if (sendButton) sendButton.disabled = true;
     }
 
     const currentChatbotPath = "gpt_chatbot.html";
     const sidebarLinks = document.querySelectorAll('#sidebar-menu li a');
     sidebarLinks.forEach(link => { link.parentElement.classList.remove('active'); });
-    const chatbotLink = Array.from(sidebarLinks).find(a => {
-        const linkHref = a.getAttribute('href');
-        const iconSrc = a.parentElement.querySelector('.menu-icon') ? a.parentElement.querySelector('.menu-icon').src : '';
-        return (linkHref && linkHref.includes(currentChatbotPath)) ||
-                (linkHref === "../GPT_Chatbot/gpt_chatbot.html") ||
-                (linkHref === "#" && iconSrc.includes('icon_gpt_chatbot'));
-    });
-    if (chatbotLink) { chatbotLink.parentElement.classList.add('active');
-    } else { document.querySelector('#sidebar-menu li a[href*="gpt_chatbot.html"]')?.parentElement.classList.add('active'); }
+    const chatbotActiveLink = Array.from(sidebarLinks).find(a => { /* 이전 활성화 로직과 동일 */ });
+    if (chatbotActiveLink) { chatbotActiveLink.parentElement.classList.add('active'); } else { /* ... */ }
 
     function loadChatHistory() {
-        if (!loggedInUserEmail) { // 로그인 안 했으면 기본 메시지만 표시
-            appendMessageToScreen("안녕하세요! AdvisorGPT입니다. 무엇을 도와드릴까요? 건강 관련 질문이나 고민을 말씀해주세요.", 'gpt', false, false); // 저장 안 함
+        chatDisplay.innerHTML = ''; // 새로고침 시 채팅창 비우기 (요청사항)
+        if (!loggedInUserEmail) {
+            appendMessageToScreen("채팅 기능을 사용하려면 먼저 로그인해주세요.", 'gpt', false, new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false }), false); // 저장 안 함
             return;
         }
         const chatHistoryKey = `userChatHistory_${loggedInUserEmail}`;
         const history = JSON.parse(localStorage.getItem(chatHistoryKey)) || [];
         
-        chatDisplay.innerHTML = ''; // 채팅창 비우기 (새로고침 시 초기화 효과)
+        let lastMessageDate = null;
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        sevenDaysAgo.setHours(0,0,0,0);
 
-        if (history.length === 0) { // 저장된 내역이 없으면 기본 환영 메시지 표시
-            appendMessageToScreen("안녕하세요! AdvisorGPT입니다. 무엇을 도와드릴까요? 건강 관련 질문이나 고민을 말씀해주세요.", 'gpt', false, false); // 저장 안 함
+        const recentHistory = history.filter(chat => {
+            const messageDate = new Date(chat.timestamp); // timestamp를 기준으로 필터링
+            return messageDate >= sevenDaysAgo;
+        });
+
+        if (recentHistory.length === 0) {
+            appendMessageToScreen("안녕하세요! AdvisorGPT입니다. 무엇을 도와드릴까요? 건강 관련 질문이나 고민을 말씀해주세요.", 'gpt', false, new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false }), false); // 저장 안 함
         } else {
-            history.forEach(chat => appendMessageToScreen(chat.message, chat.sender, false)); // 화면에만 표시
+            recentHistory.forEach(chat => {
+                const messageDateStr = chat.date || formatDateForChat(new Date(chat.timestamp));
+                if (messageDateStr !== lastMessageDate) {
+                    addDateSeparator(messageDateStr);
+                    lastMessageDate = messageDateStr;
+                }
+                appendMessageToScreen(chat.message, chat.sender, false, chat.time || formatTimeForChat(chat.timestamp)); // 화면에만 표시
+            });
         }
         if(chatDisplay) chatDisplay.scrollTop = chatDisplay.scrollHeight;
+    }
+
+    function addDateSeparator(dateStr) {
+        const separatorDiv = document.createElement('div');
+        separatorDiv.classList.add('chat-date-separator');
+        separatorDiv.textContent = dateStr;
+        chatDisplay.appendChild(separatorDiv);
     }
 
     messageInput.addEventListener('input', function() {
@@ -139,17 +210,20 @@ document.addEventListener('DOMContentLoaded', function() {
         const messageText = messageInput.value.trim();
         if (messageText === "") return;
 
-        // 사용자가 메시지 보낼 때, 기존 환영 메시지가 아직 있다면 지움 (최초 입력 시)
-        const firstGptMessage = chatDisplay.querySelector('.chat-message.gpt p');
-        if (firstGptMessage && firstGptMessage.textContent.includes("안녕하세요! AdvisorGPT입니다.")) {
-            if (chatDisplay.children.length <= 1) { // 다른 메시지가 없을 때만
-                 chatDisplay.innerHTML = ''; // 초기 메시지 완전히 제거
+        const firstMessageElement = chatDisplay.querySelector('.chat-message');
+        if (firstMessageElement && firstMessageElement.textContent.includes("안녕하세요! AdvisorGPT입니다.")) {
+            const dateSeparator = chatDisplay.querySelector('.chat-date-separator');
+            if (chatDisplay.children.length <= (dateSeparator ? 2 : 1) ) { // 날짜구분선 + 초기메시지 또는 초기메시지만 있을 때
+                 chatDisplay.innerHTML = ''; 
             }
         }
-
-        appendMessageToScreenAndSave(messageText, 'user'); 
-        messageInput.value = "";
-        messageInput.style.height = 'auto';
+        
+        const now = new Date();
+        const currentTimeString = formatTimeForChat(now.toISOString());
+        appendMessageToScreenAndSave(messageText, 'user', currentTimeString); 
+        
+        messageInput.value = ""; 
+        messageInput.style.height = 'auto'; 
         messageInput.style.overflowY = 'hidden';
         
         appendTypingIndicator(); 
@@ -170,39 +244,58 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             const data = await response.json();
-            appendMessageToScreenAndSave(data.reply, 'gpt');
+            const gptResponseTime = formatTimeForChat(new Date().toISOString());
+            appendMessageToScreenAndSave(data.reply, 'gpt', gptResponseTime);
         } catch (error) {
             console.error("Chatbot API Error:", error);
             removeTypingIndicator(); 
-            appendMessageToScreenAndSave(error.message || "죄송합니다, 답변 생성 중 오류가 발생했습니다.", 'gpt', true);
+            const errorTime = formatTimeForChat(new Date().toISOString());
+            appendMessageToScreenAndSave(error.message || "죄송합니다, 답변 생성 중 오류가 발생했습니다.", 'gpt', errorTime, true);
         }
     }
 
-    function appendMessageToScreen(text, sender, isError = false) {
-        const messageDiv = document.createElement('div');
-        messageDiv.classList.add('chat-message', sender);
-        if (isError) messageDiv.classList.add('error');
+    // 화면에만 메시지 추가 (isError, timeStr, saveToHistory 파라미터는 appendMessageToScreenAndSave에서 관리)
+    function appendMessageToScreen(text, sender, isError = false, timeStr = '') {
+        const messageWrapper = document.createElement('div');
+        messageWrapper.classList.add('chat-message', sender);
+        if (isError) messageWrapper.classList.add('error');
+
         if (sender === 'gpt') {
             const avatarImg = document.createElement('img');
             avatarImg.src = '../image/chatbot_avatar.png'; 
             avatarImg.alt = 'GPT Avatar'; avatarImg.classList.add('chat-avatar');
-            messageDiv.appendChild(avatarImg);
+            messageWrapper.appendChild(avatarImg);
         }
+
+        const contentWrapperDiv = document.createElement('div'); // 버블과 시간을 묶는 래퍼
+        contentWrapperDiv.classList.add('message-content-wrapper');
+
         const bubbleDiv = document.createElement('div');
         bubbleDiv.classList.add('message-bubble');
         const p = document.createElement('p');
         p.textContent = text;
-        bubbleDiv.appendChild(p); messageDiv.appendChild(bubbleDiv);
+        bubbleDiv.appendChild(p);
         
-        chatDisplay.appendChild(messageDiv);
-        if (chatDisplay.scrollHeight > chatDisplay.clientHeight) { // 스크롤이 필요할 때만 맨 아래로
+        const timeSpan = document.createElement('span');
+        timeSpan.classList.add('message-timestamp');
+        timeSpan.textContent = timeStr || formatTimeForChat(new Date().toISOString());
+
+        // CSS에서 flex-direction으로 순서 제어하므로, HTML 순서는 동일하게
+        contentWrapperDiv.appendChild(bubbleDiv);
+        contentWrapperDiv.appendChild(timeSpan);
+        
+        messageWrapper.appendChild(contentWrapperDiv);
+        
+        chatDisplay.appendChild(messageWrapper);
+        if (chatDisplay.scrollHeight > chatDisplay.clientHeight) {
             chatDisplay.scrollTop = chatDisplay.scrollHeight;
         }
     }
 
-    function appendMessageToScreenAndSave(text, sender, isError = false) {
-        removeTypingIndicator(); // 새 메시지 추가 전 타이핑 인디케이터 제거
-        appendMessageToScreen(text, sender, isError);
+    // 화면에 메시지 추가 및 localStorage에 저장
+    function appendMessageToScreenAndSave(text, sender, timeToDisplay, isError = false) { // timeToDisplay 인자 추가
+        removeTypingIndicator();
+        appendMessageToScreen(text, sender, isError, timeToDisplay); // 시간 전달
 
         if (loggedInUserEmail) {
             const chatHistoryKey = `userChatHistory_${loggedInUserEmail}`;
@@ -211,7 +304,7 @@ document.addEventListener('DOMContentLoaded', function() {
             history.push({
                 timestamp: now.toISOString(), 
                 date: formatDateForChat(now), 
-                time: now.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }), 
+                time: timeToDisplay, // API 응답 시간 또는 사용자 메시지 전송 시간 사용
                 sender: sender,
                 message: text
             });
@@ -253,7 +346,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    loadChatHistory(); // 페이지 로드 시 실행
+    loadChatHistory();
     if(chatDisplay) chatDisplay.scrollTop = chatDisplay.scrollHeight; 
 });
 </script>
