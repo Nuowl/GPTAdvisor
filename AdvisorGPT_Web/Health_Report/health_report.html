@@ -3,33 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AdvisorGPT</title>
-    <link rel="stylesheet" href="../Main_Page/style.css">
-    <link rel="stylesheet" href="style_report.css">
+    <title>AdvisorGPT 건강 리포트</title>
+    <link rel="stylesheet" href="../Main_Page/style.css"> <!-- 공통 스타일 -->
+    <link rel="stylesheet" href="style_report.css">   <!-- 이 페이지 전용 스타일 -->
     <link href="https://fonts.googleapis.com/css2?family=Mulish&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- 로딩 스피너 CSS 추가 -->
+    <!-- 로딩 스피너 CSS -->
     <style>
-        .loader-overlay-report { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(255, 255, 255, 0.7); display: flex; justify-content: center; align-items: center; z-index: 10000; }
-        .loader-report { border: 8px solid #f3f3f3; border-radius: 50%; border-top: 8px solid #3498db; width: 60px; height: 60px; animation: spin 1s linear infinite; }
+        .loader-overlay-report { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(255, 255, 255, 0.75); display: flex; justify-content: center; align-items: center; z-index: 10000; }
+        .loader-report { border: 8px solid #f3f3f3; border-radius: 50%; border-top: 8px solid #3498db; width: 50px; height: 50px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
     <div id="loader-overlay-report" class="loader-overlay-report" style="display: none;"><div class="loader-report"></div></div>
+
     <div class="main-dashboard-container">
-        <!-- Left Sidebar (이전과 동일) -->
-        <aside class="sidebar left-sidebar"> <div class="profile-section"> <img src="../image/user_profile_default.png" alt="User Profile" class="profile-pic" id="sidebar-profile-pic"> <p class="user-nickname" id="sidebar-username">User</p> </div> <nav class="menu-section"> <ul id="sidebar-menu"> <li><a href="../Main_Page/main.html"><img src="../image/icon_my_today.png" alt="" class="menu-icon"> 나의 오늘</a></li> <li class="active"><a href="../Health_Report/health_report.html"><img src="../image/icon_health_report.png" alt="" class="menu-icon"> 건강 리포트</a></li> <li><a href="../GPT_Chatbot/gpt_chatbot.html"><img src="../image/icon_gpt_chatbot.png" alt="" class="menu-icon"> GPT Chatbot</a></li> <li><a href="../Settings_Page/settings.html"><img src="../image/icon_settings.png" alt="" class="menu-icon"> 설정</a></li> </ul> </nav> <div class="logo-section"> <img src="../image/AdvisorGPT_Logo_big.png" alt="AdvisorGPT Logo" class="advisor-logo"> </div> </aside>
+        <!-- Left Sidebar -->
+        <aside class="sidebar left-sidebar">
+            <div class="profile-section">
+                <img src="../image/user_profile_default.png" alt="User Profile" class="profile-pic" id="sidebar-profile-pic">
+                <p class="user-nickname" id="sidebar-username">User</p>
+            </div>
+            <nav class="menu-section">
+                <ul id="sidebar-menu">
+                    <li><a href="../Main_Page/main.html"><img src="../image/icon_my_today.png" alt="" class="menu-icon"> 나의 오늘</a></li>
+                    <li class="active"><a href="../Health_Report/health_report.html"><img src="../image/icon_health_report.png" alt="" class="menu-icon"> 건강 리포트</a></li>
+                    <li><a href="../GPT_Chatbot/gpt_chatbot.html"><img src="../image/icon_gpt_chatbot.png" alt="" class="menu-icon"> GPT Chatbot</a></li>
+                    <li><a href="../Settings_Page/settings.html"><img src="../image/icon_settings.png" alt="" class="menu-icon"> 설정</a></li>
+                </ul>
+            </nav>
+            <div class="logo-section">  
+                <img src="../image/AdvisorGPT_Logo_big.png" alt="AdvisorGPT Logo" class="advisor-logo">
+            </div>
+        </aside>
+
+        <!-- Main Content for Health Report -->
         <main class="main-content report-content">
             <section class="goal-status-section">
-                <p class="goal-text"> 나의 목표 점수 <input type="number" id="goal-score-input" min="1" max="100">점까지 <span id="points-remaining">XX</span>점 남았습니다. </p>
-                <p class="gpt-comment" id="gpt-encouragement-comment">GPT 격려 코멘트: 목표를 향해 꾸준히 나아가세요! 작은 변화가 큰 결과를 만듭니다.</p> <!-- ID 추가 -->
+                <p class="goal-text">
+                    나의 목표 점수 
+                    <input type="number" id="goal-score-input" min="1" max="100">점까지 
+                    <span id="points-remaining">XX</span>점 남았습니다.
+                </p>
+                <p class="gpt-comment" id="gpt-encouragement-comment">AI가 격려 코멘트를 생성 중입니다...</p>
             </section>
-            <section class="weekly-chart-section"> <h2>주간 건강 점수</h2> <div class="chart-container"> <canvas id="weeklyHealthChart"></canvas> </div> </section>
-            <section class="weekly-summary-section"> <h2>주간 요약</h2> <ul class="summary-list" id="weekly-summary-list"></ul> </section>
+
+            <section class="weekly-chart-section">
+                <h2>주간 건강 점수</h2>
+                <div class="chart-container">
+                    <canvas id="weeklyHealthChart"></canvas>
+                </div>
+            </section>
+
+            <section class="weekly-summary-section">
+                <h2>주간 요약</h2>
+                <ul class="summary-list" id="weekly-summary-list">
+                    <!-- JavaScript가 동적으로 채움 -->
+                </ul>
+            </section>
         </main>
     </div>
+
 <script>
+// Health_Report/health_report.html 스크립트
 document.addEventListener('DOMContentLoaded', function() {
     const loggedInUserEmail = localStorage.getItem('loggedInUserEmail');
     const sidebarProfilePic = document.getElementById('sidebar-profile-pic');
@@ -37,176 +74,124 @@ document.addEventListener('DOMContentLoaded', function() {
     const goalInput = document.getElementById('goal-score-input');
     const pointsRemainingSpan = document.getElementById('points-remaining');
     const summaryList = document.getElementById('weekly-summary-list');
-    const gptEncouragementCommentEl = document.getElementById('gpt-encouragement-comment'); // 코멘트 요소
+    const gptEncouragementCommentEl = document.getElementById('gpt-encouragement-comment');
     const loaderReport = document.getElementById('loader-overlay-report');
     
     const defaultProfilePicPath = '../image/user_profile_default.png';
     const defaultGoalScore = 70;
 
     const formatDate = (dt) => `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
-    function getWeekInfo(date = new Date()) {
-        const d = new Date(date);
-        const dayOfWeek = d.getDay(); 
-        const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; 
-        
-        const monday = new Date(d);
-        monday.setDate(d.getDate() + diffToMonday);
-        monday.setHours(0, 0, 0, 0); 
-        
-        const sunday = new Date(monday);
-        sunday.setDate(monday.getDate() + 6);
-        sunday.setHours(23, 59, 59, 999);
 
+    function getWeekInfo(date = new Date()) {
+        const d = new Date(date); const dayOfWeek = d.getDay(); 
+        const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+        const monday = new Date(d); monday.setDate(d.getDate() + diffToMonday); monday.setHours(0, 0, 0, 0);
+        const sunday = new Date(monday); sunday.setDate(monday.getDate() + 6); sunday.setHours(23, 59, 59, 999);
         const weekDates = [];
-        for (let i = 0; i < 7; i++) {
-            const currentDay = new Date(monday);
-            currentDay.setDate(monday.getDate() + i);
-            weekDates.push(formatDate(currentDay));
-        }
-        
-        return { 
-            startDateObj: monday, 
-            endDateObj: sunday,   
-            startString: formatDate(monday), 
-            endString: formatDate(sunday),   
-            allDatesString: weekDates        
-        };
+        for (let i = 0; i < 7; i++) { const day = new Date(monday); day.setDate(monday.getDate() + i); weekDates.push(formatDate(day));}
+        return { startDateObj: monday, endDateObj: sunday, startString: formatDate(monday), endString: formatDate(sunday), allDatesString: weekDates };
     }
 
-    // --- 지난 주 요약 데이터 업데이트 로직 ---
     function updateLastWeekSummaryIfNeeded() {
-        if (!loggedInUserEmail) return { daysRecorded: 0 }; // 로그인 안 했으면 기본값 반환
-
-        const today = new Date();
-        const currentWeekInfo = getWeekInfo(today);
+        if (!loggedInUserEmail) return { daysRecorded: 0, sleep: 0, meal: 0, exercise: 0, stress: 0, overall: 0 };
+        const today = new Date(); const currentWeekInfo = getWeekInfo(today);
         const lastWeekSummaryProcessedKey = `lastWeekSummaryProcessedForWeekStart_${loggedInUserEmail}`;
         const lastProcessedWeekStart = localStorage.getItem(lastWeekSummaryProcessedKey);
 
         if (lastProcessedWeekStart !== currentWeekInfo.startString) {
-            console.log(`지난 주 요약 업데이트 필요. (현재 주 시작: ${currentWeekInfo.startString}, 마지막 처리된 주 시작: ${lastProcessedWeekStart || '없음'})`);
-
-            const dateForLastWeek = new Date(today);
-            dateForLastWeek.setDate(today.getDate() - 7); 
-            const lastWeekDateInfo = getWeekInfo(dateForLastWeek); 
-
+            console.log("지난 주 요약 업데이트를 수행합니다.");
+            const dateForLastWeek = new Date(today); dateForLastWeek.setDate(today.getDate() - 7); 
+            const lastWeekDateInfo = getWeekInfo(dateForLastWeek);
             const dailyRecordsKey = `dailyRecords_${loggedInUserEmail}`;
             const userDailyRecords = JSON.parse(localStorage.getItem(dailyRecordsKey)) || {};
-            
-            const lastWeekAggregatedData = { sleep: [], meal: [], exercise: [], stress: [], overall: [] };
-            let daysRecordedLastWeek = 0;
-
+            const lastWeekAggData = { sleep: [], meal: [], exercise: [], stress: [], overall: [] };
+            let daysRecordedCount = 0;
             lastWeekDateInfo.allDatesString.forEach(dateKey => {
-                const record = userDailyRecords[dateKey];
-                if (record && record.log && record.analysis) {
-                    daysRecordedLastWeek++;
-                    lastWeekAggregatedData.sleep.push(parseFloat(record.log.sleep_hours) || 0);
-                    lastWeekAggregatedData.meal.push(parseInt(record.log.calories) || 0);
-                    lastWeekAggregatedData.exercise.push((parseInt(record.log.strength_minutes) || 0) + (parseInt(record.log.cardio_minutes) || 0));
-                    lastWeekAggregatedData.stress.push(parseInt(record.analysis.aiMentalAnalysis.stress_score) || 0);
-                    lastWeekAggregatedData.overall.push(parseInt(record.analysis.todayHealthScore) || 0);
+                const rec = userDailyRecords[dateKey];
+                if (rec && rec.log && rec.analysis) {
+                    daysRecordedCount++;
+                    lastWeekAggData.sleep.push(parseFloat(rec.log.sleep_hours) || 0);
+                    lastWeekAggData.meal.push(parseInt(rec.log.calories) || 0);
+                    lastWeekAggData.exercise.push((parseInt(rec.log.strength_minutes) || 0) + (parseInt(rec.log.cardio_minutes) || 0));
+                    lastWeekAggData.stress.push(parseInt(rec.analysis.aiMentalAnalysis.stress_score) || 0);
+                    lastWeekAggData.overall.push(parseInt(rec.analysis.todayHealthScore) || 0);
                 }
             });
-
-            const calculateAverage = (arr) => arr.length > 0 ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
-            
-            const newLastWeekSummary = {
-                sleep: calculateAverage(lastWeekAggregatedData.sleep),
-                meal: calculateAverage(lastWeekAggregatedData.meal),
-                exercise: calculateAverage(lastWeekAggregatedData.exercise) / 60, 
-                stress: calculateAverage(lastWeekAggregatedData.stress),
-                overall: calculateAverage(lastWeekAggregatedData.overall),
-                daysRecorded: daysRecordedLastWeek,
+            const calcAvg = (arr) => arr.length > 0 ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
+            const summary = {
+                sleep: calcAvg(lastWeekAggData.sleep), meal: calcAvg(lastWeekAggData.meal),
+                exercise: calcAvg(lastWeekAggData.exercise) / 60, stress: calcAvg(lastWeekAggData.stress),
+                overall: calcAvg(lastWeekAggData.overall), daysRecorded: daysRecordedCount,
                 weekStartDate: lastWeekDateInfo.startString 
             };
-
-            const lastWeekSummaryKey = `lastWeekSummary_${loggedInUserEmail}`;
-            localStorage.setItem(lastWeekSummaryKey, JSON.stringify(newLastWeekSummary));
+            localStorage.setItem(`lastWeekSummary_${loggedInUserEmail}`, JSON.stringify(summary));
             localStorage.setItem(lastWeekSummaryProcessedKey, currentWeekInfo.startString); 
-            
-            console.log("지난 주 요약 데이터 업데이트 완료:", newLastWeekSummary);
-            return newLastWeekSummary;
+            return summary;
         } else {
-            console.log("이번 주에는 이미 지난 주 요약 데이터가 업데이트되었습니다.");
-            const lastWeekSummaryKey = `lastWeekSummary_${loggedInUserEmail}`;
-            return JSON.parse(localStorage.getItem(lastWeekSummaryKey)) || { daysRecorded: 0, sleep: 0, meal: 0, exercise: 0, stress: 0, overall: 0 };
+            return JSON.parse(localStorage.getItem(`lastWeekSummary_${loggedInUserEmail}`)) || { daysRecorded: 0, sleep: 0, meal: 0, exercise: 0, stress: 0, overall: 0 };
         }
     }
 
-    // --- GPT 격려 코멘트 요청 함수 ---
-    async function fetchEncouragementComment(currentGoalScore, currentAvgScore, pointsRemaining) {
+    async function fetchEncouragementComment(currentGoal, currentAvg, remainingPts) {
         if (!loggedInUserEmail || !gptEncouragementCommentEl) return;
-        if(loaderReport) loaderReport.style.display = 'flex';
+        if (loaderReport) loaderReport.style.display = 'flex';
+        gptEncouragementCommentEl.textContent = "AI가 격려 코멘트를 생성 중입니다...";
 
-        // 최근 기록에서 취약점 찾기 (간단 예시 - 실제로는 더 정교하게)
         const dailyRecordsKey = `dailyRecords_${loggedInUserEmail}`;
         const userDailyRecords = JSON.parse(localStorage.getItem(dailyRecordsKey)) || {};
         const recordDates = Object.keys(userDailyRecords).sort((a,b) => new Date(b) - new Date(a));
-        let recentLogForPrompt = {};
-        if (recordDates.length > 0) {
-            recentLogForPrompt = userDailyRecords[recordDates[0]].log || {};
-        }
+        let recentLogData = {};
+        if (recordDates.length > 0) { recentLogData = userDailyRecords[recordDates[0]].log || {}; }
         
-        // 사용자 기본 정보도 가져오기 (API가 userInfo를 받을 수 있도록)
         const users = JSON.parse(localStorage.getItem('advisorGptUsers')) || [];
         const foundUser = users.find(user => user.email === loggedInUserEmail);
-        const userInfoForPrompt = foundUser ? {
-            age: parseInt(foundUser.age) || 30,
-            gender: foundUser.gender || 'female',
-            // 필요시 키, 몸무게도 추가
-        } : {age: 30, gender: 'female'};
-
+        const userInfo = foundUser ? { age: parseInt(foundUser.age) || 30, gender: foundUser.gender || 'female', height_cm: parseFloat(foundUser.height) || 160, weight_kg: parseFloat(foundUser.weight) || 55 } : {age: 30, gender: 'female', height_cm: 160, weight_kg: 55 };
 
         try {
-            const API_ENCOURAGEMENT_URL = 'https://gptadvisor.onrender.com/api/encouragement';
-            const response = await fetch(API_ENCOURAGEMENT_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    userInfo: userInfoForPrompt, // 사용자 기본 정보
-                    goalScore: currentGoalScore, 
-                    currentAvgScore: currentAvgScore,
-                    pointsRemaining: pointsRemaining,
-                    recentLog: recentLogForPrompt // 최근 기록 전달
-                })
+            const API_URL = 'https://gptadvisor.onrender.com/api/encouragement';
+            const response = await fetch(API_URL, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userInfo: userInfo, goalScore: currentGoal, currentAvgScore: currentAvg, pointsRemaining: remainingPts, recentLog: recentLogData })
             });
-            if (!response.ok) throw new Error(`격려 메시지 서버 오류: ${response.status}`);
+            if (!response.ok) {
+                const errData = await response.json().catch(()=>({comment: `서버 응답 오류: ${response.status}`}));
+                throw new Error(errData.comment || `서버 응답 오류: ${response.status}`);
+            }
             const data = await response.json();
-            gptEncouragementCommentEl.textContent = data.comment || "목표를 향해 화이팅! (AI 코멘트 로드 실패)";
+            gptEncouragementCommentEl.textContent = data.comment || "목표 달성을 응원합니다!";
         } catch (error) {
-            console.error("Error fetching encouragement comment:", error);
-            gptEncouragementCommentEl.textContent = "목표를 향해 꾸준히 나아가세요! 오늘도 좋은 하루 보내세요. (기본 메시지)";
+            console.error("격려 코멘트 요청 오류:", error);
+            gptEncouragementCommentEl.textContent = "목표를 향해 꾸준히 나아가세요! (코멘트 로드 실패)";
         } finally {
-            if(loaderReport) loaderReport.style.display = 'none';
+            if (loaderReport) loaderReport.style.display = 'none';
         }
     }
     
-    // --- 로그인 정보 및 사용자 UI 업데이트 ---
+    let averageThisWeekScore = 0; // 스코프 상향
+
     if (loggedInUserEmail) {
         const nickname = localStorage.getItem('userNickname') || 'User';
         const userSpecificProfileKey = 'userProfileImage_' + loggedInUserEmail;
         const profilePic = localStorage.getItem(userSpecificProfileKey) || localStorage.getItem('userProfileImage') || defaultProfilePicPath;
         if (sidebarProfilePic) { sidebarProfilePic.src = profilePic; sidebarProfilePic.alt = nickname + " 프로필"; }
         if (sidebarUsername) { sidebarUsername.textContent = nickname; }
-
         const userGoalScoreKey = 'userGoalScore_' + loggedInUserEmail;
         const storedGoalScore = localStorage.getItem(userGoalScoreKey);
-        goalInput.value = storedGoalScore ? parseInt(storedGoalScore) : defaultGoalScore;
+        if (goalInput) goalInput.value = storedGoalScore ? parseInt(storedGoalScore) : defaultGoalScore;
     } else {
         if (sidebarProfilePic) sidebarProfilePic.src = defaultProfilePicPath;
         if (sidebarUsername) sidebarUsername.textContent = 'User';
-        goalInput.value = defaultGoalScore;
+        if (goalInput) goalInput.value = defaultGoalScore;
     }
     
-    // --- 주간 건강 점수 데이터 로드 및 차트 업데이트 ---
     const labels = ['월', '화', '수', '목', '금', '토', '일'];
     let weeklyScoresForChart = new Array(7).fill(null);
-    let 이번주기록된점수들 = []; // 평균 계산 및 기록 일수 확인용
+    let 이번주기록된점수들 = [];
 
     if (loggedInUserEmail) {
         const dailyRecordsKey = `dailyRecords_${loggedInUserEmail}`;
         const userDailyRecords = JSON.parse(localStorage.getItem(dailyRecordsKey)) || {};
         const currentWeekDates = getWeekInfo().allDatesString;
-
         currentWeekDates.forEach((dateKey, index) => {
             const record = userDailyRecords[dateKey];
             if (record && record.analysis && typeof record.analysis.todayHealthScore === 'number') {
@@ -215,152 +200,64 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    
-    const averageThisWeekScore = 이번주기록된점수들.length > 0
-        ? 이번주기록된점수들.reduce((sum, score) => sum + score, 0) / 이번주기록된점수들.length
-        : 0;
+    averageThisWeekScore = 이번주기록된점수들.length > 0 ? 이번주기록된점수들.reduce((sum, score) => sum + score, 0) / 이번주기록된점수들.length : 0;
 
     function updatePointsAndComment() {
+        if (!goalInput || !pointsRemainingSpan) return;
         const currentGoalScoreVal = parseInt(goalInput.value) || defaultGoalScore;
         goalInput.value = Math.max(1, Math.min(100, currentGoalScoreVal));
-        const currentAvg = averageThisWeekScore; // 이미 계산된 값 사용
+        const currentAvg = averageThisWeekScore;
         const remaining = Math.max(0, parseInt(goalInput.value) - Math.round(currentAvg));
         pointsRemainingSpan.textContent = remaining;
-        
-        fetchEncouragementComment(parseInt(goalInput.value), currentAvg, remaining); // 격려 코멘트 요청
+        fetchEncouragementComment(parseInt(goalInput.value), currentAvg, remaining);
     }
     
-    goalInput.addEventListener('input', updatePointsAndComment); // input 이벤트에도 격려 코멘트 요청
-    goalInput.addEventListener('change', function() { 
-        updatePointsAndComment(); // 여기서도 격려 코멘트 요청
-        if (loggedInUserEmail) {
-            const userGoalScoreKey = 'userGoalScore_' + loggedInUserEmail;
-            localStorage.setItem(userGoalScoreKey, goalInput.value);
-        }
-    });
-    updatePointsRemaining();
-
+    if(goalInput) {
+        goalInput.addEventListener('input', updatePointsAndComment);
+        goalInput.addEventListener('change', function() { 
+            updatePointsAndComment();
+            if (loggedInUserEmail) {
+                localStorage.setItem(`userGoalScore_${loggedInUserEmail}`, goalInput.value);
+            }
+        });
+    }
+    
     const ctx = document.getElementById('weeklyHealthChart');
     if (ctx) {
         new Chart(ctx.getContext('2d'), {
             type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: '주간 건강 점수',
-                    data: weeklyScoresForChart,
-                    borderColor: '#3377DD',
-                    backgroundColor: 'rgba(51, 119, 221, 0.1)',
-                    tension: 0.1,
-                    fill: true,
-                    pointBackgroundColor: '#3377DD',
-                    pointBorderColor: '#FFFFFF',
-                    pointHoverBackgroundColor: '#FFFFFF',
-                    pointHoverBorderColor: '#3377DD',
-                    pointRadius: 5,
-                    pointHoverRadius: 7,
-                    borderWidth: 2,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: { beginAtZero: true, max: 100, min: 0, ticks: { stepSize: 10, color: '#555', font: { family: "'Noto Sans KR', sans-serif" } }, grid: { color: '#E0E0E0', drawBorder: false, } },
-                    x: { ticks: { color: '#555', font: { family: "'Noto Sans KR', sans-serif" } }, grid: { display: true, drawBorder: false } }
-                },
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        backgroundColor: 'rgba(0,0,0,0.7)', titleFont: { family: "'Noto Sans KR', sans-serif", size: 14 },
-                        bodyFont: { family: "'Noto Sans KR', sans-serif", size: 12 }, padding: 10, cornerRadius: 6, displayColors: false,
-                        callbacks: {
-                            label: function(context) {
-                                return context.parsed.y !== null ? `점수: ${context.parsed.y}` : '기록 없음';
-                            }
-                        }
-                    }
-                }
-            }
+            data: { labels: labels, datasets: [{ label: '주간 건강 점수', data: weeklyScoresForChart, borderColor: '#3377DD', backgroundColor: 'rgba(51, 119, 221, 0.1)', tension: 0.1, fill: true, pointBackgroundColor: '#3377DD', pointBorderColor: '#FFFFFF', pointHoverBackgroundColor: '#FFFFFF', pointHoverBorderColor: '#3377DD', pointRadius: 5, pointHoverRadius: 7, borderWidth: 2, }] },
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 100, min: 0, ticks: { stepSize: 10, color: '#555', font: { family: "'Noto Sans KR', sans-serif" } }, grid: { color: '#E0E0E0', drawBorder: false, } }, x: { ticks: { color: '#555', font: { family: "'Noto Sans KR', sans-serif" } }, grid: { display: true, drawBorder: false } } }, plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(0,0,0,0.7)', titleFont: { family: "'Noto Sans KR', sans-serif", size: 14 }, bodyFont: { family: "'Noto Sans KR', sans-serif", size: 12 }, padding: 10, cornerRadius: 6, displayColors: false, callbacks: { label: function(context) { return context.parsed.y !== null ? `점수: ${context.parsed.y}` : '기록 없음'; } } } } }
         });
-    } else {
-        console.error("Error: Canvas element #weeklyHealthChart not found.");
-    }
+    } else { console.error("Error: Canvas element #weeklyHealthChart not found."); }
 
-    // --- 주간 요약 UI 업데이트 함수 ---
-    function updateWeeklySummaryDisplay(thisWeekAverageData, lastWeekSummaryData) {
+    function updateWeeklySummaryDisplay(thisWeekAvgData, lastWeekAvgData) {
         if (!summaryList) return;
-        summaryList.innerHTML = ''; // 기존 목록 비우기
-
-        const daysRecordedThisWeek = thisWeekAverageData.daysRecorded;
-        const daysRecordedLastWeek = lastWeekSummaryData.daysRecorded || 0;
-
-        const summaryElements = {
-            sleep: { unit: "시간", name: "수면 시간" },
-            meal: { unit: "kcal", name: "식사량" },
-            exercise: { unit: "시간", name: "운동 시간" },
-            stress: { unit: "점", name: "스트레스 지수" },
-            overall: { unit: "점", name: "건강 점수" }
-        };
-
-        Object.keys(summaryElements).forEach(type => {
-            const li = document.createElement('li');
-            const img = document.createElement('img');
+        summaryList.innerHTML = '';
+        const daysThisWeek = thisWeekAvgData.daysRecorded;
+        const daysLastWeek = lastWeekAvgData.daysRecorded || 0;
+        const elements = { sleep: { unit: "시간", name: "수면 시간" }, meal: { unit: "kcal", name: "식사량" }, exercise: { unit: "시간", name: "운동 시간" }, stress: { unit: "점", name: "스트레스 지수" }, overall: { unit: "점", name: "건강 점수" } };
+        Object.keys(elements).forEach(type => {
+            const li = document.createElement('li'); const img = document.createElement('img');
             img.src = `../image/${ type === 'sleep' ? 'icon_sleep_moon_right.png' : type === 'meal' ? 'icon_meal_bowl_center.png' : type === 'exercise' ? 'icon_exercise_dumbbell_center.png' : type === 'stress' ? 'icon_stress_head_center.png' : 'icon_health_score.png' }`;
-            img.alt = summaryElements[type].name; 
-            img.classList.add('summary-icon');
-            
-            const span = document.createElement('span');
-            
-            const currentAvg = thisWeekAverageData[type];
-            const lastAvg = lastWeekSummaryData[type] || 0;
-            
-            let changeText = "";
-            let percentageChange = 0; // 비교를 위해 초기화
-
-            if (daysRecordedThisWeek === 0) {
-                changeText = `<strong class="highlight-gray">비교 불가(이번주 기록 X)</strong>`;
-            } else if (daysRecordedLastWeek === 0) {
-                changeText = `<strong class="highlight-gray">비교 불가(지난주 기록 X)</strong>`;
-            } else {
-                if (lastAvg === currentAvg) {
-                    changeText = `<strong class="highlight-blue">동일</strong>`;
-                } else if (lastAvg !== 0) { 
-                    percentageChange = ((currentAvg - lastAvg) / lastAvg) * 100;
-                    if (percentageChange > 0) {
-                        changeText = `<strong class="highlight-green">${Math.abs(percentageChange).toFixed(0)}% 증가</strong>`;
-                    } else {
-                        changeText = `<strong class="highlight-red">${Math.abs(percentageChange).toFixed(0)}% 감소</strong>`;
-                    }
-                } else if (currentAvg > 0) { 
-                    changeText = `<strong class="highlight-green">이번주 기록 시작</strong>`;
-                } else { 
-                     changeText = `<strong class="highlight-gray">비교 불가(기록 X)</strong>`; // 둘 다 0이거나 lastAvg만 0이고 currentAvg도 0일 때
-                }
-            }
-            
-            let baseText = `이번 주 평균 ${summaryElements[type].name}은 <strong class="highlight-blue">${currentAvg.toFixed(type === 'exercise' || type === 'sleep' ? 1 : 0)}${summaryElements[type].unit}</strong>으로 지난 주 대비 ${changeText}합니다.`;
-            if (daysRecordedThisWeek > 0) {
-                baseText += ` (총 ${daysRecordedThisWeek}일 기록)`;
-            }
-            if (type === 'stress' && currentAvg > 0) baseText += " (점수가 낮을수록 긍정적입니다.)";
-            if (type === 'overall' && percentageChange > 0) baseText += "!"; // 건강점수 증가 시 느낌표
-            
-            span.innerHTML = baseText;
-            li.appendChild(img); 
-            li.appendChild(span); 
-            summaryList.appendChild(li);
+            img.alt = elements[type].name; img.classList.add('summary-icon');
+            const span = document.createElement('span'); const current = thisWeekAvgData[type]; const last = lastWeekAvgData[type] || 0;
+            let changeText = ""; let percChange = 0;
+            if (daysThisWeek === 0) changeText = `<strong class="highlight-gray">이번주 기록 X</strong>`;
+            else if (daysLastWeek === 0) changeText = `<strong class="highlight-gray">지난주 기록 X</strong>`;
+            else { if (last === current) changeText = `<strong class="highlight-blue">동일</strong>`; else if (last !== 0) { percChange = ((current - last) / last) * 100; if (percChange > 0) changeText = `<strong class="highlight-green">${Math.abs(percChange).toFixed(0)}% 증가</strong>`; else changeText = `<strong class="highlight-red">${Math.abs(percChange).toFixed(0)}% 감소</strong>`; } else if (current > 0) changeText = `<strong class="highlight-green">기록 시작</strong>`; else changeText = `<strong class="highlight-gray">변동 없음</strong>`; }
+            let base = `이번 주 평균 ${elements[type].name}은 <strong class="highlight-blue">${current.toFixed(type === 'exercise' || type === 'sleep' ? 1 : 0)}${elements[type].unit}</strong>으로 지난 주 대비 ${changeText}합니다.`;
+            if (daysThisWeek > 0) base += ` (총 ${daysThisWeek}일 기록)`;
+            if (type === 'stress' && current > 0) base += " (낮을수록 긍정)";
+            if (type === 'overall' && percChange > 0) base += "!";
+            span.innerHTML = base; li.appendChild(img); li.appendChild(span); summaryList.appendChild(li);
         });
     }
-
-    // --- 초기 실행 로직 ---
-    const lastWeekFinalSummary = updateLastWeekSummaryIfNeeded(); // 1. 지난주 데이터 처리/로드
     
-    // 2. 이번 주 데이터 집계 (주간 요약 표시용)
+    const lastWeekFinalSummary = updateLastWeekSummaryIfNeeded();
     const currentWeekDatesForSummary = getWeekInfo().allDatesString;
     const thisWeekAggregatedData = { sleep: [], meal: [], exercise: [], stress: [], overall: [] };
     let thisWeekDaysRecordedCount = 0;
-
     if (loggedInUserEmail) {
         const dailyRecordsKey = `dailyRecords_${loggedInUserEmail}`;
         const userDailyRecords = JSON.parse(localStorage.getItem(dailyRecordsKey)) || {};
@@ -376,30 +273,21 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    updatePointsAndComment();
     const calculateAverageForSummary = (arr) => arr.length > 0 ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
     const avgThisWeekForSummaryDisplay = {
-        sleep: calculateAverageForSummary(thisWeekAggregatedData.sleep),
-        meal: calculateAverageForSummary(thisWeekAggregatedData.meal),
-        exercise: calculateAverageForSummary(thisWeekAggregatedData.exercise) / 60,
-        stress: calculateAverageForSummary(thisWeekAggregatedData.stress),
-        overall: calculateAverageForSummary(thisWeekAggregatedData.overall),
-        daysRecorded: thisWeekDaysRecordedCount // 기록된 날짜 수 추가
+        sleep: calculateAverageForSummary(thisWeekAggregatedData.sleep), meal: calculateAverageForSummary(thisWeekAggregatedData.meal),
+        exercise: calculateAverageForSummary(thisWeekAggregatedData.exercise) / 60, stress: calculateAverageForSummary(thisWeekAggregatedData.stress),
+        overall: calculateAverageForSummary(thisWeekAggregatedData.overall), daysRecorded: thisWeekDaysRecordedCount
     };
-
-    // 3. 주간 요약 UI 업데이트
     updateWeeklySummaryDisplay(avgThisWeekForSummaryDisplay, lastWeekFinalSummary);
+    updatePointsAndComment();
 
-    // 4. 사이드바 활성화 (이전과 동일)
     const currentReportPath = "health_report.html";
     const sidebarMenuLinks = document.querySelectorAll('#sidebar-menu li a');
     sidebarMenuLinks.forEach(link => { link.parentElement.classList.remove('active'); });
     const healthReportLinkFromList = Array.from(sidebarMenuLinks).find(a => {
-        const linkHref = a.getAttribute('href');
-        const iconSrc = a.parentElement.querySelector('.menu-icon') ? a.parentElement.querySelector('.menu-icon').src : '';
-        return (linkHref && linkHref.includes(currentReportPath)) ||
-                (linkHref === "../Health_Report/health_report.html") ||
-                (linkHref === "#" && iconSrc.includes('icon_health_report'));
+        const linkHref = a.getAttribute('href'); const iconSrc = a.parentElement.querySelector('.menu-icon') ? a.parentElement.querySelector('.menu-icon').src : '';
+        return (linkHref && linkHref.includes(currentReportPath)) || (linkHref === "../Health_Report/health_report.html") || (linkHref === "#" && iconSrc.includes('icon_health_report'));
     });
     if (healthReportLinkFromList) { healthReportLinkFromList.parentElement.classList.add('active');
     } else { document.querySelector('#sidebar-menu li a[href*="health_report.html"]')?.parentElement.classList.add('active'); }
