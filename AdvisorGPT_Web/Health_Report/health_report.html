@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AdvisorGPT 건강 리포트</title>
-    <link rel="stylesheet" href="../Main_Page/style.css"> <!-- 공통 스타일 -->
-    <link rel="stylesheet" href="style_report.css">   <!-- 이 페이지 전용 스타일 -->
+    <link rel="stylesheet" href="../Main_Page/style.css"> <!-- 기본 스타일 상속 -->
+    <link rel="stylesheet" href="style_report.css"> <!-- 리포트 페이지 전용 스타일 -->
     <link href="https://fonts.googleapis.com/css2?family=Mulish&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- 로딩 스피너 CSS -->
@@ -41,11 +41,15 @@
         <!-- Main Content for Health Report -->
         <main class="main-content report-content">
             <section class="goal-status-section">
-                <p class="goal-text">
-                    나의 목표 점수 
-                    <input type="number" id="goal-score-input" min="1" max="100">점까지 
-                    <span id="points-remaining">XX</span>점 남았습니다.
-                </p>
+                <div class="goal-setting-area">
+                    <p class="goal-text">
+                        나의 목표 점수 
+                        <input type="number" id="goal-score-input" min="0" max="100">점까지 
+                        <span id="points-remaining">XX</span>점 남았습니다.
+                    </p>
+                    <button id="set-goal-button" class="set-goal-btn">설정 완료</button>
+                    <span id="goal-error-message" class="error-message"></span>
+                </div>
                 <p class="gpt-comment" id="gpt-encouragement-comment">AI가 격려 코멘트를 생성 중입니다...</p>
             </section>
 
@@ -72,6 +76,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const sidebarProfilePic = document.getElementById('sidebar-profile-pic');
     const sidebarUsername = document.getElementById('sidebar-username');
     const goalInput = document.getElementById('goal-score-input');
+    const setGoalButton = document.getElementById('set-goal-button');
+    const goalErrorMessageEl = document.getElementById('goal-error-message');
     const pointsRemainingSpan = document.getElementById('points-remaining');
     const summaryList = document.getElementById('weekly-summary-list');
     const gptEncouragementCommentEl = document.getElementById('gpt-encouragement-comment');
@@ -97,7 +103,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const today = new Date(); const currentWeekInfo = getWeekInfo(today);
         const lastWeekSummaryProcessedKey = `lastWeekSummaryProcessedForWeekStart_${loggedInUserEmail}`;
         const lastProcessedWeekStart = localStorage.getItem(lastWeekSummaryProcessedKey);
-
         if (lastProcessedWeekStart !== currentWeekInfo.startString) {
             console.log("지난 주 요약 업데이트를 수행합니다.");
             const dateForLastWeek = new Date(today); dateForLastWeek.setDate(today.getDate() - 7); 
@@ -145,29 +150,29 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const users = JSON.parse(localStorage.getItem('advisorGptUsers')) || [];
         const foundUser = users.find(user => user.email === loggedInUserEmail);
-        const userInfo = foundUser ? { age: parseInt(foundUser.age) || 30, gender: foundUser.gender || 'female', height_cm: parseFloat(foundUser.height) || 160, weight_kg: parseFloat(foundUser.weight) || 55 } : {age: 30, gender: 'female', height_cm: 160, weight_kg: 55 };
+        const userInfoForPrompt = foundUser ? { age: parseInt(foundUser.age) || 30, gender: foundUser.gender || 'female', height_cm: parseFloat(foundUser.height) || 160, weight_kg: parseFloat(foundUser.weight) || 55 } : {age: 30, gender: 'female', height_cm: 160, weight_kg: 55 };
 
         try {
             const API_URL = 'https://gptadvisor.onrender.com/api/encouragement';
             const response = await fetch(API_URL, {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userInfo: userInfo, goalScore: currentGoal, currentAvgScore: currentAvg, pointsRemaining: remainingPts, recentLog: recentLogData })
+                body: JSON.stringify({ userInfo: userInfoForPrompt, goalScore: currentGoal, currentAvgScore: currentAvg, pointsRemaining: remainingPts, recentLog: recentLogData })
             });
             if (!response.ok) {
-                const errData = await response.json().catch(()=>({comment: `서버 응답 오류: ${response.status}`}));
-                throw new Error(errData.comment || `서버 응답 오류: ${response.status}`);
+                const errData = await response.json().catch(()=>({comment: `격려 메시지 서버 오류: ${response.status}`}));
+                throw new Error(errData.comment || `격려 메시지 서버 오류: ${response.status}`);
             }
             const data = await response.json();
-            gptEncouragementCommentEl.textContent = data.comment || "목표 달성을 응원합니다!";
+            gptEncouragementCommentEl.textContent = "GPT의 격려 한마디: " + (data.comment || "목표를 향해 화이팅! (코멘트 없음)");
         } catch (error) {
             console.error("격려 코멘트 요청 오류:", error);
-            gptEncouragementCommentEl.textContent = "목표를 향해 꾸준히 나아가세요! (코멘트 로드 실패)";
+            gptEncouragementCommentEl.textContent = "GPT의 격려 한마디: 목표를 향해 꾸준히 나아가세요! (코멘트 로드 실패)";
         } finally {
             if (loaderReport) loaderReport.style.display = 'none';
         }
     }
     
-    let averageThisWeekScore = 0; // 스코프 상향
+    let averageThisWeekScore = 0;
 
     if (loggedInUserEmail) {
         const nickname = localStorage.getItem('userNickname') || 'User';
@@ -175,15 +180,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const profilePic = localStorage.getItem(userSpecificProfileKey) || localStorage.getItem('userProfileImage') || defaultProfilePicPath;
         if (sidebarProfilePic) { sidebarProfilePic.src = profilePic; sidebarProfilePic.alt = nickname + " 프로필"; }
         if (sidebarUsername) { sidebarUsername.textContent = nickname; }
-        const userGoalScoreKey = 'userGoalScore_' + loggedInUserEmail;
-        const storedGoalScore = localStorage.getItem(userGoalScoreKey);
-        if (goalInput) goalInput.value = storedGoalScore ? parseInt(storedGoalScore) : defaultGoalScore;
     } else {
         if (sidebarProfilePic) sidebarProfilePic.src = defaultProfilePicPath;
         if (sidebarUsername) sidebarUsername.textContent = 'User';
-        if (goalInput) goalInput.value = defaultGoalScore;
     }
     
+    // 주간 건강 점수 데이터 로드 (averageThisWeekScore 계산 먼저)
     const labels = ['월', '화', '수', '목', '금', '토', '일'];
     let weeklyScoresForChart = new Array(7).fill(null);
     let 이번주기록된점수들 = [];
@@ -202,47 +204,134 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     averageThisWeekScore = 이번주기록된점수들.length > 0 ? 이번주기록된점수들.reduce((sum, score) => sum + score, 0) / 이번주기록된점수들.length : 0;
 
-    function updatePointsAndComment() {
+    // "남은 점수"만 업데이트하는 함수
+    function updatePointsRemainingDisplay() {
         if (!goalInput || !pointsRemainingSpan) return;
-        const currentGoalScoreVal = parseInt(goalInput.value) || defaultGoalScore;
-        goalInput.value = Math.max(1, Math.min(100, currentGoalScoreVal));
+        const currentGoalScoreVal = goalInput.value === "" ? "" : (parseInt(goalInput.value) || 0);
         const currentAvg = averageThisWeekScore;
-        const remaining = Math.max(0, parseInt(goalInput.value) - Math.round(currentAvg));
-        pointsRemainingSpan.textContent = remaining;
-        fetchEncouragementComment(parseInt(goalInput.value), currentAvg, remaining);
+        let remainingText = "XX"; 
+        if (currentGoalScoreVal !== "" && currentGoalScoreVal >= 0 && currentGoalScoreVal <=100) {
+             const remainingNum = Math.max(0, currentGoalScoreVal - Math.round(currentAvg));
+             remainingText = isNaN(remainingNum) ? "XX" : remainingNum;
+        }
+        pointsRemainingSpan.textContent = remainingText;
     }
     
-    if(goalInput) {
-        goalInput.addEventListener('input', updatePointsAndComment);
-        goalInput.addEventListener('change', function() { 
-            updatePointsAndComment();
+    // 목표 점수 입력 시 "남은 점수" 즉시 업데이트
+    if (goalInput) {
+        goalInput.addEventListener('input', updatePointsRemainingDisplay);
+    }
+
+    // "설정 완료" 버튼 클릭 이벤트
+    if (setGoalButton && goalInput && pointsRemainingSpan && gptEncouragementCommentEl) {
+        setGoalButton.addEventListener('click', function() {
+            goalErrorMessageEl.textContent = ''; 
+            const currentGoalScoreStr = goalInput.value.trim();
+            let currentGoalScoreNum;
+
+            if (currentGoalScoreStr === "") {
+                goalErrorMessageEl.textContent = "목표 점수는 공백으로 설정할 수 없습니다.";
+                return;
+            }
+            
+            currentGoalScoreNum = parseInt(currentGoalScoreStr);
+
+            if (isNaN(currentGoalScoreNum) || currentGoalScoreNum < 0 || currentGoalScoreNum > 100) {
+                goalErrorMessageEl.textContent = "목표 점수는 0점에서 100점 사이로 입력해주세요.";
+                // goalInput.value = Math.max(0, Math.min(100, currentGoalScoreNum || defaultGoalScore)); // 유효성 검사 실패 시 값 변경 안 함
+                updatePointsRemainingDisplay(); // 현재 값 기준으로 남은 점수만 업데이트
+                return;
+            }
+            if (currentGoalScoreNum === 0) {
+                goalErrorMessageEl.textContent = "목표 점수는 0점으로 설정할 수 없습니다.";
+                return;
+            }
+            // 현재 평균 점수가 로드된 후에 비교
+            const currentAvgRounded = Math.round(averageThisWeekScore);
+            if (currentGoalScoreNum <= currentAvgRounded) {
+                goalErrorMessageEl.textContent = "목표 점수는 현재 평균 점수(" + currentAvgRounded + "점)보다 같거나 낮을 수 없습니다.";
+                return;
+            }
+
+            // 유효성 검사 통과
+            goalInput.value = currentGoalScoreNum; // 정제된 값으로 입력칸 업데이트
+            updatePointsRemainingDisplay(); // 최종 남은 점수 표시
+            
             if (loggedInUserEmail) {
-                localStorage.setItem(`userGoalScore_${loggedInUserEmail}`, goalInput.value);
+                const userGoalScoreKey = 'userGoalScore_' + loggedInUserEmail;
+                localStorage.setItem(userGoalScoreKey, goalInput.value);
+                alert("목표 점수가 성공적으로 저장되었습니다!");
+                fetchEncouragementComment(parseInt(goalInput.value), averageThisWeekScore, parseInt(pointsRemainingSpan.textContent));
             }
         });
     }
     
+    // 페이지 로드 시 초기화
+    if (loggedInUserEmail) {
+        const userGoalScoreKey = `userGoalScore_${loggedInUserEmail}`;
+        const storedGoalScore = localStorage.getItem(userGoalScoreKey);
+        if (goalInput) goalInput.value = storedGoalScore ? parseInt(storedGoalScore) : defaultGoalScore;
+    } else {
+        if (goalInput) goalInput.value = defaultGoalScore;
+    }
+    updatePointsRemainingDisplay(); 
+    if (goalInput && pointsRemainingSpan && gptEncouragementCommentEl) { // 요소들이 모두 로드되었는지 확인 후 호출
+        const initialRemaining = pointsRemainingSpan.textContent === "XX" 
+            ? (parseInt(goalInput.value) || defaultGoalScore) - Math.round(averageThisWeekScore) 
+            : parseInt(pointsRemainingSpan.textContent);
+        fetchEncouragementComment(parseInt(goalInput.value), averageThisWeekScore, Math.max(0, initialRemaining) );
+    }
+
+    // Chart.js 설정
     const ctx = document.getElementById('weeklyHealthChart');
     if (ctx) {
         new Chart(ctx.getContext('2d'), {
             type: 'line',
-            data: { labels: labels, datasets: [{ label: '주간 건강 점수', data: weeklyScoresForChart, borderColor: '#3377DD', backgroundColor: 'rgba(51, 119, 221, 0.1)', tension: 0.1, fill: true, pointBackgroundColor: '#3377DD', pointBorderColor: '#FFFFFF', pointHoverBackgroundColor: '#FFFFFF', pointHoverBorderColor: '#3377DD', pointRadius: 5, pointHoverRadius: 7, borderWidth: 2, }] },
-            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 100, min: 0, ticks: { stepSize: 10, color: '#555', font: { family: "'Noto Sans KR', sans-serif" } }, grid: { color: '#E0E0E0', drawBorder: false, } }, x: { ticks: { color: '#555', font: { family: "'Noto Sans KR', sans-serif" } }, grid: { display: true, drawBorder: false } } }, plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(0,0,0,0.7)', titleFont: { family: "'Noto Sans KR', sans-serif", size: 14 }, bodyFont: { family: "'Noto Sans KR', sans-serif", size: 12 }, padding: 10, cornerRadius: 6, displayColors: false, callbacks: { label: function(context) { return context.parsed.y !== null ? `점수: ${context.parsed.y}` : '기록 없음'; } } } } }
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: '주간 건강 점수', data: weeklyScoresForChart, borderColor: '#3377DD',
+                    backgroundColor: 'rgba(51, 119, 221, 0.1)', tension: 0.1, fill: true,
+                    pointBackgroundColor: '#3377DD', pointBorderColor: '#FFFFFF',
+                    pointHoverBackgroundColor: '#FFFFFF', pointHoverBorderColor: '#3377DD',
+                    pointRadius: 5, pointHoverRadius: 7, borderWidth: 2,
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, max: 100, min: 0, ticks: { stepSize: 10, color: '#555', font: { family: "'Noto Sans KR', sans-serif" } }, grid: { color: '#E0E0E0', drawBorder: false, } },
+                    x: { ticks: { color: '#555', font: { family: "'Noto Sans KR', sans-serif" } }, grid: { display: true, drawBorder: false } }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(0,0,0,0.7)', titleFont: { family: "'Noto Sans KR', sans-serif", size: 14 },
+                        bodyFont: { family: "'Noto Sans KR', sans-serif", size: 12 }, padding: 10, cornerRadius: 6, displayColors: false,
+                        callbacks: { label: function(context) { return context.parsed.y !== null ? `점수: ${context.parsed.y}` : '기록 없음'; } }
+                    }
+                }
+            }
         });
     } else { console.error("Error: Canvas element #weeklyHealthChart not found."); }
 
-    function updateWeeklySummaryDisplay(thisWeekAvgData, lastWeekAvgData) {
+    // 주간 요약 UI 업데이트 함수
+    function updateWeeklySummaryDisplay(thisWeekAverageData, lastWeekSummaryData) {
         if (!summaryList) return;
         summaryList.innerHTML = '';
-        const daysThisWeek = thisWeekAvgData.daysRecorded;
-        const daysLastWeek = lastWeekAvgData.daysRecorded || 0;
-        const elements = { sleep: { unit: "시간", name: "수면 시간" }, meal: { unit: "kcal", name: "식사량" }, exercise: { unit: "시간", name: "운동 시간" }, stress: { unit: "점", name: "스트레스 지수" }, overall: { unit: "점", name: "건강 점수" } };
+        const daysThisWeek = thisWeekAverageData.daysRecorded;
+        const daysLastWeek = lastWeekSummaryData.daysRecorded || 0;
+        const elements = {
+            sleep: { unit: "시간", name: "수면 시간" }, meal: { unit: "kcal", name: "식사량" },
+            exercise: { unit: "시간", name: "운동 시간" }, stress: { unit: "점", name: "스트레스 지수" },
+            overall: { unit: "점", name: "건강 점수" }
+        };
         Object.keys(elements).forEach(type => {
             const li = document.createElement('li'); const img = document.createElement('img');
             img.src = `../image/${ type === 'sleep' ? 'icon_sleep_moon_right.png' : type === 'meal' ? 'icon_meal_bowl_center.png' : type === 'exercise' ? 'icon_exercise_dumbbell_center.png' : type === 'stress' ? 'icon_stress_head_center.png' : 'icon_health_score.png' }`;
             img.alt = elements[type].name; img.classList.add('summary-icon');
-            const span = document.createElement('span'); const current = thisWeekAvgData[type]; const last = lastWeekAvgData[type] || 0;
-            let changeText = ""; let percChange = 0;
+            const span = document.createElement('span'); const current = thisWeekAverageData[type];
+            const last = lastWeekSummaryData[type] || 0; let changeText = ""; let percChange = 0;
             if (daysThisWeek === 0) changeText = `<strong class="highlight-gray">이번주 기록 X</strong>`;
             else if (daysLastWeek === 0) changeText = `<strong class="highlight-gray">지난주 기록 X</strong>`;
             else { if (last === current) changeText = `<strong class="highlight-blue">동일</strong>`; else if (last !== 0) { percChange = ((current - last) / last) * 100; if (percChange > 0) changeText = `<strong class="highlight-green">${Math.abs(percChange).toFixed(0)}% 증가</strong>`; else changeText = `<strong class="highlight-red">${Math.abs(percChange).toFixed(0)}% 감소</strong>`; } else if (current > 0) changeText = `<strong class="highlight-green">기록 시작</strong>`; else changeText = `<strong class="highlight-gray">변동 없음</strong>`; }
@@ -280,8 +369,8 @@ document.addEventListener('DOMContentLoaded', function() {
         overall: calculateAverageForSummary(thisWeekAggregatedData.overall), daysRecorded: thisWeekDaysRecordedCount
     };
     updateWeeklySummaryDisplay(avgThisWeekForSummaryDisplay, lastWeekFinalSummary);
-    updatePointsAndComment();
 
+    // 사이드바 활성화
     const currentReportPath = "health_report.html";
     const sidebarMenuLinks = document.querySelectorAll('#sidebar-menu li a');
     sidebarMenuLinks.forEach(link => { link.parentElement.classList.remove('active'); });
