@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AdvisorGPT 건강 리포트</title>
+    <title>AdvisorGPT</title>
     <link rel="stylesheet" href="../Main_Page/style.css"> <!-- 기본 스타일 상속 -->
     <link rel="stylesheet" href="style_report.css"> <!-- 리포트 페이지 전용 스타일 -->
     <link href="https://fonts.googleapis.com/css2?family=Mulish&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
@@ -166,7 +166,7 @@ document.addEventListener('DOMContentLoaded', function() {
             gptEncouragementCommentEl.textContent = "GPT의 격려 한마디: " + (data.comment || "목표를 향해 화이팅! (코멘트 없음)");
         } catch (error) {
             console.error("격려 코멘트 요청 오류:", error);
-            gptEncouragementCommentEl.textContent = "GPT의 격려 한마디: 목표를 향해 꾸준히 나아가세요! (코멘트 로드 실패)";
+            gptEncouragementCommentEl.textContent = "GPT의 격려 한마디(기본본): 목표를 향해 꾸준히 나아가세요!";
         } finally {
             if (loaderReport) loaderReport.style.display = 'none';
         }
@@ -332,10 +332,10 @@ document.addEventListener('DOMContentLoaded', function() {
             img.alt = elements[type].name; img.classList.add('summary-icon');
             const span = document.createElement('span'); const current = thisWeekAverageData[type];
             const last = lastWeekSummaryData[type] || 0; let changeText = ""; let percChange = 0;
-            if (daysThisWeek === 0) changeText = `<strong class="highlight-gray">이번주 기록 X</strong>`;
-            else if (daysLastWeek === 0) changeText = `<strong class="highlight-gray">지난주 기록 X</strong>`;
-            else { if (last === current) changeText = `<strong class="highlight-blue">동일</strong>`; else if (last !== 0) { percChange = ((current - last) / last) * 100; if (percChange > 0) changeText = `<strong class="highlight-green">${Math.abs(percChange).toFixed(0)}% 증가</strong>`; else changeText = `<strong class="highlight-red">${Math.abs(percChange).toFixed(0)}% 감소</strong>`; } else if (current > 0) changeText = `<strong class="highlight-green">기록 시작</strong>`; else changeText = `<strong class="highlight-gray">변동 없음</strong>`; }
-            let base = `이번 주 평균 ${elements[type].name}은 <strong class="highlight-blue">${current.toFixed(type === 'exercise' || type === 'sleep' ? 1 : 0)}${elements[type].unit}</strong>으로 지난 주 대비 ${changeText}합니다.`;
+            if (daysThisWeek === 0) changeText = `<strong class="highlight-gray">이번주 기록이 없어 비교 불가</strong>`;
+            else if (daysLastWeek === 0) changeText = `<strong class="highlight-gray">지난주 기록이 없어 비교 불가</strong>`;
+            else { if (last === current) changeText = `<strong class="highlight-blue">동일</strong>`; else if (last !== 0) { percChange = ((current - last) / last) * 100; if (percChange > 0) changeText = `<strong class="highlight-green">${Math.abs(percChange).toFixed(0)}% 증가</strong>`; else changeText = `<strong class="highlight-red">${Math.abs(percChange).toFixed(0)}% 감소</strong>`; } else if (current > 0) changeText = `<strong class="highlight-green">기록 시작</strong>`; else changeText = `<strong class="highlight-gray">동일</strong>`; }
+            let base = `이번 주 평균 ${elements[type].name}은 <strong class="highlight-blue">${current.toFixed(type === 'exercise' || type === 'sleep' ? 1 : 0)}${elements[type].unit}</strong>으로 지난 주 대비 ${changeText}했습니다.`;
             if (daysThisWeek > 0) base += ` (총 ${daysThisWeek}일 기록)`;
             if (type === 'stress' && current > 0) base += " (낮을수록 긍정)";
             if (type === 'overall' && percChange > 0) base += "!";
